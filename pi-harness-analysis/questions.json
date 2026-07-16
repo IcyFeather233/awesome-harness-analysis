@@ -1,0 +1,47 @@
+{
+  "questions": [
+    {
+      "id": "Q-001",
+      "next_experiment": "对同一 faux script 做 AgentSession/AgentHarness differential test。",
+      "priority": "high",
+      "question": "Coding Agent 何时以及如何迁移到新 AgentHarness？迁移前两套编排语义会怎样保持一致？",
+      "status": "open"
+    },
+    {
+      "id": "Q-002",
+      "next_experiment": "在 Node 24 + QEMU 或容器环境运行 side-effect matrix。",
+      "priority": "high",
+      "question": "外部 Gondolin/Docker/OpenShell 路径是否覆盖全部 extension tools、用户 ! bash 与凭证边界？",
+      "status": "open"
+    },
+    {
+      "id": "Q-003",
+      "next_experiment": "复制合成 session，逐类破坏 header/middle/tail/parentId 并恢复。",
+      "priority": "medium",
+      "question": "部分损坏 JSONL 的恢复策略是跳过、拒绝还是可能静默改变 active branch？",
+      "status": "open"
+    },
+    {
+      "id": "Q-004",
+      "next_experiment": "用 faux provider 分别在 interactive/json/rpc 触发 project agent。",
+      "priority": "medium",
+      "question": "可选 subagent extension 的 project-agent confirmation 在 JSON/RPC headless 模式下如何退化？",
+      "status": "open"
+    },
+    {
+      "id": "Q-005",
+      "next_experiment": "确认 provider 是否支持 request body extension/chat_template_kwargs。",
+      "priority": "medium",
+      "question": "SiFlow endpoint 如何在 Pi models.json 中稳定关闭服务端 thinking？",
+      "status": "open"
+    },
+    {
+      "id": "Q-006",
+      "next_experiment": "spawn instance 后 kill supervisor 并运行 recoverAfterRestart。",
+      "priority": "low",
+      "question": "experimental orchestrator 的 crash/restart 是否可恢复运行中的 RPC instance，而非仅把记录标记 stopped？",
+      "status": "open"
+    }
+  ],
+  "schema_version": "1.0"
+}

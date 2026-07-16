@@ -1,0 +1,40 @@
+Use case: infographic-diagram
+Asset type: reader-facing permission and trust-boundary illustration
+Primary request: Explain Pi's default side-effect path and separate three commonly confused boundaries: startup project trust, optional tool policy, and external isolation.
+
+Mandatory layout and arrows:
+- Draw one dominant solid horizontal default path through the center: "Agent loop" -> "Built-in tools" -> "Host process" -> "Workspace".
+- Add a small prominent badge beside the default path containing exactly "No default approval".
+- Above the left side, draw a separate startup-only mini-flow: "Startup resources" -> "Project trust" -> "Extensions / settings". Label its connecting bracket "startup only". It must not connect into the runtime tool path.
+- Above "Built-in tools", place "Optional extension gate" as a dashed detour with a small badge "OPT" and a short outcome label "allow / block / rewrite". The solid default path must visibly bypass this optional detour.
+- Around or outside "Host process" and "Workspace", draw a dashed boundary labeled "External container / VM" with a small badge "OPT". It represents deployment isolation outside Pi.
+- Below the main path, place "Custom extension tools" with a solid arrow to "Host process" and a small warning label "host by default". This shows why partial routed-tool isolation may not cover every custom tool.
+- Use loop, toolbox, process, folder, startup file, trust check, shield, warning, and container icons.
+
+Text (verbatim, case-sensitive):
+"Agent loop"
+"Built-in tools"
+"Host process"
+"Workspace"
+"No default approval"
+"Startup resources"
+"Project trust"
+"Extensions / settings"
+"startup only"
+"Optional extension gate"
+"allow / block / rewrite"
+"External container / VM"
+"Custom extension tools"
+"host by default"
+"OPT"
+
+Style and visual hierarchy:
+- Clean academic security-boundary infographic with friendly hand-sketched geometry, large icons, bold dark-gray outlines, flat semantic colors, and thick directional arrows.
+- White background. Coral runtime loop, blue tools, gray host execution, green workspace, amber optional policy, and dashed gray external isolation.
+- The center default path must be obvious before any text is read. Keep startup, optional policy, and deployment isolation spatially separate.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing artwork.
+
+Constraints:
+- Use only the exact text listed above; no title, caption, evidence IDs, source paths, paragraphs, user approval popup, deny-first default, in-process sandbox, or claim that all extension tools are routed externally.
+- Never draw "Project trust" between "Agent loop" and "Built-in tools". Never put the optional gate on the mandatory path.
+- No gradients, shadows, 3D, photorealism, tiny print, crossing arrows, decorative background, logos, or watermark.

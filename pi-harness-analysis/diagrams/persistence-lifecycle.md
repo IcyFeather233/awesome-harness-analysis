@@ -1,0 +1,41 @@
+# Persistence Lifecycle
+
+Transition between live state, durable state, restore, and recovery.
+
+~~~mermaid
+flowchart LR
+  %% Persistence Lifecycle
+  classDef observed fill:#E8F5E9,stroke:#2E7D32,color:#14261A,stroke-width:2px;
+  classDef staticOnly fill:#F8FAFC,stroke:#64748B,color:#1E293B,stroke-width:1.5px;
+  classDef inferred fill:#FFF7ED,stroke:#B45309,color:#431407,stroke-width:1.5px;
+  classDef conflicted fill:#FEF2F2,stroke:#B91C1C,color:#450A0A,stroke-width:2.5px;
+  classDef unknown fill:#F8FAFC,stroke:#94A3B8,color:#475569,stroke-width:1.5px;
+  subgraph g_6867de3aa1a7["durable"]
+    direction LR
+    n_2fb97928aabe["Coding Agent compaction<br/>Compactor"]
+    n_110ebbcc690b["Session JSONL v3<br/>SessionStore"]
+  end
+  subgraph g_736521b51165["live"]
+    direction LR
+    n_825e7b7c4e51["Coding Agent AgentSession<br/>AgentLoop"]
+    n_1f48ee0d4fd8["runAgentLoop<br/>AgentLoop"]
+    n_3af45ee25e84["Context assembly<br/>ContextBuilder"]
+    n_9021d26f0f99["agent_end / agent_settled<br/>ExitCondition"]
+    n_6fad310cfe27["Live active session<br/>Session"]
+  end
+  class n_825e7b7c4e51,n_1f48ee0d4fd8,n_2fb97928aabe,n_3af45ee25e84,n_9021d26f0f99,n_6fad310cfe27,n_110ebbcc690b observed;
+  n_825e7b7c4e51 -->|"live messages"| n_6fad310cfe27
+  n_2fb97928aabe -->|"summary boundary"| n_6fad310cfe27
+  n_2fb97928aabe -->|"compaction entry"| n_110ebbcc690b
+  n_1f48ee0d4fd8 -->|"no tools/queues"| n_9021d26f0f99
+  n_6fad310cfe27 -->|"active branch"| n_3af45ee25e84
+  n_6fad310cfe27 -->|"append JSONL"| n_110ebbcc690b
+  n_110ebbcc690b -->|"active branch"| n_6fad310cfe27
+  linkStyle 0 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 1 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 2 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 3 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 4 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 5 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 6 stroke:#2E7D32,stroke-width:2px;
+~~~

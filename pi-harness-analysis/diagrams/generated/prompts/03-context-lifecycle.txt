@@ -1,0 +1,43 @@
+Use case: infographic-diagram
+Asset type: reader-facing context lifecycle illustration
+Primary request: Explain what reaches the Pi model on each request by organizing context sources by lifecycle, then showing their convergence and the compaction feedback path.
+
+Architecture facts and layout:
+- Use three clearly separated source columns feeding a large center-right funnel labeled "Per-request context" and then a final node labeled "Model request".
+- Column 1 is labeled "Startup / lazy" and contains three icon-backed items: "System prompt", "Project instructions", and "Skills". Add a small badge "lazy body" only on "Skills".
+- Column 2 is labeled "Carry-forward" and contains "Active session branch" and "Compaction summary".
+- Column 3 is labeled "Runtime" and contains "User message", "Tool result", and "Extension input".
+- Between the sources and "Per-request context", show two ordered transformation steps labeled "transformContext" and "convertToLlm".
+- Draw a clear feedback arrow from "Tool result" back through "Per-request context" to the next "Model request".
+- Draw a dashed green feedback path from a threshold marker labeled "Near context limit" to "Compaction summary", then back into "Carry-forward".
+- Use simple icons for prompt document, project file, skill, session tree, summary, user, tool result, extension plug, funnel, transform, and model.
+
+Text (verbatim, case-sensitive):
+"Startup / lazy"
+"System prompt"
+"Project instructions"
+"Skills"
+"lazy body"
+"Carry-forward"
+"Active session branch"
+"Compaction summary"
+"Runtime"
+"User message"
+"Tool result"
+"Extension input"
+"transformContext"
+"convertToLlm"
+"Per-request context"
+"Model request"
+"Near context limit"
+
+Style and visual hierarchy:
+- Clean academic data-flow infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel color families, large modern sans-serif labels, and generous white space.
+- White background. Yellow startup sources, green durable/carry-forward state, teal runtime additions, coral transformations, and blue model boundary.
+- Make lifecycle grouping obvious through spatial bands and icons, not through paragraphs or a large legend.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Constraints:
+- Use only the exact text listed above; no title, caption, evidence IDs, source paths, paragraphs, vector-memory layer, database, or invented retrieval system.
+- Do not depict compaction as occurring every turn. Its path must be dashed and clearly conditional.
+- No gradients, shadows, 3D, photorealism, tiny print, dense tables, tangled arrows, decorative background, logos, or watermark.

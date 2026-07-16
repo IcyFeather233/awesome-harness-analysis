@@ -1,0 +1,18 @@
+{"scenario_id": "R-SCENARIO-002", "sequence": 1, "session_id": "019f6526-270b-7323-94b5-1170a17591a3", "session_version": 3, "type": "session.created_or_restored"}
+{"scenario_id": "R-SCENARIO-002", "sequence": 2, "type": "run.started"}
+{"scenario_id": "R-SCENARIO-002", "sequence": 3, "type": "turn.started"}
+{"content_types": ["text"], "role": "user", "scenario_id": "R-SCENARIO-002", "sequence": 4, "text_char_count": 133, "type": "message.start"}
+{"content_types": ["text"], "role": "user", "scenario_id": "R-SCENARIO-002", "sequence": 5, "text_char_count": 133, "type": "message.end"}
+{"content_types": [], "role": "assistant", "scenario_id": "R-SCENARIO-002", "sequence": 6, "text_char_count": 0, "type": "message.start"}
+{"content_types": ["thinking", "text", "toolCall"], "model": "qwen3.6-35ba3b", "provider": "siflow", "role": "assistant", "scenario_id": "R-SCENARIO-002", "sequence": 53, "stop_reason": "toolUse", "text_char_count": 2, "type": "message.end", "usage": {"cache_read": 0, "cache_write": 0, "input": 808, "output": 69, "total_tokens": 877}}
+{"is_error": null, "scenario_id": "R-SCENARIO-002", "sequence": 54, "tool_call_id": "call_523f06273bd14ea8b2223290", "tool_name": "read", "type": "tool.started"}
+{"is_error": false, "scenario_id": "R-SCENARIO-002", "sequence": 55, "tool_call_id": "call_523f06273bd14ea8b2223290", "tool_name": "read", "type": "tool.completed"}
+{"content_types": ["text"], "role": "toolResult", "scenario_id": "R-SCENARIO-002", "sequence": 56, "text_char_count": 24, "type": "message.start"}
+{"content_types": ["text"], "role": "toolResult", "scenario_id": "R-SCENARIO-002", "sequence": 57, "text_char_count": 24, "type": "message.end"}
+{"scenario_id": "R-SCENARIO-002", "sequence": 58, "tool_result_count": 1, "type": "turn.completed"}
+{"scenario_id": "R-SCENARIO-002", "sequence": 59, "type": "turn.started"}
+{"content_types": [], "role": "assistant", "scenario_id": "R-SCENARIO-002", "sequence": 60, "text_char_count": 0, "type": "message.start"}
+{"content_types": ["thinking", "text"], "model": "qwen3.6-35ba3b", "provider": "siflow", "role": "assistant", "scenario_id": "R-SCENARIO-002", "sequence": 116, "stop_reason": "stop", "text_char_count": 8, "type": "message.end", "usage": {"cache_read": 0, "cache_write": 0, "input": 903, "output": 53, "total_tokens": 956}}
+{"scenario_id": "R-SCENARIO-002", "sequence": 117, "tool_result_count": 0, "type": "turn.completed"}
+{"scenario_id": "R-SCENARIO-002", "sequence": 118, "type": "run.completed"}
+{"scenario_id": "R-SCENARIO-002", "sequence": 119, "type": "run.settled"}

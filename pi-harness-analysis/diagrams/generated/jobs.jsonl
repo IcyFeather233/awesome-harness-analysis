@@ -1,0 +1,3 @@
+{"prompt_file":"diagrams/generated/prompts/01-system-overview.txt","out":"pi-system-overview.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/02-observed-turn.txt","out":"pi-observed-turn.png","model":"gpt-image-2","size":"1024x1536","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/03-context-lifecycle-v2.txt","out":"pi-context-lifecycle-v2.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}

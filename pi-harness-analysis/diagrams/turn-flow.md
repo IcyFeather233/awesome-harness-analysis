@@ -1,0 +1,64 @@
+# Runtime Turn Flow
+
+Control flow from interface input through loop iterations and exit.
+
+~~~mermaid
+flowchart LR
+  %% Runtime Turn Flow
+  classDef observed fill:#E8F5E9,stroke:#2E7D32,color:#14261A,stroke-width:2px;
+  classDef staticOnly fill:#F8FAFC,stroke:#64748B,color:#1E293B,stroke-width:1.5px;
+  classDef inferred fill:#FFF7ED,stroke:#B45309,color:#431407,stroke-width:1.5px;
+  classDef conflicted fill:#FEF2F2,stroke:#B91C1C,color:#450A0A,stroke-width:2.5px;
+  classDef unknown fill:#F8FAFC,stroke:#94A3B8,color:#475569,stroke-width:1.5px;
+  subgraph g_98fcbc09e8ac["context-capability"]
+    direction LR
+    n_3af45ee25e84["Context assembly<br/>ContextBuilder"]
+  end
+  subgraph g_186f7e4baa12["execution"]
+    direction LR
+    n_c223520f774e["read tool<br/>Tool"]
+  end
+  subgraph g_890cb18f192d["governance"]
+    direction LR
+    n_1606289c70f4["Optional extension gate<br/>PermissionGate"]
+  end
+  subgraph g_9a8a594fcb80["infrastructure"]
+    direction LR
+    n_6327a3e9cdd9["Provider request<br/>ModelCall"]
+  end
+  subgraph g_92e93e576aba["orchestration"]
+    direction LR
+    n_825e7b7c4e51["Coding Agent AgentSession<br/>AgentLoop"]
+    n_546fb0dae98a["New AgentHarness<br/>AgentLoop"]
+    n_1f48ee0d4fd8["runAgentLoop<br/>AgentLoop"]
+    n_2fb97928aabe["Coding Agent compaction<br/>Compactor"]
+    n_9021d26f0f99["agent_end / agent_settled<br/>ExitCondition"]
+    n_c1d0b90b4198["Retry / overflow recovery<br/>RecoveryPolicy"]
+  end
+  subgraph g_a4810eea71b9["state"]
+    direction LR
+    n_6fad310cfe27["Live active session<br/>Session"]
+  end
+  class n_825e7b7c4e51,n_546fb0dae98a,n_1f48ee0d4fd8,n_2fb97928aabe,n_3af45ee25e84,n_9021d26f0f99,n_6327a3e9cdd9,n_c1d0b90b4198,n_6fad310cfe27,n_c223520f774e observed;
+  class n_1606289c70f4 staticOnly;
+  n_546fb0dae98a -->|"direct loop"| n_1f48ee0d4fd8
+  n_825e7b7c4e51 -->|"prompt/continue"| n_1f48ee0d4fd8
+  n_2fb97928aabe -->|"summary boundary"| n_6fad310cfe27
+  n_3af45ee25e84 -->|"system/messages/tools"| n_6327a3e9cdd9
+  n_1f48ee0d4fd8 -->|"convert before request"| n_3af45ee25e84
+  n_1f48ee0d4fd8 -->|"no tools/queues"| n_9021d26f0f99
+  n_1f48ee0d4fd8 -->|"dispatch"| n_c223520f774e
+  n_6327a3e9cdd9 -->|"toolUse"| n_c223520f774e
+  n_1606289c70f4 -.->|"allow/block"| n_c223520f774e
+  n_c1d0b90b4198 -->|"bounded continue"| n_825e7b7c4e51
+  linkStyle 0 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 1 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 2 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 3 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 4 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 5 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 6 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 7 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 8 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 9 stroke:#2E7D32,stroke-width:2px;
+~~~

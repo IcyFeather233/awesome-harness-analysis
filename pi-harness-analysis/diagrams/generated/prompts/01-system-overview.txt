@@ -1,0 +1,40 @@
+Use case: infographic-diagram
+Asset type: reader-facing software architecture illustration
+Primary request: Explain the Pi coding-agent harness as one obvious left-to-right runtime path with a few clearly secondary branches. The image must be understandable in five seconds at normal report width.
+
+Architecture facts and layout:
+- Draw one straight main path across the center with exactly six large stages, in this order: "Pi surfaces" -> "AgentSession" -> "Agent loop" -> "Model" -> "Tools" -> "Workspace".
+- Use a distinct, simple icon above or beside each stage: terminal, session/controller, circular loop, model/cloud, wrench, folder/process.
+- Draw one curved return arrow from "Tools" back to "Agent loop" to show tool results entering the next iteration.
+- Place "Context" directly below the gap between "Agent loop" and "Model", with arrows into both. It represents session messages, instructions, and tool results assembled for a request.
+- Place "Session JSONL" below "AgentSession", connected by a two-way state arrow.
+- Place "AgentHarness v2" above "AgentSession" and "Agent loop" as a muted dashed migration branch. Add a small badge containing exactly "WIP".
+- Place "Optional tool gate" above "Tools" as a muted dashed branch. Add a small badge containing exactly "OPT". It is optional extension policy, not the default execution path.
+- Put "Workspace" inside a clearly separate outer boundary labeled "External isolation" to show that container, VM, or OS policy is outside the Pi process.
+
+Text (verbatim, case-sensitive):
+"Pi surfaces"
+"AgentSession"
+"Agent loop"
+"Model"
+"Tools"
+"Workspace"
+"Context"
+"Session JSONL"
+"AgentHarness v2"
+"Optional tool gate"
+"External isolation"
+"WIP"
+"OPT"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, and large modern sans-serif labels.
+- White background, generous whitespace, strong visual rhythm, large recognizable icons, thick arrows, and a clearly dominant center path.
+- Use coral for orchestration, blue for model/capabilities, green for durable state, amber for optional policy, and neutral gray for external execution boundaries.
+- Keep every label horizontal. Labels must be large enough to read when the image is displayed 1200 pixels wide.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Constraints:
+- Use only the exact text listed above; no title, subtitle, legend, evidence IDs, source code, paragraphs, or decorative words.
+- No gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, repeated stages, extra components, logos, or watermark.
+- Do not imply that the optional tool gate is mandatory or that Pi provides an in-process sandbox.

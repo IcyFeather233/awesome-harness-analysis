@@ -1,0 +1,65 @@
+{
+  "analysis_status": "complete_with_known_gaps",
+  "completed_at": "2026-07-15T10:00:00+00:00",
+  "created_at": "2026-07-15T09:16:46.703822+00:00",
+  "execution": {
+    "credential_policy": "No API key stored; non-secret placeholder only; normalized traces remove prompts, reasoning, tool args and contents.",
+    "filesystem_policy": "Real-model runs limited to no tools or read-only fixture; generated analysis artifacts under external bundle.",
+    "isolation": "Disposable /tmp HOME, fixture and session directory; target source snapshot not modified.",
+    "model_mode": "real SiFlow for representative paths; repository faux provider for deterministic controller tests",
+    "model_provider": "siflow/qwen3.6-35ba3b",
+    "network_policy": "SiFlow endpoint for authorized model scenarios; dependency/runtime downloads during setup.",
+    "runtime_versions": {
+      "node": "22.19.0",
+      "npm": "10.9.3",
+      "python": "3.x",
+      "vitest": "4.1.9"
+    }
+  },
+  "schema_version": "1.0",
+  "scope": {
+    "configurations": [
+      "v0.80.7 source snapshot",
+      "isolated JSON mode",
+      "SiFlow qwen3.6-35ba3b",
+      "faux-provider unit scenarios"
+    ],
+    "disabled_features": [
+      "project extensions",
+      "skills",
+      "prompt templates",
+      "context files",
+      "write/edit/bash in real-model scenarios"
+    ],
+    "enabled_features": [
+      "read tool in R-SCENARIO-002",
+      "session persistence in R-SCENARIO-003/004"
+    ],
+    "entrypoints": [
+      "coding-agent CLI interactive",
+      "coding-agent print/JSON",
+      "coding-agent RPC",
+      "agent-core SDK",
+      "experimental orchestrator (static only)"
+    ],
+    "inaccessible_surfaces": [
+      "Gondolin/QEMU",
+      "Docker/OpenShell",
+      "production usage flags/configuration",
+      "maintainer design intent beyond repository docs"
+    ]
+  },
+  "target": {
+    "branch": null,
+    "changed_path_count": 0,
+    "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+    "dirty": false,
+    "repository_root": "/volume/med/work/users/mzchen/lab/pi",
+    "tag": "v0.80.7"
+  },
+  "tooling": {
+    "skill": "harness-analysis",
+    "skill_commit": "cb778e3",
+    "skill_schema_version": "1.0"
+  }
+}

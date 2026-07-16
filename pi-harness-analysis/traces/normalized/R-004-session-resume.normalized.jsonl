@@ -1,0 +1,10 @@
+{"scenario_id": "R-SCENARIO-004", "sequence": 1, "session_id": "analysis-resume-001", "session_version": 3, "type": "session.created_or_restored"}
+{"scenario_id": "R-SCENARIO-004", "sequence": 2, "type": "run.started"}
+{"scenario_id": "R-SCENARIO-004", "sequence": 3, "type": "turn.started"}
+{"content_types": ["text"], "role": "user", "scenario_id": "R-SCENARIO-004", "sequence": 4, "text_char_count": 91, "type": "message.start"}
+{"content_types": ["text"], "role": "user", "scenario_id": "R-SCENARIO-004", "sequence": 5, "text_char_count": 91, "type": "message.end"}
+{"content_types": [], "role": "assistant", "scenario_id": "R-SCENARIO-004", "sequence": 6, "text_char_count": 0, "type": "message.start"}
+{"content_types": ["thinking", "text"], "model": "qwen3.6-35ba3b", "provider": "siflow", "role": "assistant", "scenario_id": "R-SCENARIO-004", "sequence": 82, "stop_reason": "stop", "text_char_count": 16, "type": "message.end", "usage": {"cache_read": 0, "cache_write": 0, "input": 423, "output": 73, "total_tokens": 496}}
+{"scenario_id": "R-SCENARIO-004", "sequence": 83, "tool_result_count": 0, "type": "turn.completed"}
+{"scenario_id": "R-SCENARIO-004", "sequence": 84, "type": "run.completed"}
+{"scenario_id": "R-SCENARIO-004", "sequence": 85, "type": "run.settled"}

@@ -1,0 +1,5 @@
+{"prompt_file":"diagrams/generated/prompts/04-extension-surface.txt","out":"pi-extension-surface.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/05-permission-boundaries.txt","out":"pi-permission-boundaries.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/06-subagent-topology.txt","out":"pi-subagent-topology.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/07-persistence-lifecycle.txt","out":"pi-persistence-lifecycle.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/08-design-space.txt","out":"pi-design-space.png","model":"gpt-image-2","size":"2048x1152","quality":"high"}

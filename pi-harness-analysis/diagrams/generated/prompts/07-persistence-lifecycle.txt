@@ -1,0 +1,43 @@
+Use case: infographic-diagram
+Asset type: reader-facing session persistence lifecycle illustration
+Primary request: Explain how Pi's live active branch becomes durable JSONL state, how resume rebuilds context, and why session navigation does not roll back workspace files.
+
+Mandatory layout and arrows:
+- Draw one dominant lifecycle across the center: "AgentSession" -> "Live active branch" -> "Append entry" -> "Session JSONL v3" -> "Resume / open" -> "Rebuild active branch" -> "Context assembly".
+- Draw a curved solid arrow from "Session JSONL v3" back to "Live active branch" labeled "restore".
+- Render "Session JSONL v3" as an append-only tree/file icon containing three short entry labels: "message", "branch", and "compaction".
+- Above the center, add a conditional compaction mini-flow: "Near context limit" -> "Compaction summary" -> "Compaction entry" -> "Session JSONL v3". Its first arrow must be dashed; the persisted entry arrow may be solid.
+- Below the lifecycle, draw "Workspace files" as a separate durable store with a bold warning badge "NOT ROLLED BACK". Do not connect branch navigation or resume to workspace rollback.
+- Add a small two-process proof around the JSONL store: "Process A" -> "Session JSONL v3" -> "Process B". Keep it secondary to the main lifecycle.
+- Use agent, active tree, append document, JSONL tree, restore, context funnel, summary, workspace folder, and two process icons.
+
+Text (verbatim, case-sensitive):
+"AgentSession"
+"Live active branch"
+"Append entry"
+"Session JSONL v3"
+"Resume / open"
+"Rebuild active branch"
+"Context assembly"
+"restore"
+"message"
+"branch"
+"compaction"
+"Near context limit"
+"Compaction summary"
+"Compaction entry"
+"Workspace files"
+"NOT ROLLED BACK"
+"Process A"
+"Process B"
+
+Style and visual hierarchy:
+- Clean academic state-lifecycle infographic with friendly hand-sketched geometry, large icons, bold dark-gray outlines, flat semantic colors, thick arrows, and generous whitespace.
+- White background. Coral live state, green durable JSONL, blue restore/context, amber conditional compaction, and neutral workspace warning.
+- Make append, restore, and the separate workspace store understandable before labels are read.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing artwork.
+
+Constraints:
+- Use only the exact text listed above; no title, caption, evidence IDs, source paths, paragraphs, database, vector memory, automatic workspace snapshot, or transaction rollback.
+- Do not depict compaction on every turn. Do not show workspace files as children of the JSONL tree.
+- No gradients, shadows, 3D, photorealism, tiny print, tangled arrows, decorative background, logos, or watermark.

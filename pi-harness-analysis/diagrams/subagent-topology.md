@@ -1,0 +1,52 @@
+# Subagent Topology
+
+Delegation, inheritance, isolation, and result aggregation.
+
+~~~mermaid
+flowchart TB
+  %% Subagent Topology
+  classDef observed fill:#E8F5E9,stroke:#2E7D32,color:#14261A,stroke-width:2px;
+  classDef staticOnly fill:#F8FAFC,stroke:#64748B,color:#1E293B,stroke-width:1.5px;
+  classDef inferred fill:#FFF7ED,stroke:#B45309,color:#431407,stroke-width:1.5px;
+  classDef conflicted fill:#FEF2F2,stroke:#B91C1C,color:#450A0A,stroke-width:2.5px;
+  classDef unknown fill:#F8FAFC,stroke:#94A3B8,color:#475569,stroke-width:1.5px;
+  subgraph g_0146b2da27ba["Ungrouped"]
+    direction TB
+    n_825e7b7c4e51["Coding Agent AgentSession<br/>AgentLoop"]
+    n_546fb0dae98a["New AgentHarness<br/>AgentLoop"]
+    n_1f48ee0d4fd8["runAgentLoop<br/>AgentLoop"]
+    n_3af45ee25e84["Context assembly<br/>ContextBuilder"]
+    n_c1d0b90b4198["Retry / overflow recovery<br/>RecoveryPolicy"]
+    n_cb9c10e1a22e["AgentSessionRuntime<br/>Router"]
+    n_6fad310cfe27["Live active session<br/>Session"]
+    n_94fdf21bba59["cwd workspace<br/>Workspace"]
+  end
+  subgraph g_746fcedd9fd1["supervisor"]
+    direction TB
+    n_156b03ba3464["Experimental OrchestratorSupervisor<br/>Planner"]
+  end
+  subgraph g_62b364fe6a4d["worker"]
+    direction TB
+    n_deaa5a1626b3["Child pi process<br/>Subagent"]
+  end
+  class n_825e7b7c4e51,n_546fb0dae98a,n_1f48ee0d4fd8,n_3af45ee25e84,n_c1d0b90b4198,n_cb9c10e1a22e,n_6fad310cfe27,n_94fdf21bba59 observed;
+  class n_156b03ba3464,n_deaa5a1626b3 staticOnly;
+  n_546fb0dae98a -->|"direct loop"| n_1f48ee0d4fd8
+  n_825e7b7c4e51 -->|"prompt/continue"| n_1f48ee0d4fd8
+  n_825e7b7c4e51 -->|"live messages"| n_6fad310cfe27
+  n_156b03ba3464 -.->|"independent RPC instance"| n_deaa5a1626b3
+  n_c1d0b90b4198 -->|"bounded continue"| n_825e7b7c4e51
+  n_6fad310cfe27 -->|"active branch"| n_3af45ee25e84
+  n_cb9c10e1a22e -->|"own/rebind"| n_825e7b7c4e51
+  n_deaa5a1626b3 -.->|"separate process/no session"| n_825e7b7c4e51
+  n_deaa5a1626b3 -.->|"same cwd by default"| n_94fdf21bba59
+  linkStyle 0 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 1 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 2 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 3 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 4 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 5 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 6 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 7 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 8 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+~~~

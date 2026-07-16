@@ -1,0 +1,41 @@
+Use case: infographic-diagram
+Asset type: reader-facing conditional subagent topology illustration
+Primary request: Explain that Pi core has no default subagent primitive, while an optional extension and a separate experimental orchestrator can create child Pi processes with different semantics.
+
+Mandatory layout and arrows:
+- At the top center, draw "Pi core" with a prominent badge "NO SUBAGENTS". It must not have a default child edge.
+- Below it, split into two clearly dashed optional lanes.
+- Left lane header: "Subagent extension" with badge "OPT". Flow: "subagent tool" -> a small cluster labeled "Child pi process". Add two compact labels beside the cluster: "separate context / no session" and "inherits environment".
+- Connect both "Pi core" and the child cluster to one shared folder labeled "Shared cwd / workspace". Make the shared boundary visually obvious; do not place the child in a separate workspace box.
+- Draw a result arrow from "Child pi process" back to "Pi core" labeled "result summary".
+- Right lane header: "Experimental orchestrator" with badge "EXP". Flow to "Independent RPC Pi instance". Add the compact label "process supervisor" and keep this lane visually separate from the subagent tool lane.
+- Add one small label at the bottom of the right lane: "not loop delegation".
+- Use parent agent, optional tool, multiple process, shared folder, RPC, and supervisor icons.
+
+Text (verbatim, case-sensitive):
+"Pi core"
+"NO SUBAGENTS"
+"Subagent extension"
+"OPT"
+"subagent tool"
+"Child pi process"
+"separate context / no session"
+"inherits environment"
+"Shared cwd / workspace"
+"result summary"
+"Experimental orchestrator"
+"EXP"
+"Independent RPC Pi instance"
+"process supervisor"
+"not loop delegation"
+
+Style and visual hierarchy:
+- Clean academic process-topology infographic with friendly hand-sketched geometry, large icons, bold dark-gray outlines, flat pastel fills, thick arrows, and generous whitespace.
+- White background. Neutral core, blue child processes, green shared workspace, purple experimental supervisor, and dashed amber optional branches.
+- Make the absence of default subagents and the shared workspace immediately visible.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing artwork.
+
+Constraints:
+- Use only the exact text listed above; no title, caption, evidence IDs, source paths, paragraphs, built-in delegation, isolated child workspace, inherited session, mandatory confirmation, or claim that the orchestrator is the agent loop.
+- All edges from Pi core into the two lanes must be dashed/conditional. The result arrow inside the optional subagent lane may be solid.
+- No gradients, shadows, 3D, photorealism, tiny print, crossing arrows, decorative background, logos, or watermark.

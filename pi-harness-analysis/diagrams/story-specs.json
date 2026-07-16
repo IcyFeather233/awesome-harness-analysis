@@ -1,0 +1,2448 @@
+{
+  "schema_version": "1.0",
+  "figures": [
+    {
+      "id": "pi-system-story",
+      "title": "Pi: thin loop, explicit state, external isolation",
+      "description": "The current Coding Agent path at v0.80.7, with migration and optional policy branches separated from the observed spine.",
+      "kicker": "PRODUCT BOUNDARY",
+      "width": 1600,
+      "height": 720,
+      "footer": "Solid green: observed | Dashed green: controlled experiment | Dashed gray: source-visible optional path",
+      "groups": [
+        {
+          "label": "Pi process",
+          "x": 220,
+          "y": 112,
+          "width": 1020,
+          "height": 510,
+          "tone": "muted"
+        },
+        {
+          "label": "Host / deployment boundary",
+          "x": 1260,
+          "y": 112,
+          "width": 300,
+          "height": 510,
+          "tone": "execution"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "surfaces",
+          "hir_ids": [
+            "N-CLI",
+            "N-Main"
+          ],
+          "claim_ids": [
+            "C-001"
+          ],
+          "evidence_ids": [
+            "S-013",
+            "R-001"
+          ],
+          "label": "CLI / JSON / RPC",
+          "subtitle": "Shared product surfaces",
+          "tone": "interface",
+          "x": 30,
+          "y": 270,
+          "width": 170,
+          "height": 96
+        },
+        {
+          "id": "agent-session",
+          "hir_ids": [
+            "N-AgentSession"
+          ],
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-002",
+            "S-009",
+            "S-010"
+          ],
+          "label": "AgentSession",
+          "subtitle": "Current product orchestration",
+          "tone": "core",
+          "x": 250,
+          "y": 270,
+          "width": 180,
+          "height": 96
+        },
+        {
+          "id": "low-loop",
+          "hir_ids": [
+            "N-LowLoop"
+          ],
+          "claim_ids": [
+            "C-002"
+          ],
+          "evidence_ids": [
+            "S-001",
+            "R-002",
+            "X-001"
+          ],
+          "label": "runAgentLoop",
+          "subtitle": "Model / tool iteration",
+          "tone": "core",
+          "x": 470,
+          "y": 270,
+          "width": 170,
+          "height": 96
+        },
+        {
+          "id": "context",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-002",
+            "S-004",
+            "R-002"
+          ],
+          "label": "Context",
+          "subtitle": "Session + instructions + tools",
+          "tone": "capability",
+          "x": 680,
+          "y": 270,
+          "width": 170,
+          "height": 96
+        },
+        {
+          "id": "provider",
+          "hir_ids": [
+            "N-Models",
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "S-012",
+            "R-001",
+            "R-005"
+          ],
+          "label": "Provider",
+          "subtitle": "Catalog, auth, streaming",
+          "tone": "model",
+          "x": 890,
+          "y": 270,
+          "width": 170,
+          "height": 96
+        },
+        {
+          "id": "tools",
+          "hir_ids": [
+            "N-ToolRegistry",
+            "N-ReadTool",
+            "N-Bash"
+          ],
+          "claim_ids": [
+            "C-004",
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-003",
+            "S-007",
+            "R-002"
+          ],
+          "label": "Tools",
+          "subtitle": "Built-in + extension registry",
+          "tone": "capability",
+          "x": 1090,
+          "y": 270,
+          "width": 170,
+          "height": 96
+        },
+        {
+          "id": "workspace",
+          "hir_ids": [
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-007",
+            "R-002"
+          ],
+          "label": "Workspace",
+          "subtitle": "Files and local processes",
+          "tone": "execution",
+          "x": 1310,
+          "y": 270,
+          "width": 220,
+          "height": 96
+        },
+        {
+          "id": "new-harness",
+          "hir_ids": [
+            "N-AgentHarness"
+          ],
+          "claim_ids": [
+            "C-010",
+            "C-016"
+          ],
+          "evidence_ids": [
+            "D-003",
+            "S-011",
+            "X-002"
+          ],
+          "label": "AgentHarness v2",
+          "subtitle": "Migration target; incomplete",
+          "tone": "muted",
+          "x": 460,
+          "y": 135,
+          "width": 190,
+          "height": 90,
+          "badge": "WIP"
+        },
+        {
+          "id": "optional-gate",
+          "hir_ids": [
+            "N-Hooks",
+            "N-OptionalGate"
+          ],
+          "claim_ids": [
+            "C-005",
+            "C-017"
+          ],
+          "evidence_ids": [
+            "S-003",
+            "S-017"
+          ],
+          "label": "Tool gate",
+          "subtitle": "Extension policy, not default",
+          "tone": "policy",
+          "x": 1080,
+          "y": 135,
+          "width": 190,
+          "height": 90,
+          "badge": "OPT"
+        },
+        {
+          "id": "session-store",
+          "hir_ids": [
+            "N-Session",
+            "N-SessionStore"
+          ],
+          "claim_ids": [
+            "C-008",
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-008",
+            "R-003",
+            "R-004"
+          ],
+          "label": "Session JSONL v3",
+          "subtitle": "Append-only tree + resume",
+          "tone": "state",
+          "x": 250,
+          "y": 480,
+          "width": 210,
+          "height": 90
+        },
+        {
+          "id": "events",
+          "hir_ids": [
+            "N-Events"
+          ],
+          "claim_ids": [
+            "C-014"
+          ],
+          "evidence_ids": [
+            "D-005",
+            "R-001",
+            "R-002"
+          ],
+          "label": "Lifecycle events",
+          "subtitle": "JSON / RPC stream",
+          "tone": "observability",
+          "x": 510,
+          "y": 480,
+          "width": 190,
+          "height": 90
+        },
+        {
+          "id": "external-sandbox",
+          "hir_ids": [
+            "N-ExternalSandbox"
+          ],
+          "claim_ids": [
+            "C-005",
+            "C-007"
+          ],
+          "evidence_ids": [
+            "D-002",
+            "D-007"
+          ],
+          "label": "Container / VM",
+          "subtitle": "External isolation option",
+          "tone": "execution",
+          "x": 1320,
+          "y": 480,
+          "width": 200,
+          "height": 90,
+          "badge": "OPT"
+        }
+      ],
+      "edges": [
+        {
+          "id": "story-surface-session",
+          "source": "surfaces",
+          "target": "agent-session",
+          "points": [
+            [
+              200,
+              318
+            ],
+            [
+              250,
+              318
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "S-013",
+            "R-001"
+          ]
+        },
+        {
+          "id": "story-session-loop",
+          "source": "agent-session",
+          "target": "low-loop",
+          "points": [
+            [
+              430,
+              318
+            ],
+            [
+              470,
+              318
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "S-001",
+            "S-002",
+            "R-002"
+          ]
+        },
+        {
+          "id": "story-loop-context",
+          "source": "low-loop",
+          "target": "context",
+          "points": [
+            [
+              640,
+              318
+            ],
+            [
+              680,
+              318
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "S-001",
+            "R-002"
+          ]
+        },
+        {
+          "id": "story-context-provider",
+          "source": "context",
+          "target": "provider",
+          "points": [
+            [
+              850,
+              318
+            ],
+            [
+              890,
+              318
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "S-012",
+            "R-002"
+          ]
+        },
+        {
+          "id": "story-provider-tools",
+          "source": "provider",
+          "target": "tools",
+          "points": [
+            [
+              1060,
+              318
+            ],
+            [
+              1090,
+              318
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "story-tools-workspace",
+          "source": "tools",
+          "target": "workspace",
+          "points": [
+            [
+              1260,
+              318
+            ],
+            [
+              1310,
+              318
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "S-007",
+            "R-002"
+          ]
+        },
+        {
+          "id": "story-tool-result",
+          "source": "tools",
+          "target": "low-loop",
+          "points": [
+            [
+              1175,
+              366
+            ],
+            [
+              1175,
+              420
+            ],
+            [
+              555,
+              420
+            ],
+            [
+              555,
+              366
+            ]
+          ],
+          "label": "toolResult -> next iteration",
+          "label_x": 865,
+          "label_y": 411,
+          "status": "observed",
+          "evidence_ids": [
+            "S-001",
+            "R-002"
+          ]
+        },
+        {
+          "id": "story-session-persist",
+          "source": "agent-session",
+          "target": "session-store",
+          "points": [
+            [
+              340,
+              366
+            ],
+            [
+              340,
+              480
+            ]
+          ],
+          "label": "append",
+          "label_x": 375,
+          "label_y": 440,
+          "status": "observed",
+          "evidence_ids": [
+            "S-008",
+            "R-003"
+          ]
+        },
+        {
+          "id": "story-loop-events",
+          "source": "low-loop",
+          "target": "events",
+          "points": [
+            [
+              555,
+              366
+            ],
+            [
+              555,
+              448
+            ],
+            [
+              605,
+              448
+            ],
+            [
+              605,
+              480
+            ]
+          ],
+          "label": "events",
+          "label_x": 605,
+          "label_y": 441,
+          "status": "observed",
+          "evidence_ids": [
+            "D-005",
+            "R-002"
+          ]
+        },
+        {
+          "id": "story-new-harness",
+          "source": "new-harness",
+          "target": "low-loop",
+          "points": [
+            [
+              555,
+              225
+            ],
+            [
+              555,
+              270
+            ]
+          ],
+          "label": "direct loop",
+          "label_x": 600,
+          "label_y": 252,
+          "status": "experimental",
+          "evidence_ids": [
+            "S-011",
+            "X-002"
+          ]
+        },
+        {
+          "id": "story-optional-gate",
+          "source": "optional-gate",
+          "target": "tools",
+          "points": [
+            [
+              1175,
+              225
+            ],
+            [
+              1175,
+              270
+            ]
+          ],
+          "label": "allow / block",
+          "label_x": 1225,
+          "label_y": 252,
+          "status": "static",
+          "evidence_ids": [
+            "S-003",
+            "S-017"
+          ]
+        },
+        {
+          "id": "story-external-sandbox",
+          "source": "external-sandbox",
+          "target": "workspace",
+          "points": [
+            [
+              1420,
+              480
+            ],
+            [
+              1420,
+              366
+            ]
+          ],
+          "label": "contain",
+          "label_x": 1460,
+          "label_y": 438,
+          "status": "static",
+          "evidence_ids": [
+            "D-007"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pi-observed-turn",
+      "title": "One observed read turn: two model iterations",
+      "description": "R-SCENARIO-002 is the running example; recovery and persistence branches are shown separately from the observed read path.",
+      "kicker": "RUNNING EXAMPLE",
+      "width": 1200,
+      "height": 1050,
+      "footer": "Observed with SiFlow qwen3.6-35ba3b, JSON mode, read-only tool, isolated HOME/workspace",
+      "groups": [
+        {
+          "label": "Observed R-SCENARIO-002",
+          "x": 35,
+          "y": 112,
+          "width": 875,
+          "height": 830,
+          "tone": "state"
+        },
+        {
+          "label": "Controlled / durable side paths",
+          "x": 930,
+          "y": 112,
+          "width": 235,
+          "height": 830,
+          "tone": "muted"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "turn-prompt",
+          "kind": "external",
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "R-002"
+          ],
+          "label": "User prompt",
+          "subtitle": "Read fixture and answer",
+          "tone": "interface",
+          "x": 75,
+          "y": 145,
+          "width": 230,
+          "height": 82
+        },
+        {
+          "id": "turn-pipeline",
+          "hir_ids": [
+            "N-AgentSession"
+          ],
+          "claim_ids": [
+            "C-003",
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-002",
+            "R-002"
+          ],
+          "label": "AgentSession pipeline",
+          "subtitle": "Resolve input and active session",
+          "tone": "core",
+          "x": 75,
+          "y": 280,
+          "width": 230,
+          "height": 88
+        },
+        {
+          "id": "turn-context-1",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-001",
+            "R-002"
+          ],
+          "label": "Context #1",
+          "subtitle": "System + prompt + read schema",
+          "tone": "capability",
+          "x": 75,
+          "y": 430,
+          "width": 230,
+          "height": 88
+        },
+        {
+          "id": "turn-model-1",
+          "hir_ids": [
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "R-002"
+          ],
+          "label": "Model iteration 1",
+          "subtitle": "Emits read toolUse",
+          "tone": "model",
+          "x": 370,
+          "y": 430,
+          "width": 220,
+          "height": 88
+        },
+        {
+          "id": "turn-read",
+          "hir_ids": [
+            "N-ReadTool",
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-004",
+            "C-011"
+          ],
+          "evidence_ids": [
+            "R-002"
+          ],
+          "label": "read fixture.txt",
+          "subtitle": "tool start -> end",
+          "tone": "capability",
+          "x": 665,
+          "y": 430,
+          "width": 210,
+          "height": 88
+        },
+        {
+          "id": "turn-result",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-002",
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-001",
+            "R-002"
+          ],
+          "label": "toolResult",
+          "subtitle": "314159 appended",
+          "tone": "state",
+          "x": 665,
+          "y": 590,
+          "width": 210,
+          "height": 82
+        },
+        {
+          "id": "turn-context-2",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "R-002"
+          ],
+          "label": "Context #2",
+          "subtitle": "Prior response + toolResult",
+          "tone": "capability",
+          "x": 370,
+          "y": 590,
+          "width": 220,
+          "height": 82
+        },
+        {
+          "id": "turn-model-2",
+          "hir_ids": [
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "R-002"
+          ],
+          "label": "Model iteration 2",
+          "subtitle": "Returns final text",
+          "tone": "model",
+          "x": 75,
+          "y": 590,
+          "width": 230,
+          "height": 82
+        },
+        {
+          "id": "turn-exit",
+          "hir_ids": [
+            "N-Exit"
+          ],
+          "claim_ids": [
+            "C-002"
+          ],
+          "evidence_ids": [
+            "R-002"
+          ],
+          "label": "agent_end",
+          "subtitle": "No more tools or queues",
+          "tone": "core",
+          "x": 75,
+          "y": 755,
+          "width": 230,
+          "height": 82
+        },
+        {
+          "id": "turn-settled",
+          "hir_ids": [
+            "N-AgentSession"
+          ],
+          "claim_ids": [
+            "C-014"
+          ],
+          "evidence_ids": [
+            "R-002"
+          ],
+          "label": "agent_settled",
+          "subtitle": "Product-level completion",
+          "tone": "observability",
+          "x": 370,
+          "y": 755,
+          "width": 220,
+          "height": 82
+        },
+        {
+          "id": "turn-recovery",
+          "hir_ids": [
+            "N-Retry",
+            "N-Compactor"
+          ],
+          "claim_ids": [
+            "C-009",
+            "C-020"
+          ],
+          "evidence_ids": [
+            "S-009",
+            "S-010",
+            "X-003"
+          ],
+          "label": "Recovery",
+          "subtitle": "Retry or compaction",
+          "tone": "risk",
+          "x": 950,
+          "y": 430,
+          "width": 195,
+          "height": 90,
+          "badge": "X-003"
+        },
+        {
+          "id": "turn-store",
+          "hir_ids": [
+            "N-SessionStore"
+          ],
+          "claim_ids": [
+            "C-008",
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-008",
+            "R-003",
+            "R-004"
+          ],
+          "label": "Session store",
+          "subtitle": "Cross-process resume",
+          "tone": "state",
+          "x": 950,
+          "y": 700,
+          "width": 195,
+          "height": 90,
+          "badge": "R-004"
+        }
+      ],
+      "edges": [
+        {
+          "id": "turn-e1",
+          "source": "turn-prompt",
+          "target": "turn-pipeline",
+          "points": [
+            [
+              190,
+              227
+            ],
+            [
+              190,
+              280
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "turn-e2",
+          "source": "turn-pipeline",
+          "target": "turn-context-1",
+          "points": [
+            [
+              190,
+              368
+            ],
+            [
+              190,
+              430
+            ]
+          ],
+          "label": "turn_start",
+          "label_x": 240,
+          "label_y": 405,
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "turn-e3",
+          "source": "turn-context-1",
+          "target": "turn-model-1",
+          "points": [
+            [
+              305,
+              474
+            ],
+            [
+              370,
+              474
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "turn-e4",
+          "source": "turn-model-1",
+          "target": "turn-read",
+          "points": [
+            [
+              590,
+              474
+            ],
+            [
+              665,
+              474
+            ]
+          ],
+          "label": "toolUse",
+          "label_x": 627,
+          "label_y": 455,
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "turn-e5",
+          "source": "turn-read",
+          "target": "turn-result",
+          "points": [
+            [
+              770,
+              518
+            ],
+            [
+              770,
+              590
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "turn-e6",
+          "source": "turn-result",
+          "target": "turn-context-2",
+          "points": [
+            [
+              665,
+              631
+            ],
+            [
+              590,
+              631
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "turn-e7",
+          "source": "turn-context-2",
+          "target": "turn-model-2",
+          "points": [
+            [
+              370,
+              631
+            ],
+            [
+              305,
+              631
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "turn-e8",
+          "source": "turn-model-2",
+          "target": "turn-exit",
+          "points": [
+            [
+              190,
+              672
+            ],
+            [
+              190,
+              755
+            ]
+          ],
+          "label": "final text",
+          "label_x": 235,
+          "label_y": 720,
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "turn-e9",
+          "source": "turn-exit",
+          "target": "turn-settled",
+          "points": [
+            [
+              305,
+              796
+            ],
+            [
+              370,
+              796
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "R-002"
+          ]
+        },
+        {
+          "id": "turn-e10",
+          "source": "turn-model-1",
+          "target": "turn-recovery",
+          "points": [
+            [
+              480,
+              430
+            ],
+            [
+              480,
+              395
+            ],
+            [
+              1047,
+              395
+            ],
+            [
+              1047,
+              430
+            ]
+          ],
+          "label": "on retryable error",
+          "label_x": 760,
+          "label_y": 386,
+          "status": "experimental",
+          "evidence_ids": [
+            "X-003"
+          ]
+        },
+        {
+          "id": "turn-e11",
+          "source": "turn-settled",
+          "target": "turn-store",
+          "points": [
+            [
+              590,
+              796
+            ],
+            [
+              950,
+              796
+            ]
+          ],
+          "label": "durable entries",
+          "label_x": 770,
+          "label_y": 786,
+          "status": "observed",
+          "evidence_ids": [
+            "S-008",
+            "R-003"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pi-design-space",
+      "title": "Pi design space: stance, mechanism, consequence",
+      "description": "Documented product choices are separated from analyst-synthesized tradeoffs; dotted edges are interpretation, not author intent.",
+      "kicker": "DESIGN SYNTHESIS",
+      "width": 1600,
+      "height": 820,
+      "footer": "Left: documented stance | Center: recovered implementation | Right: observable tradeoff (analyst synthesis)",
+      "groups": [
+        {
+          "label": "Documented stance",
+          "x": 35,
+          "y": 115,
+          "width": 420,
+          "height": 635,
+          "tone": "interface"
+        },
+        {
+          "label": "Recovered mechanism",
+          "x": 590,
+          "y": 115,
+          "width": 420,
+          "height": 635,
+          "tone": "core"
+        },
+        {
+          "label": "Observable tradeoff",
+          "x": 1145,
+          "y": 115,
+          "width": 420,
+          "height": 635,
+          "tone": "policy"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "stance-thin",
+          "kind": "concept",
+          "claim_ids": [
+            "C-002",
+            "C-010"
+          ],
+          "evidence_ids": [
+            "D-001",
+            "D-003"
+          ],
+          "label": "Thin generic core",
+          "subtitle": "Keep model decisions in the model",
+          "tone": "interface",
+          "x": 70,
+          "y": 165,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "mechanism-thin",
+          "hir_ids": [
+            "N-LowLoop",
+            "N-AgentSession",
+            "N-AgentHarness"
+          ],
+          "claim_ids": [
+            "C-002",
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-001",
+            "S-011",
+            "X-002"
+          ],
+          "label": "runAgentLoop + orchestration",
+          "subtitle": "One loop, two product layers",
+          "tone": "core",
+          "x": 625,
+          "y": 165,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "tradeoff-thin",
+          "kind": "concept",
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "D-008",
+            "S-011"
+          ],
+          "label": "Composable, but split ownership",
+          "subtitle": "Migration and parity become architecture work",
+          "tone": "policy",
+          "x": 1180,
+          "y": 165,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "stance-extension",
+          "kind": "concept",
+          "claim_ids": [
+            "C-004",
+            "C-013"
+          ],
+          "evidence_ids": [
+            "D-004"
+          ],
+          "label": "Extension over built-ins",
+          "subtitle": "MCP, subagent and policy are optional",
+          "tone": "interface",
+          "x": 70,
+          "y": 310,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "mechanism-extension",
+          "hir_ids": [
+            "N-ToolRegistry",
+            "N-Hooks",
+            "N-SubagentPlugin"
+          ],
+          "claim_ids": [
+            "C-004",
+            "C-017"
+          ],
+          "evidence_ids": [
+            "S-003",
+            "S-015",
+            "S-017"
+          ],
+          "label": "Registry + lifecycle hooks",
+          "subtitle": "Capabilities merge at runtime",
+          "tone": "capability",
+          "x": 625,
+          "y": 310,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "tradeoff-extension",
+          "kind": "concept",
+          "claim_ids": [
+            "C-005",
+            "C-017"
+          ],
+          "evidence_ids": [
+            "D-002",
+            "S-017"
+          ],
+          "label": "Flexible, but policy can fragment",
+          "subtitle": "Optional hooks are not a global boundary",
+          "tone": "policy",
+          "x": 1180,
+          "y": 310,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "stance-isolation",
+          "kind": "concept",
+          "claim_ids": [
+            "C-005",
+            "C-007"
+          ],
+          "evidence_ids": [
+            "D-002",
+            "D-007"
+          ],
+          "label": "Externalize isolation",
+          "subtitle": "Do not imply an in-process sandbox",
+          "tone": "interface",
+          "x": 70,
+          "y": 455,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "mechanism-isolation",
+          "hir_ids": [
+            "N-Bash",
+            "N-Workspace",
+            "N-ExternalSandbox"
+          ],
+          "claim_ids": [
+            "C-005",
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-007",
+            "D-007"
+          ],
+          "label": "Host process + optional container",
+          "subtitle": "Whole-process or routed-tool isolation",
+          "tone": "execution",
+          "x": 625,
+          "y": 455,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "tradeoff-isolation",
+          "kind": "concept",
+          "claim_ids": [
+            "C-007",
+            "C-017"
+          ],
+          "evidence_ids": [
+            "D-002",
+            "D-007"
+          ],
+          "label": "Honest boundary, deployment burden",
+          "subtitle": "Custom tools can escape partial routing",
+          "tone": "risk",
+          "x": 1180,
+          "y": 455,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "stance-state",
+          "kind": "concept",
+          "claim_ids": [
+            "C-008",
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-008"
+          ],
+          "label": "Append-oriented durable state",
+          "subtitle": "Preserve branches and summaries",
+          "tone": "interface",
+          "x": 70,
+          "y": 600,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "mechanism-state",
+          "hir_ids": [
+            "N-Session",
+            "N-SessionStore",
+            "N-Compactor"
+          ],
+          "claim_ids": [
+            "C-008",
+            "C-009"
+          ],
+          "evidence_ids": [
+            "S-008",
+            "S-009",
+            "R-004"
+          ],
+          "label": "JSONL tree + compaction entries",
+          "subtitle": "Active leaf reconstructs context",
+          "tone": "state",
+          "x": 625,
+          "y": 600,
+          "width": 350,
+          "height": 96
+        },
+        {
+          "id": "tradeoff-state",
+          "kind": "concept",
+          "claim_ids": [
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-008"
+          ],
+          "label": "Auditable, not workspace-transactional",
+          "subtitle": "Session branch does not roll back files",
+          "tone": "policy",
+          "x": 1180,
+          "y": 600,
+          "width": 350,
+          "height": 96
+        }
+      ],
+      "edges": [
+        {
+          "id": "design-e1",
+          "source": "stance-thin",
+          "target": "mechanism-thin",
+          "points": [
+            [
+              420,
+              213
+            ],
+            [
+              625,
+              213
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "D-001",
+            "S-001"
+          ]
+        },
+        {
+          "id": "design-e2",
+          "source": "mechanism-thin",
+          "target": "tradeoff-thin",
+          "points": [
+            [
+              975,
+              213
+            ],
+            [
+              1180,
+              213
+            ]
+          ],
+          "status": "inferred",
+          "evidence_ids": [
+            "D-008",
+            "S-011"
+          ],
+          "claim_ids": [
+            "C-010"
+          ]
+        },
+        {
+          "id": "design-e3",
+          "source": "stance-extension",
+          "target": "mechanism-extension",
+          "points": [
+            [
+              420,
+              358
+            ],
+            [
+              625,
+              358
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "D-004",
+            "S-003"
+          ]
+        },
+        {
+          "id": "design-e4",
+          "source": "mechanism-extension",
+          "target": "tradeoff-extension",
+          "points": [
+            [
+              975,
+              358
+            ],
+            [
+              1180,
+              358
+            ]
+          ],
+          "status": "inferred",
+          "evidence_ids": [
+            "D-002",
+            "S-017"
+          ],
+          "claim_ids": [
+            "C-017"
+          ]
+        },
+        {
+          "id": "design-e5",
+          "source": "stance-isolation",
+          "target": "mechanism-isolation",
+          "points": [
+            [
+              420,
+              503
+            ],
+            [
+              625,
+              503
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "D-002",
+            "S-007"
+          ]
+        },
+        {
+          "id": "design-e6",
+          "source": "mechanism-isolation",
+          "target": "tradeoff-isolation",
+          "points": [
+            [
+              975,
+              503
+            ],
+            [
+              1180,
+              503
+            ]
+          ],
+          "status": "inferred",
+          "evidence_ids": [
+            "D-007"
+          ],
+          "claim_ids": [
+            "C-007"
+          ]
+        },
+        {
+          "id": "design-e7",
+          "source": "stance-state",
+          "target": "mechanism-state",
+          "points": [
+            [
+              420,
+              648
+            ],
+            [
+              625,
+              648
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "S-008"
+          ]
+        },
+        {
+          "id": "design-e8",
+          "source": "mechanism-state",
+          "target": "tradeoff-state",
+          "points": [
+            [
+              975,
+              648
+            ],
+            [
+              1180,
+              648
+            ]
+          ],
+          "status": "inferred",
+          "evidence_ids": [
+            "S-008"
+          ],
+          "claim_ids": [
+            "C-008"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pi-context-assembly",
+      "title": "Pi context: sources converge, then the loop transforms",
+      "description": "Startup, lazy, carry-forward, runtime, and compacted sources remain distinct until the provider boundary.",
+      "kicker": "CONTEXT LIFECYCLE",
+      "width": 1600,
+      "height": 760,
+      "footer": "Solid: observed in named traces | Dashed: source-visible | Dashed green: controlled compaction tests",
+      "groups": [
+        {
+          "label": "Sources by lifecycle",
+          "x": 35,
+          "y": 115,
+          "width": 720,
+          "height": 555,
+          "tone": "capability"
+        },
+        {
+          "label": "Per-request construction",
+          "x": 800,
+          "y": 115,
+          "width": 340,
+          "height": 555,
+          "tone": "core"
+        },
+        {
+          "label": "Provider boundary",
+          "x": 1185,
+          "y": 115,
+          "width": 375,
+          "height": 555,
+          "tone": "model"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "ctx-project",
+          "hir_ids": [
+            "N-ProjectContext",
+            "N-ResourceLoader"
+          ],
+          "claim_ids": [
+            "C-003",
+            "C-006"
+          ],
+          "evidence_ids": [
+            "S-004",
+            "S-005"
+          ],
+          "label": "System + project context",
+          "subtitle": "Startup / reload",
+          "tone": "capability",
+          "x": 70,
+          "y": 165,
+          "width": 300,
+          "height": 88
+        },
+        {
+          "id": "ctx-skills",
+          "hir_ids": [
+            "N-Skills"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-004"
+          ],
+          "label": "Skills",
+          "subtitle": "Metadata at startup; body lazy",
+          "tone": "capability",
+          "x": 410,
+          "y": 165,
+          "width": 300,
+          "height": 88
+        },
+        {
+          "id": "ctx-session",
+          "hir_ids": [
+            "N-Session",
+            "N-SessionStore"
+          ],
+          "claim_ids": [
+            "C-003",
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-008",
+            "R-004"
+          ],
+          "label": "Active session branch",
+          "subtitle": "Carry-forward durable history",
+          "tone": "state",
+          "x": 70,
+          "y": 330,
+          "width": 300,
+          "height": 88
+        },
+        {
+          "id": "ctx-tool",
+          "hir_ids": [
+            "N-ReadTool"
+          ],
+          "claim_ids": [
+            "C-002",
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-001",
+            "R-002"
+          ],
+          "label": "toolResult",
+          "subtitle": "Runtime append before next call",
+          "tone": "state",
+          "x": 410,
+          "y": 330,
+          "width": 300,
+          "height": 88
+        },
+        {
+          "id": "ctx-hooks",
+          "hir_ids": [
+            "N-Hooks"
+          ],
+          "claim_ids": [
+            "C-003",
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-002",
+            "S-003"
+          ],
+          "label": "Extension context hooks",
+          "subtitle": "Per turn / per request",
+          "tone": "policy",
+          "x": 70,
+          "y": 495,
+          "width": 300,
+          "height": 88
+        },
+        {
+          "id": "ctx-compact",
+          "hir_ids": [
+            "N-Compactor"
+          ],
+          "claim_ids": [
+            "C-009",
+            "C-020"
+          ],
+          "evidence_ids": [
+            "S-009",
+            "X-003"
+          ],
+          "label": "Compaction summary",
+          "subtitle": "Threshold / overflow replacement",
+          "tone": "state",
+          "x": 410,
+          "y": 495,
+          "width": 300,
+          "height": 88,
+          "badge": "X-003"
+        },
+        {
+          "id": "ctx-builder",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-001",
+            "S-002",
+            "R-002"
+          ],
+          "label": "Context assembly",
+          "subtitle": "transformContext -> convertToLlm",
+          "tone": "core",
+          "x": 835,
+          "y": 300,
+          "width": 270,
+          "height": 110
+        },
+        {
+          "id": "ctx-model",
+          "hir_ids": [
+            "N-Models",
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "S-012",
+            "R-001",
+            "R-002"
+          ],
+          "label": "Provider request",
+          "subtitle": "System, messages, tools, model",
+          "tone": "model",
+          "x": 1230,
+          "y": 300,
+          "width": 285,
+          "height": 110
+        }
+      ],
+      "edges": [
+        {
+          "id": "ctx-e1",
+          "source": "ctx-project",
+          "target": "ctx-builder",
+          "points": [
+            [
+              370,
+              209
+            ],
+            [
+              390,
+              209
+            ],
+            [
+              390,
+              275
+            ],
+            [
+              770,
+              275
+            ],
+            [
+              770,
+              325
+            ],
+            [
+              835,
+              325
+            ]
+          ],
+          "label": "startup",
+          "label_x": 590,
+          "label_y": 264,
+          "status": "static",
+          "evidence_ids": [
+            "S-004",
+            "S-005"
+          ]
+        },
+        {
+          "id": "ctx-e2",
+          "source": "ctx-skills",
+          "target": "ctx-builder",
+          "points": [
+            [
+              710,
+              209
+            ],
+            [
+              770,
+              209
+            ],
+            [
+              770,
+              345
+            ],
+            [
+              835,
+              345
+            ]
+          ],
+          "label": "lazy",
+          "label_x": 755,
+          "label_y": 255,
+          "status": "static",
+          "evidence_ids": [
+            "S-004"
+          ]
+        },
+        {
+          "id": "ctx-e3",
+          "source": "ctx-session",
+          "target": "ctx-builder",
+          "points": [
+            [
+              370,
+              374
+            ],
+            [
+              390,
+              374
+            ],
+            [
+              390,
+              445
+            ],
+            [
+              770,
+              445
+            ],
+            [
+              770,
+              365
+            ],
+            [
+              835,
+              365
+            ]
+          ],
+          "label": "active branch",
+          "label_x": 580,
+          "label_y": 434,
+          "status": "observed",
+          "evidence_ids": [
+            "S-008",
+            "R-004"
+          ]
+        },
+        {
+          "id": "ctx-e4",
+          "source": "ctx-tool",
+          "target": "ctx-builder",
+          "points": [
+            [
+              710,
+              374
+            ],
+            [
+              835,
+              374
+            ]
+          ],
+          "status": "observed",
+          "evidence_ids": [
+            "S-001",
+            "R-002"
+          ]
+        },
+        {
+          "id": "ctx-e5",
+          "source": "ctx-hooks",
+          "target": "ctx-builder",
+          "points": [
+            [
+              370,
+              539
+            ],
+            [
+              390,
+              539
+            ],
+            [
+              390,
+              620
+            ],
+            [
+              770,
+              620
+            ],
+            [
+              770,
+              390
+            ],
+            [
+              835,
+              390
+            ]
+          ],
+          "label": "per request",
+          "label_x": 590,
+          "label_y": 609,
+          "status": "static",
+          "evidence_ids": [
+            "S-002",
+            "S-003"
+          ]
+        },
+        {
+          "id": "ctx-e6",
+          "source": "ctx-compact",
+          "target": "ctx-builder",
+          "points": [
+            [
+              710,
+              539
+            ],
+            [
+              790,
+              539
+            ],
+            [
+              790,
+              405
+            ],
+            [
+              835,
+              405
+            ]
+          ],
+          "label": "summary",
+          "label_x": 760,
+          "label_y": 500,
+          "status": "experimental",
+          "evidence_ids": [
+            "S-009",
+            "X-003"
+          ]
+        },
+        {
+          "id": "ctx-e7",
+          "source": "ctx-builder",
+          "target": "ctx-model",
+          "points": [
+            [
+              1105,
+              355
+            ],
+            [
+              1230,
+              355
+            ]
+          ],
+          "label": "model request",
+          "label_x": 1167,
+          "label_y": 344,
+          "status": "observed",
+          "evidence_ids": [
+            "S-001",
+            "S-012",
+            "R-002"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pi-extension-injection",
+      "title": "Pi extension surface: three different control points",
+      "description": "Context injection, capability registration, and action control are separate mechanisms with different safety implications.",
+      "kicker": "EXTENSION MODEL",
+      "width": 1600,
+      "height": 800,
+      "footer": "Context and registry paths are source-visible; direct read execution was observed; policy and sandbox remain optional",
+      "groups": [
+        {
+          "label": "assemble(): what the model sees",
+          "x": 35,
+          "y": 115,
+          "width": 470,
+          "height": 610,
+          "tone": "capability"
+        },
+        {
+          "label": "reach(): what the model can call",
+          "x": 565,
+          "y": 115,
+          "width": 470,
+          "height": 610,
+          "tone": "model"
+        },
+        {
+          "label": "execute(): how actions run",
+          "x": 1095,
+          "y": 115,
+          "width": 470,
+          "height": 610,
+          "tone": "policy"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "ext-project",
+          "hir_ids": [
+            "N-ProjectContext"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-004",
+            "S-005"
+          ],
+          "label": "Project instructions",
+          "subtitle": "AGENTS / CLAUDE / SYSTEM",
+          "tone": "capability",
+          "x": 75,
+          "y": 165,
+          "width": 390,
+          "height": 86
+        },
+        {
+          "id": "ext-skills",
+          "hir_ids": [
+            "N-Skills"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-004"
+          ],
+          "label": "Skills",
+          "subtitle": "Metadata + lazy invocation",
+          "tone": "capability",
+          "x": 75,
+          "y": 295,
+          "width": 390,
+          "height": 86
+        },
+        {
+          "id": "ext-context-hooks",
+          "hir_ids": [
+            "N-Hooks"
+          ],
+          "claim_ids": [
+            "C-003",
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-002",
+            "S-003"
+          ],
+          "label": "Input / context hooks",
+          "subtitle": "Transform messages or system prompt",
+          "tone": "policy",
+          "x": 75,
+          "y": 425,
+          "width": 390,
+          "height": 86
+        },
+        {
+          "id": "ext-context",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-001",
+            "S-002"
+          ],
+          "label": "Context assembly",
+          "subtitle": "Provider-visible request",
+          "tone": "core",
+          "x": 75,
+          "y": 570,
+          "width": 390,
+          "height": 92
+        },
+        {
+          "id": "ext-builtins",
+          "hir_ids": [
+            "N-ReadTool",
+            "N-Bash"
+          ],
+          "claim_ids": [
+            "C-004",
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-003",
+            "S-007"
+          ],
+          "label": "Built-in tools",
+          "subtitle": "read / write / edit / bash",
+          "tone": "capability",
+          "x": 605,
+          "y": 165,
+          "width": 390,
+          "height": 86
+        },
+        {
+          "id": "ext-plugins",
+          "hir_ids": [
+            "N-SubagentPlugin"
+          ],
+          "claim_ids": [
+            "C-013",
+            "C-017"
+          ],
+          "evidence_ids": [
+            "S-015",
+            "S-017"
+          ],
+          "label": "Extension tools",
+          "subtitle": "Custom tools, subagent examples",
+          "tone": "capability",
+          "x": 605,
+          "y": 335,
+          "width": 390,
+          "height": 86
+        },
+        {
+          "id": "ext-registry",
+          "hir_ids": [
+            "N-ToolRegistry"
+          ],
+          "claim_ids": [
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-003",
+            "R-002"
+          ],
+          "label": "Unified tool registry",
+          "subtitle": "Schema advertised to the model",
+          "tone": "model",
+          "x": 605,
+          "y": 570,
+          "width": 390,
+          "height": 92
+        },
+        {
+          "id": "ext-dispatch",
+          "hir_ids": [
+            "N-LowLoop"
+          ],
+          "claim_ids": [
+            "C-002",
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-001",
+            "R-002"
+          ],
+          "label": "Tool dispatch",
+          "subtitle": "Validated args -> execute",
+          "tone": "core",
+          "x": 1135,
+          "y": 165,
+          "width": 390,
+          "height": 86
+        },
+        {
+          "id": "ext-gate",
+          "hir_ids": [
+            "N-Hooks",
+            "N-OptionalGate"
+          ],
+          "claim_ids": [
+            "C-005",
+            "C-017"
+          ],
+          "evidence_ids": [
+            "S-003",
+            "S-017"
+          ],
+          "label": "Optional tool_call gate",
+          "subtitle": "Allow / block / rewrite by extension",
+          "tone": "policy",
+          "x": 1135,
+          "y": 315,
+          "width": 390,
+          "height": 86,
+          "badge": "OPT"
+        },
+        {
+          "id": "ext-host",
+          "hir_ids": [
+            "N-ReadTool",
+            "N-Bash",
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-005",
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-007",
+            "R-002"
+          ],
+          "label": "Host execution",
+          "subtitle": "Pi process permissions",
+          "tone": "execution",
+          "x": 1135,
+          "y": 465,
+          "width": 390,
+          "height": 86
+        },
+        {
+          "id": "ext-sandbox",
+          "hir_ids": [
+            "N-ExternalSandbox"
+          ],
+          "claim_ids": [
+            "C-005",
+            "C-007"
+          ],
+          "evidence_ids": [
+            "D-002",
+            "D-007"
+          ],
+          "label": "External container / VM",
+          "subtitle": "Whole process or routed tools",
+          "tone": "execution",
+          "x": 1135,
+          "y": 600,
+          "width": 390,
+          "height": 86,
+          "badge": "OPT"
+        }
+      ],
+      "edges": [
+        {
+          "id": "ext-e1",
+          "source": "ext-project",
+          "target": "ext-context",
+          "points": [
+            [
+              465,
+              208
+            ],
+            [
+              485,
+              208
+            ],
+            [
+              485,
+              616
+            ],
+            [
+              465,
+              616
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "S-004",
+            "S-005"
+          ]
+        },
+        {
+          "id": "ext-e2",
+          "source": "ext-skills",
+          "target": "ext-context",
+          "points": [
+            [
+              75,
+              338
+            ],
+            [
+              55,
+              338
+            ],
+            [
+              55,
+              616
+            ],
+            [
+              75,
+              616
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "S-004"
+          ]
+        },
+        {
+          "id": "ext-e3",
+          "source": "ext-context-hooks",
+          "target": "ext-context",
+          "points": [
+            [
+              270,
+              511
+            ],
+            [
+              270,
+              570
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "S-002",
+            "S-003"
+          ]
+        },
+        {
+          "id": "ext-e4",
+          "source": "ext-builtins",
+          "target": "ext-registry",
+          "points": [
+            [
+              995,
+              208
+            ],
+            [
+              1015,
+              208
+            ],
+            [
+              1015,
+              616
+            ],
+            [
+              995,
+              616
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "S-003",
+            "S-007"
+          ]
+        },
+        {
+          "id": "ext-e5",
+          "source": "ext-plugins",
+          "target": "ext-registry",
+          "points": [
+            [
+              800,
+              421
+            ],
+            [
+              800,
+              570
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "S-003",
+            "S-015"
+          ]
+        },
+        {
+          "id": "ext-e6",
+          "source": "ext-dispatch",
+          "target": "ext-host",
+          "points": [
+            [
+              1525,
+              208
+            ],
+            [
+              1545,
+              208
+            ],
+            [
+              1545,
+              508
+            ],
+            [
+              1525,
+              508
+            ]
+          ],
+          "label": "default path",
+          "label_x": 1490,
+          "label_y": 447,
+          "status": "observed",
+          "evidence_ids": [
+            "S-001",
+            "R-002"
+          ]
+        },
+        {
+          "id": "ext-e7",
+          "source": "ext-dispatch",
+          "target": "ext-gate",
+          "points": [
+            [
+              1330,
+              251
+            ],
+            [
+              1330,
+              315
+            ]
+          ],
+          "status": "static",
+          "evidence_ids": [
+            "S-003",
+            "S-017"
+          ]
+        },
+        {
+          "id": "ext-e8",
+          "source": "ext-gate",
+          "target": "ext-host",
+          "points": [
+            [
+              1330,
+              401
+            ],
+            [
+              1330,
+              465
+            ]
+          ],
+          "label": "if installed",
+          "label_x": 1380,
+          "label_y": 445,
+          "status": "static",
+          "evidence_ids": [
+            "S-003",
+            "S-017"
+          ]
+        },
+        {
+          "id": "ext-e9",
+          "source": "ext-sandbox",
+          "target": "ext-host",
+          "points": [
+            [
+              1330,
+              600
+            ],
+            [
+              1330,
+              551
+            ]
+          ],
+          "label": "optional containment",
+          "label_x": 1420,
+          "label_y": 580,
+          "status": "static",
+          "evidence_ids": [
+            "D-007"
+          ]
+        }
+      ]
+    }
+  ]
+}

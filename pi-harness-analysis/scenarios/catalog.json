@@ -1,0 +1,95 @@
+{
+  "safety_gate": {
+    "authorization": "User explicitly authorized use of the supplied SiFlow endpoint for agent tests.",
+    "credentials": "No API key stored or required; models.json used a non-secret placeholder.",
+    "home": "/tmp/pi-analysis-runtime/home",
+    "limits": {
+      "cost_rates": 0,
+      "shell_side_effects": "not exercised",
+      "tools": "disabled or read-only"
+    },
+    "network": "Only the configured SiFlow HTTPS endpoint; npm/node downloads occurred during setup.",
+    "session_dir": "/tmp/pi-analysis-runtime/sessions",
+    "workspace": "/tmp/pi-analysis-runtime/fixture"
+  },
+  "scenarios": [
+    {
+      "id": "R-SCENARIO-000",
+      "mode": "real",
+      "result": "siflow/qwen3.6-35ba3b listed",
+      "status": "passed",
+      "title": "Custom model discovery"
+    },
+    {
+      "claims_tested": [
+        "C-002",
+        "C-019"
+      ],
+      "id": "R-SCENARIO-001",
+      "mode": "real",
+      "result": "PI_TEXT_OK",
+      "status": "passed",
+      "title": "Text-only stop",
+      "trace": "traces/normalized/R-001-text-only.normalized.jsonl"
+    },
+    {
+      "claims_tested": [
+        "C-002",
+        "C-004",
+        "C-011"
+      ],
+      "id": "R-SCENARIO-002",
+      "mode": "real",
+      "result": "read executed; final 314159",
+      "status": "passed",
+      "title": "Read tool loop",
+      "trace": "traces/normalized/R-002-read-tool.normalized.jsonl"
+    },
+    {
+      "claims_tested": [
+        "C-008",
+        "C-012"
+      ],
+      "id": "R-SCENARIO-003",
+      "mode": "real",
+      "result": "ACK and JSONL persisted",
+      "status": "passed",
+      "title": "Create persistent session",
+      "trace": "traces/normalized/R-003-session-create.normalized.jsonl"
+    },
+    {
+      "claims_tested": [
+        "C-008",
+        "C-012"
+      ],
+      "id": "R-SCENARIO-004",
+      "mode": "real",
+      "result": "PI_RESUME_2718 recovered in a new process",
+      "status": "passed",
+      "title": "Resume persistent session",
+      "trace": "traces/normalized/R-004-session-resume.normalized.jsonl"
+    },
+    {
+      "id": "X-SCENARIO-001",
+      "mode": "scripted-faux",
+      "result": "39/39",
+      "status": "passed",
+      "title": "agent-core loop tests"
+    },
+    {
+      "id": "X-SCENARIO-002",
+      "mode": "scripted-faux",
+      "result": "61/61",
+      "status": "passed",
+      "title": "new AgentHarness tests"
+    },
+    {
+      "id": "X-SCENARIO-003",
+      "mode": "scripted-faux",
+      "result": "31/31",
+      "status": "passed",
+      "title": "Coding Agent compaction/retry/session tests"
+    }
+  ],
+  "schema_version": "1.0"
+}

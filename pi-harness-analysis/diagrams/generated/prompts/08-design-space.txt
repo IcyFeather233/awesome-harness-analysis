@@ -1,0 +1,43 @@
+Use case: infographic-diagram
+Asset type: reader-facing architecture design-space matrix
+Primary request: Explain four Pi product stances, the mechanisms recovered from code, and their observable tradeoffs. Preserve the distinction between documented stance and analyst synthesis.
+
+Mandatory layout and arrows:
+- Use a clean three-column by four-row matrix. Column headers are "Documented stance", "Recovered mechanism", and "Observable tradeoff".
+- Row 1: "Thin generic core" -> "runAgentLoop + orchestration" -> "Composable, split ownership".
+- Row 2: "Extension over built-ins" -> "Registry + lifecycle hooks" -> "Flexible, fragmented policy".
+- Row 3: "Externalize isolation" -> "Host + optional container" -> "Honest boundary, deployment burden".
+- Row 4: "Append-oriented state" -> "JSONL tree + compaction" -> "Auditable, no workspace rollback".
+- Use solid neutral arrows from the left column to the center column. Use dotted amber arrows from the center column to the right column.
+- Place one small badge above the right column containing exactly "ANALYST SYNTHESIS".
+- Give each row a distinct recognizable icon family: thin loop, extension puzzle/toolbox, host/container boundary, and JSONL tree/state.
+- Keep each row aligned and visually independent; no arrows between rows.
+
+Text (verbatim, case-sensitive):
+"Documented stance"
+"Recovered mechanism"
+"Observable tradeoff"
+"Thin generic core"
+"runAgentLoop + orchestration"
+"Composable, split ownership"
+"Extension over built-ins"
+"Registry + lifecycle hooks"
+"Flexible, fragmented policy"
+"Externalize isolation"
+"Host + optional container"
+"Honest boundary, deployment burden"
+"Append-oriented state"
+"JSONL tree + compaction"
+"Auditable, no workspace rollback"
+"ANALYST SYNTHESIS"
+
+Style and visual hierarchy:
+- Clean academic design-space infographic with friendly hand-sketched geometry, large row icons, bold dark-gray outlines, flat pastel fills, clear column alignment, and generous whitespace.
+- White background. Cool documented-stance column, coral mechanism column, amber tradeoff column. Use a different subtle row accent for the four design themes.
+- Labels must remain horizontal and readable at 1200px report width. The matrix should feel like an explanatory systems-research figure, not a spreadsheet screenshot.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing artwork.
+
+Constraints:
+- Use only the exact text listed above; no title, caption, evidence IDs, source paths, paragraphs, author intent claims, extra design rows, scores, rankings, or invented alternatives.
+- The right-column arrows must be dotted to indicate inference. Do not label analyst tradeoffs as documented facts.
+- No gradients, shadows, 3D, photorealism, tiny print, crossing arrows, decorative background, logos, or watermark.

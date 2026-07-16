@@ -1,0 +1,1278 @@
+{
+  "edges": [
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-013",
+        "R-001"
+      ],
+      "id": "E-CLI-Main",
+      "label": "invoke",
+      "source": "N-CLI",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-Main",
+      "type": "enters"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-013",
+        "R-001"
+      ],
+      "id": "E-Main-Runtime",
+      "label": "create runtime",
+      "source": "N-Main",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-SessionRuntime",
+      "type": "calls"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-014",
+        "R-004"
+      ],
+      "id": "E-Runtime-Session",
+      "label": "own/rebind",
+      "source": "N-SessionRuntime",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-AgentSession",
+      "type": "calls"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-002",
+        "R-001",
+        "R-002"
+      ],
+      "id": "E-AgentSession-Loop",
+      "label": "prompt/continue",
+      "source": "N-AgentSession",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-LowLoop",
+      "type": "calls"
+    },
+    {
+      "conditions": {
+        "surface": "new AgentHarness"
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "S-011",
+        "X-002"
+      ],
+      "id": "E-AgentHarness-Loop",
+      "label": "direct loop",
+      "source": "N-AgentHarness",
+      "source_refs": [],
+      "status": "experimental_verified",
+      "target": "N-LowLoop",
+      "type": "calls"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-008",
+        "R-004"
+      ],
+      "id": "E-Session-Context",
+      "label": "active branch",
+      "source": "N-Session",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-Context",
+      "type": "reads"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-002",
+        "S-005"
+      ],
+      "id": "E-Resource-Context",
+      "label": "resources",
+      "source": "N-ResourceLoader",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-Context",
+      "type": "assembles"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-004"
+      ],
+      "id": "E-Project-Context",
+      "label": "project instructions",
+      "source": "N-ProjectContext",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-Context",
+      "type": "injects"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-002",
+        "S-004"
+      ],
+      "id": "E-Skills-Context",
+      "label": "metadata/invocation",
+      "source": "N-Skills",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-Context",
+      "type": "injects"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "D-002",
+        "S-005",
+        "S-006"
+      ],
+      "id": "E-Trust-Resource",
+      "label": "load project resources",
+      "source": "N-ProjectTrust",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-ResourceLoader",
+      "type": "authorizes"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-001",
+        "R-001"
+      ],
+      "id": "E-Loop-Context",
+      "label": "convert before request",
+      "source": "N-LowLoop",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-Context",
+      "type": "assembles"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-001",
+        "R-001"
+      ],
+      "id": "E-Context-Model",
+      "label": "system/messages/tools",
+      "source": "N-Context",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-ModelCall",
+      "type": "calls"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-012",
+        "R-001"
+      ],
+      "id": "E-Models-Call",
+      "label": "auth + dispatch",
+      "source": "N-Models",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-ModelCall",
+      "type": "executes"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "R-002"
+      ],
+      "id": "E-Model-Tool",
+      "label": "toolUse",
+      "source": "N-ModelCall",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-ReadTool",
+      "type": "proposes"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-003",
+        "R-002"
+      ],
+      "id": "E-Registry-Tool",
+      "label": "active tool",
+      "source": "N-ToolRegistry",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-ReadTool",
+      "type": "registers"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-001",
+        "R-002"
+      ],
+      "id": "E-Loop-Tool",
+      "label": "dispatch",
+      "source": "N-LowLoop",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-ReadTool",
+      "type": "executes"
+    },
+    {
+      "conditions": {
+        "extension_required": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "S-003",
+        "S-017",
+        "X-001"
+      ],
+      "id": "E-Hook-Gate",
+      "label": "tool_call policy",
+      "source": "N-Hooks",
+      "source_refs": [],
+      "status": "experimental_verified",
+      "target": "N-OptionalGate",
+      "type": "calls"
+    },
+    {
+      "conditions": {
+        "extension_required": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "S-003",
+        "S-017"
+      ],
+      "id": "E-Gate-Tool",
+      "label": "allow/block",
+      "source": "N-OptionalGate",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-ReadTool",
+      "type": "authorizes"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "R-002"
+      ],
+      "id": "E-Read-Workspace",
+      "label": "fixture.txt",
+      "source": "N-ReadTool",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-Workspace",
+      "type": "reads"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-001",
+        "R-002"
+      ],
+      "id": "E-Tool-Context",
+      "label": "toolResult",
+      "source": "N-ReadTool",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-Context",
+      "type": "appends_to_context"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-007",
+        "D-002"
+      ],
+      "id": "E-Bash-Workspace",
+      "label": "local shell",
+      "source": "N-Bash",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-Workspace",
+      "type": "executes"
+    },
+    {
+      "conditions": {
+        "external_configuration": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-007"
+      ],
+      "id": "E-Sandbox-Bash",
+      "label": "optional routed backend",
+      "source": "N-ExternalSandbox",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-Bash",
+      "type": "executes"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-002",
+        "S-008",
+        "R-003"
+      ],
+      "id": "E-AgentSession-Session",
+      "label": "live messages",
+      "source": "N-AgentSession",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-Session",
+      "type": "writes"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-008",
+        "R-003"
+      ],
+      "id": "E-Session-Store",
+      "label": "append JSONL",
+      "source": "N-Session",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-SessionStore",
+      "type": "persists"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-008",
+        "R-004"
+      ],
+      "id": "E-Store-Session",
+      "label": "active branch",
+      "source": "N-SessionStore",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-Session",
+      "type": "restores"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-009",
+        "X-003"
+      ],
+      "id": "E-Compactor-Session",
+      "label": "summary boundary",
+      "source": "N-Compactor",
+      "source_refs": [],
+      "status": "experimental_verified",
+      "target": "N-Session",
+      "type": "compacts"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-008",
+        "S-009",
+        "X-003"
+      ],
+      "id": "E-Compactor-Store",
+      "label": "compaction entry",
+      "source": "N-Compactor",
+      "source_refs": [],
+      "status": "experimental_verified",
+      "target": "N-SessionStore",
+      "type": "persists"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-009",
+        "S-010",
+        "X-003"
+      ],
+      "id": "E-Retry-Agent",
+      "label": "bounded continue",
+      "source": "N-Retry",
+      "source_refs": [],
+      "status": "experimental_verified",
+      "target": "N-AgentSession",
+      "type": "retries"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "D-005",
+        "R-001",
+        "R-002"
+      ],
+      "id": "E-Loop-Events",
+      "label": "lifecycle events",
+      "source": "N-LowLoop",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-Events",
+      "type": "emits_trace"
+    },
+    {
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-001",
+        "R-001"
+      ],
+      "id": "E-Loop-Exit",
+      "label": "no tools/queues",
+      "source": "N-LowLoop",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "target": "N-Exit",
+      "type": "exits_to"
+    },
+    {
+      "conditions": {
+        "extension_required": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "S-015"
+      ],
+      "id": "E-Plugin-Registry",
+      "label": "subagent tool",
+      "source": "N-SubagentPlugin",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-ToolRegistry",
+      "type": "registers"
+    },
+    {
+      "conditions": {
+        "extension_required": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-006",
+        "S-015"
+      ],
+      "id": "E-Plugin-Subagent",
+      "label": "spawn pi --mode json",
+      "source": "N-SubagentPlugin",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-Subagent",
+      "type": "delegates"
+    },
+    {
+      "conditions": {
+        "extension_required": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-006",
+        "S-015"
+      ],
+      "id": "E-Subagent-Workspace",
+      "label": "same cwd by default",
+      "source": "N-Subagent",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-Workspace",
+      "type": "shares_workspace_with"
+    },
+    {
+      "conditions": {
+        "extension_required": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-006",
+        "S-015"
+      ],
+      "id": "E-Subagent-Context",
+      "label": "separate process/no session",
+      "source": "N-Subagent",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-AgentSession",
+      "type": "isolates_context_from"
+    },
+    {
+      "conditions": {
+        "package": "experimental"
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-010",
+        "S-016"
+      ],
+      "id": "E-Orchestrator-Subagent",
+      "label": "independent RPC instance",
+      "source": "N-Orchestrator",
+      "source_refs": [],
+      "status": "static_only",
+      "target": "N-Subagent",
+      "type": "delegates"
+    }
+  ],
+  "nodes": [
+    {
+      "attributes": {
+        "layer": "interface",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-013",
+        "R-001"
+      ],
+      "id": "N-CLI",
+      "name": "pi CLI / JSON / RPC / TUI",
+      "source_refs": [
+        {
+          "end_line": 857,
+          "path": "packages/coding-agent/src/main.ts",
+          "start_line": 650,
+          "symbol": "main"
+        }
+      ],
+      "status": "runtime_verified",
+      "summary": "Shared user and embedding interfaces.",
+      "type": "Interface"
+    },
+    {
+      "attributes": {
+        "layer": "interface",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-013",
+        "R-001"
+      ],
+      "id": "N-Main",
+      "name": "main()",
+      "source_refs": [
+        {
+          "end_line": 857,
+          "path": "packages/coding-agent/src/main.ts",
+          "start_line": 473,
+          "symbol": "main"
+        }
+      ],
+      "status": "runtime_verified",
+      "summary": "Parses mode, trust, resources, session and model configuration.",
+      "type": "Entrypoint"
+    },
+    {
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-014",
+        "R-004"
+      ],
+      "id": "N-SessionRuntime",
+      "name": "AgentSessionRuntime",
+      "source_refs": [
+        {
+          "end_line": 353,
+          "path": "packages/coding-agent/src/core/agent-session-runtime.ts",
+          "start_line": 67,
+          "symbol": "AgentSessionRuntime"
+        }
+      ],
+      "status": "runtime_verified",
+      "summary": "Owns one AgentSession and recreates cwd-bound services on structural session changes.",
+      "type": "Router"
+    },
+    {
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-002",
+        "S-003",
+        "R-001",
+        "X-003"
+      ],
+      "id": "N-AgentSession",
+      "name": "Coding Agent AgentSession",
+      "source_refs": [
+        {
+          "end_line": 2740,
+          "path": "packages/coding-agent/src/core/agent-session.ts",
+          "start_line": 269,
+          "symbol": "AgentSession"
+        }
+      ],
+      "status": "runtime_verified",
+      "summary": "Current product orchestration for prompt expansion, retry, compaction, extensions and persistence.",
+      "type": "AgentLoop"
+    },
+    {
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {
+        "surface": "agent-core API, not default coding-agent"
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-003",
+        "S-011",
+        "X-002"
+      ],
+      "id": "N-AgentHarness",
+      "name": "New AgentHarness",
+      "source_refs": [
+        {
+          "end_line": 1010,
+          "path": "packages/agent/src/harness/agent-harness.ts",
+          "start_line": 152,
+          "symbol": "AgentHarness"
+        }
+      ],
+      "status": "experimental_verified",
+      "summary": "New generic orchestration layer with snapshots and save points; migration incomplete.",
+      "type": "AgentLoop"
+    },
+    {
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-001",
+        "R-001",
+        "R-002",
+        "X-001"
+      ],
+      "id": "N-LowLoop",
+      "name": "runAgentLoop",
+      "source_refs": [
+        {
+          "end_line": 755,
+          "path": "packages/agent/src/agent-loop.ts",
+          "start_line": 95,
+          "symbol": "runAgentLoop"
+        }
+      ],
+      "status": "runtime_verified",
+      "summary": "Low-level model/tool/queue loop shared by Agent and AgentHarness.",
+      "type": "AgentLoop"
+    },
+    {
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "per-turn",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "S-004",
+        "R-001"
+      ],
+      "id": "N-Context",
+      "name": "Context assembly",
+      "source_refs": [
+        {
+          "end_line": 314,
+          "path": "packages/agent/src/agent-loop.ts",
+          "start_line": 281,
+          "symbol": "streamAssistantResponse"
+        }
+      ],
+      "status": "runtime_verified",
+      "summary": "Builds system + transcript + tools before the provider call.",
+      "type": "ContextBuilder"
+    },
+    {
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "startup/reload",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-005",
+        "S-006"
+      ],
+      "id": "N-ResourceLoader",
+      "name": "DefaultResourceLoader",
+      "source_refs": [
+        {
+          "end_line": 1025,
+          "path": "packages/coding-agent/src/core/resource-loader.ts",
+          "start_line": 159,
+          "symbol": "DefaultResourceLoader"
+        }
+      ],
+      "status": "static_only",
+      "summary": "Discovers trusted resources, extensions, prompts, themes and skills.",
+      "type": "ContextTransformer"
+    },
+    {
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "startup/reload",
+        "persistence_tier": "live",
+        "trust_zone": "workspace"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-004",
+        "D-002"
+      ],
+      "id": "N-ProjectContext",
+      "name": "AGENTS/CLAUDE + SYSTEM",
+      "source_refs": [
+        {
+          "end_line": 159,
+          "path": "packages/coding-agent/src/core/system-prompt.ts",
+          "start_line": 43,
+          "symbol": "buildSystemPrompt"
+        }
+      ],
+      "status": "static_only",
+      "summary": "Project/user instruction sources embedded in the system prompt.",
+      "type": "PromptSource"
+    },
+    {
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "startup/lazy",
+        "persistence_tier": "live",
+        "trust_zone": "workspace"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-002",
+        "S-004"
+      ],
+      "id": "N-Skills",
+      "name": "Skills",
+      "source_refs": [],
+      "status": "static_only",
+      "summary": "Metadata is advertised in system prompt and full skill content is injected on invocation.",
+      "type": "Skill"
+    },
+    {
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "threshold/overflow/manual",
+        "persistence_tier": "durable",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-009",
+        "X-003"
+      ],
+      "id": "N-Compactor",
+      "name": "Coding Agent compaction",
+      "source_refs": [
+        {
+          "end_line": 2161,
+          "path": "packages/coding-agent/src/core/agent-session.ts",
+          "start_line": 1890,
+          "symbol": "_checkCompaction"
+        }
+      ],
+      "status": "experimental_verified",
+      "summary": "Summarizes older branch content and persists a compaction boundary.",
+      "type": "Compactor"
+    },
+    {
+      "attributes": {
+        "layer": "infrastructure",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "network"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-012",
+        "R-005",
+        "R-001"
+      ],
+      "id": "N-Models",
+      "name": "pi-ai Models / ModelRegistry",
+      "source_refs": [
+        {
+          "end_line": 369,
+          "path": "packages/ai/src/models.ts",
+          "start_line": 24,
+          "symbol": "ModelsImpl"
+        }
+      ],
+      "status": "runtime_verified",
+      "summary": "Provider catalog, auth and API dispatch boundary.",
+      "type": "ModelAdapter"
+    },
+    {
+      "attributes": {
+        "layer": "infrastructure",
+        "lifecycle": "per-turn",
+        "persistence_tier": "live",
+        "trust_zone": "network"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-001",
+        "S-012",
+        "R-001",
+        "R-002"
+      ],
+      "id": "N-ModelCall",
+      "name": "Provider request",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "summary": "Streaming model request and response boundary.",
+      "type": "ModelCall"
+    },
+    {
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-003",
+        "R-002"
+      ],
+      "id": "N-ToolRegistry",
+      "name": "Unified tool registry",
+      "source_refs": [
+        {
+          "end_line": 2487,
+          "path": "packages/coding-agent/src/core/agent-session.ts",
+          "start_line": 2397,
+          "symbol": "_refreshToolRegistry"
+        }
+      ],
+      "status": "runtime_verified",
+      "summary": "Merges built-in, extension and SDK tools with allow/exclude filters.",
+      "type": "ToolRegistry"
+    },
+    {
+      "attributes": {
+        "layer": "execution",
+        "lifecycle": "tool-call",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "R-002",
+        "S-003"
+      ],
+      "id": "N-ReadTool",
+      "name": "read tool",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "summary": "Built-in read capability observed in the real tool scenario.",
+      "type": "Tool"
+    },
+    {
+      "attributes": {
+        "layer": "execution",
+        "lifecycle": "tool-call",
+        "persistence_tier": "live",
+        "trust_zone": "host"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-007",
+        "D-002"
+      ],
+      "id": "N-Bash",
+      "name": "Local bash backend",
+      "source_refs": [
+        {
+          "end_line": 148,
+          "path": "packages/coding-agent/src/core/tools/bash.ts",
+          "start_line": 27,
+          "symbol": "createLocalBashOperations"
+        }
+      ],
+      "status": "static_only",
+      "summary": "Spawns inherited-environment shell in cwd with optional timeout.",
+      "type": "ExecutionBackend"
+    },
+    {
+      "attributes": {
+        "layer": "governance",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-002",
+        "S-003",
+        "S-017",
+        "X-001"
+      ],
+      "id": "N-Hooks",
+      "name": "Extension hooks",
+      "source_refs": [],
+      "status": "experimental_verified",
+      "summary": "Optional control/mutation hooks around input, context, tools, sessions and provider boundaries.",
+      "type": "Hook"
+    },
+    {
+      "attributes": {
+        "layer": "governance",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {
+        "extension_required": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-004",
+        "S-017"
+      ],
+      "id": "N-OptionalGate",
+      "name": "Optional extension gate",
+      "source_refs": [],
+      "status": "static_only",
+      "summary": "Application-defined tool_call blocking; absent by default.",
+      "type": "PermissionGate"
+    },
+    {
+      "attributes": {
+        "layer": "governance",
+        "lifecycle": "startup/reload",
+        "persistence_tier": "live",
+        "trust_zone": "resource-loading"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "D-002",
+        "S-005",
+        "S-006"
+      ],
+      "id": "N-ProjectTrust",
+      "name": "Project trust",
+      "source_refs": [],
+      "status": "static_only",
+      "summary": "Gates project-local settings/resources/extensions, not tool execution.",
+      "type": "PolicyRule"
+    },
+    {
+      "attributes": {
+        "layer": "execution",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "external"
+      },
+      "conditions": {
+        "external_configuration": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-007"
+      ],
+      "id": "N-ExternalSandbox",
+      "name": "External container / VM",
+      "source_refs": [],
+      "status": "static_only",
+      "summary": "Optional OS/VM boundary; not part of the default process.",
+      "type": "Sandbox"
+    },
+    {
+      "attributes": {
+        "layer": "execution",
+        "lifecycle": "runtime",
+        "persistence_tier": "filesystem",
+        "trust_zone": "host"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-007",
+        "R-002"
+      ],
+      "id": "N-Workspace",
+      "name": "cwd workspace",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "summary": "Shared filesystem root for built-in tools and optional child agents.",
+      "type": "Workspace"
+    },
+    {
+      "attributes": {
+        "layer": "state",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-008",
+        "R-003",
+        "R-004"
+      ],
+      "id": "N-Session",
+      "name": "Live active session",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "summary": "In-memory active branch and model context.",
+      "type": "Session"
+    },
+    {
+      "attributes": {
+        "layer": "state",
+        "lifecycle": "runtime",
+        "persistence_tier": "durable",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-008",
+        "R-003",
+        "R-004"
+      ],
+      "id": "N-SessionStore",
+      "name": "Session JSONL v3",
+      "source_refs": [
+        {
+          "end_line": 1540,
+          "path": "packages/coding-agent/src/core/session-manager.ts",
+          "start_line": 780,
+          "symbol": "SessionManager"
+        }
+      ],
+      "status": "runtime_verified",
+      "summary": "Append-only durable tree with header, entries and parent links.",
+      "type": "SessionStore"
+    },
+    {
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "failure",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-009",
+        "S-010",
+        "X-003"
+      ],
+      "id": "N-Retry",
+      "name": "Retry / overflow recovery",
+      "source_refs": [],
+      "status": "experimental_verified",
+      "summary": "Exponential provider retry and one-shot overflow compaction recovery.",
+      "type": "RecoveryPolicy"
+    },
+    {
+      "attributes": {
+        "layer": "observability",
+        "lifecycle": "runtime",
+        "persistence_tier": "stream",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "D-005",
+        "R-001",
+        "R-002"
+      ],
+      "id": "N-Events",
+      "name": "Agent events + JSON/RPC",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "summary": "Structured lifecycle event output; not a native span exporter.",
+      "type": "TelemetrySink"
+    },
+    {
+      "attributes": {
+        "layer": "extension",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {
+        "extension_required": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-006",
+        "S-015"
+      ],
+      "id": "N-SubagentPlugin",
+      "name": "Subagent example extension",
+      "source_refs": [],
+      "status": "static_only",
+      "summary": "Optional tool that spawns separate Pi processes.",
+      "type": "Plugin"
+    },
+    {
+      "attributes": {
+        "agent_role": "worker",
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "child-process"
+      },
+      "conditions": {
+        "extension_required": true
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-006",
+        "S-015"
+      ],
+      "id": "N-Subagent",
+      "name": "Child pi process",
+      "source_refs": [],
+      "status": "static_only",
+      "summary": "Separate context, same configured cwd unless overridden.",
+      "type": "Subagent"
+    },
+    {
+      "attributes": {
+        "agent_role": "supervisor",
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "supervisor"
+      },
+      "conditions": {
+        "package": "experimental"
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-010",
+        "S-016"
+      ],
+      "id": "N-Orchestrator",
+      "name": "Experimental OrchestratorSupervisor",
+      "source_refs": [],
+      "status": "static_only",
+      "summary": "Supervises independent RPC Pi instances; outside default CLI.",
+      "type": "Planner"
+    },
+    {
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "turn-end",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "confidence": "high",
+      "evidence_ids": [
+        "S-001",
+        "R-001",
+        "R-002"
+      ],
+      "id": "N-Exit",
+      "name": "agent_end / agent_settled",
+      "source_refs": [],
+      "status": "runtime_verified",
+      "summary": "No more tool calls or queued messages; product-level retry/compaction also settled.",
+      "type": "ExitCondition"
+    }
+  ],
+  "repository": {
+    "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+    "configurations": [
+      "v0.80.7 source snapshot",
+      "isolated JSON mode",
+      "SiFlow qwen3.6-35ba3b",
+      "faux-provider unit scenarios"
+    ],
+    "entrypoints": [
+      "coding-agent CLI interactive",
+      "coding-agent print/JSON",
+      "coding-agent RPC",
+      "agent-core SDK",
+      "experimental orchestrator (static only)"
+    ],
+    "root": "/volume/med/work/users/mzchen/lab/pi"
+  },
+  "schema_version": "1.0"
+}

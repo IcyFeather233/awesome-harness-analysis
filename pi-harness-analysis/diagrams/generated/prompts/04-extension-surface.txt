@@ -1,0 +1,43 @@
+Use case: infographic-diagram
+Asset type: reader-facing software extension architecture illustration
+Primary request: Explain that Pi has three different extension control points rather than one universal plugin gate. The three pipelines must remain visually separate and understandable in five seconds.
+
+Mandatory layout and arrows:
+- Use three equal vertical columns with large icon-backed headers: "What the model sees", "What the model can call", and "How actions run".
+- Column 1 contains three inputs: "Project instructions", "Skills", and "Input / context hooks". All three converge into "Context assembly". Do not connect these inputs to the tool registry.
+- Column 2 contains "Built-in tools" and "Extension tools". Both converge into "Unified tool registry". Add small examples below the two source labels: "read / write / edit / bash" and "custom / subagent".
+- Column 3 starts at "Tool dispatch". Draw a thick solid default arrow directly to "Host execution".
+- In Column 3, place "Optional tool_call gate" as a dashed detour between "Tool dispatch" and "Host execution". Add a small badge "OPT" and the short label "allow / block / rewrite".
+- Place "External container / VM" as a separate dashed outer boundary around or beside "Host execution". Add a small badge "OPT". It is optional containment, not an in-process plugin sandbox.
+- Use eye/context, toolbox/registry, dispatch, shield, host-process, and container icons.
+
+Text (verbatim, case-sensitive):
+"What the model sees"
+"Project instructions"
+"Skills"
+"Input / context hooks"
+"Context assembly"
+"What the model can call"
+"Built-in tools"
+"read / write / edit / bash"
+"Extension tools"
+"custom / subagent"
+"Unified tool registry"
+"How actions run"
+"Tool dispatch"
+"Optional tool_call gate"
+"allow / block / rewrite"
+"Host execution"
+"External container / VM"
+"OPT"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, large recognizable icons, bold dark-gray outlines, flat pastel fills, thick arrows, and generous whitespace.
+- White background. Yellow/teal context column, blue capability column, coral/amber execution-policy column, gray external boundary.
+- Make the three column headers and three convergence/end points visually dominant. Keep every label horizontal and readable at 1200px report width.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing artwork.
+
+Constraints:
+- Use only the exact text listed above; no title, legend, evidence IDs, source paths, paragraphs, MCP core, global plugin sandbox, mandatory approval, or invented extension manager.
+- The optional gate must not appear on the solid default arrow. The external container/VM must not appear inside the Pi process as a built-in mechanism.
+- No gradients, shadows, 3D, photorealism, tiny print, tangled cross-column arrows, decorative background, logos, or watermark.

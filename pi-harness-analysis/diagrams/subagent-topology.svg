@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1810" height="694" viewBox="0 0 1810 694" role="img">
+<title>Subagent Topology</title>
+<desc>Delegation, inheritance, isolation, and result aggregation.</desc>
+<defs>
+<marker id="arrow-runtime_verified" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#2E7D32"/></marker>
+<marker id="arrow-experimental_verified" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#2E7D32"/></marker>
+<marker id="arrow-static_only" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+<marker id="arrow-inferred" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B45309"/></marker>
+<marker id="arrow-conflicted" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B91C1C"/></marker>
+<marker id="arrow-unknown" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+</defs>
+<style>
+text { font-family: Inter, Arial, sans-serif; letter-spacing: 0; }
+.diagram-title { font-size: 24px; font-weight: 700; fill: #111827; }
+.diagram-subtitle { font-size: 13px; fill: #475569; }
+.group-title { font-size: 13px; font-weight: 700; fill: #334155; }
+.node-name { font-size: 13px; font-weight: 700; }
+.node-type { font-size: 11px; }
+.edge-label { font-size: 10px; fill: #334155; paint-order: stroke; stroke: #FFFFFF; stroke-width: 4px; stroke-linejoin: round; }
+.legend-title { font-size: 11px; font-weight: 700; fill: #334155; }
+.legend-label { font-size: 10px; fill: #475569; }
+</style>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="36" y="39" class="diagram-title">Subagent Topology</text>
+<text x="36" y="64" class="diagram-subtitle">Delegation, inheritance, isolation, and result aggregation.</text>
+<g class="group"><rect x="36.0" y="96.0" width="240.0" height="140.0" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="58.0" y="118.0" class="group-title">supervisor</text></g>
+<g class="group"><rect x="36.0" y="278.0" width="1738.0" height="140.0" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="58.0" y="300.0" class="group-title">Ungrouped</text></g>
+<g class="group"><rect x="36.0" y="460.0" width="240.0" height="140.0" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="58.0" y="482.0" class="group-title">worker</text></g>
+<g class="edge" data-id="E-AgentHarness-Loop" data-evidence="S-011,X-002"><title>E-AgentHarness-Loop: S-011,X-002</title><path d="M 370.0 396.0 C 370.0 430.0, 584.0 296.0, 584.0 330.0" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrow-experimental_verified)"/><text x="477.0" y="358.0" class="edge-label" text-anchor="middle">direct loop</text></g>
+<g class="edge" data-id="E-AgentSession-Loop" data-evidence="S-002,R-001,R-002"><title>E-AgentSession-Loop: S-002,R-001,R-002</title><path d="M 156.0 396.0 C 156.0 430.0, 584.0 296.0, 584.0 330.0" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrow-runtime_verified)"/><text x="370.0" y="358.0" class="edge-label" text-anchor="middle">prompt/continue</text></g>
+<g class="edge" data-id="E-AgentSession-Session" data-evidence="S-002,S-008,R-003"><title>E-AgentSession-Session: S-002,S-008,R-003</title><path d="M 156.0 396.0 C 156.0 430.0, 1440.0 296.0, 1440.0 330.0" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrow-runtime_verified)"/><text x="798.0" y="358.0" class="edge-label" text-anchor="middle">live messages</text></g>
+<g class="edge" data-id="E-Orchestrator-Subagent" data-evidence="D-010,S-016"><title>E-Orchestrator-Subagent: D-010,S-016</title><path d="M 156.0 214.0 C 156.0 348.1, 156.0 377.9, 156.0 512.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="156.0" y="358.0" class="edge-label" text-anchor="middle">independent RPC instance</text></g>
+<g class="edge" data-id="E-Retry-Agent" data-evidence="S-009,S-010,X-003"><title>E-Retry-Agent: S-009,S-010,X-003</title><path d="M 1654.0 396.0 C 1654.0 430.0, 156.0 296.0, 156.0 330.0" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrow-experimental_verified)"/><text x="905.0" y="358.0" class="edge-label" text-anchor="middle">bounded continue</text></g>
+<g class="edge" data-id="E-Session-Context" data-evidence="S-008,R-004"><title>E-Session-Context: S-008,R-004</title><path d="M 1440.0 396.0 C 1440.0 430.0, 1012.0 296.0, 1012.0 330.0" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrow-runtime_verified)"/><text x="1226.0" y="358.0" class="edge-label" text-anchor="middle">active branch</text></g>
+<g class="edge" data-id="E-Runtime-Session" data-evidence="S-014,R-004"><title>E-Runtime-Session: S-014,R-004</title><path d="M 798.0 396.0 C 798.0 430.0, 156.0 296.0, 156.0 330.0" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrow-runtime_verified)"/><text x="477.0" y="358.0" class="edge-label" text-anchor="middle">own/rebind</text></g>
+<g class="edge" data-id="E-Subagent-Context" data-evidence="D-006,S-015"><title>E-Subagent-Context: D-006,S-015</title><path d="M 156.0 578.0 C 156.0 689.6, 156.0 218.4, 156.0 330.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="156.0" y="449.0" class="edge-label" text-anchor="middle">separate process/no session</text></g>
+<g class="edge" data-id="E-Subagent-Workspace" data-evidence="D-006,S-015"><title>E-Subagent-Workspace: D-006,S-015</title><path d="M 156.0 578.0 C 156.0 689.6, 1226.0 218.4, 1226.0 330.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="691.0" y="449.0" class="edge-label" text-anchor="middle">same cwd by default</text></g>
+<g class="node" data-id="N-AgentSession" data-evidence="S-002,S-003,R-001,X-003"><title>N-AgentSession: S-002,S-003,R-001,X-003</title><rect x="58.0" y="330.0" width="196" height="66" rx="6" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/><text x="72.0" y="357.0" class="node-name" fill="#14261A">Coding Agent AgentSession</text><text x="72.0" y="379.0" class="node-type" fill="#14261A">AgentLoop</text></g>
+<g class="node" data-id="N-AgentHarness" data-evidence="D-003,S-011,X-002"><title>N-AgentHarness: D-003,S-011,X-002</title><rect x="272.0" y="330.0" width="196" height="66" rx="6" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/><text x="286.0" y="357.0" class="node-name" fill="#14261A">New AgentHarness</text><text x="286.0" y="379.0" class="node-type" fill="#14261A">AgentLoop</text></g>
+<g class="node" data-id="N-LowLoop" data-evidence="S-001,R-001,R-002,X-001"><title>N-LowLoop: S-001,R-001,R-002,X-001</title><rect x="486.0" y="330.0" width="196" height="66" rx="6" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/><text x="500.0" y="357.0" class="node-name" fill="#14261A">runAgentLoop</text><text x="500.0" y="379.0" class="node-type" fill="#14261A">AgentLoop</text></g>
+<g class="node" data-id="N-Context" data-evidence="S-001,S-002,S-004,R-001"><title>N-Context: S-001,S-002,S-004,R-001</title><rect x="914.0" y="330.0" width="196" height="66" rx="6" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/><text x="928.0" y="357.0" class="node-name" fill="#14261A">Context assembly</text><text x="928.0" y="379.0" class="node-type" fill="#14261A">ContextBuilder</text></g>
+<g class="node" data-id="N-Orchestrator" data-evidence="D-010,S-016"><title>N-Orchestrator: D-010,S-016</title><rect x="58.0" y="148.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="72.0" y="175.0" class="node-name" fill="#1E293B">Experimental Orchestrator...</text><text x="72.0" y="197.0" class="node-type" fill="#1E293B">Planner</text></g>
+<g class="node" data-id="N-Retry" data-evidence="S-009,S-010,X-003"><title>N-Retry: S-009,S-010,X-003</title><rect x="1556.0" y="330.0" width="196" height="66" rx="6" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/><text x="1570.0" y="357.0" class="node-name" fill="#14261A">Retry / overflow recovery</text><text x="1570.0" y="379.0" class="node-type" fill="#14261A">RecoveryPolicy</text></g>
+<g class="node" data-id="N-SessionRuntime" data-evidence="S-014,R-004"><title>N-SessionRuntime: S-014,R-004</title><rect x="700.0" y="330.0" width="196" height="66" rx="6" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/><text x="714.0" y="357.0" class="node-name" fill="#14261A">AgentSessionRuntime</text><text x="714.0" y="379.0" class="node-type" fill="#14261A">Router</text></g>
+<g class="node" data-id="N-Session" data-evidence="S-008,R-003,R-004"><title>N-Session: S-008,R-003,R-004</title><rect x="1342.0" y="330.0" width="196" height="66" rx="6" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/><text x="1356.0" y="357.0" class="node-name" fill="#14261A">Live active session</text><text x="1356.0" y="379.0" class="node-type" fill="#14261A">Session</text></g>
+<g class="node" data-id="N-Subagent" data-evidence="D-006,S-015"><title>N-Subagent: D-006,S-015</title><rect x="58.0" y="512.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="72.0" y="539.0" class="node-name" fill="#1E293B">Child pi process</text><text x="72.0" y="561.0" class="node-type" fill="#1E293B">Subagent</text></g>
+<g class="node" data-id="N-Workspace" data-evidence="S-007,R-002"><title>N-Workspace: S-007,R-002</title><rect x="1128.0" y="330.0" width="196" height="66" rx="6" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/><text x="1142.0" y="357.0" class="node-name" fill="#14261A">cwd workspace</text><text x="1142.0" y="379.0" class="node-type" fill="#14261A">Workspace</text></g>
+<text x="36" y="636.0" class="legend-title">Evidence state</text>
+<line x1="36.0" y1="656.0" x2="64.0" y2="656.0" stroke="#2E7D32" stroke-width="2"/><text x="72.0" y="660.0" class="legend-label">Observed</text>
+<line x1="196.0" y1="656.0" x2="224.0" y2="656.0" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5"/><text x="232.0" y="660.0" class="legend-label">Static only</text>
+<line x1="356.0" y1="656.0" x2="384.0" y2="656.0" stroke="#B45309" stroke-width="2" stroke-dasharray="2 5"/><text x="392.0" y="660.0" class="legend-label">Inferred</text>
+<line x1="516.0" y1="656.0" x2="544.0" y2="656.0" stroke="#B91C1C" stroke-width="2"/><text x="552.0" y="660.0" class="legend-label">Conflicted</text>
+<line x1="676.0" y1="656.0" x2="704.0" y2="656.0" stroke="#64748B" stroke-width="2" stroke-dasharray="3 5"/><text x="712.0" y="660.0" class="legend-label">Unknown</text>
+</svg>

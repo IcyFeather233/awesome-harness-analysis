@@ -1,0 +1,411 @@
+{
+  "global": {
+    "configurations_tested": [
+      "v0.80.7 source snapshot",
+      "isolated JSON mode",
+      "SiFlow qwen3.6-35ba3b",
+      "faux-provider unit scenarios"
+    ],
+    "entrypoints_examined": [
+      "coding-agent CLI interactive",
+      "coding-agent print/JSON",
+      "coding-agent RPC",
+      "agent-core SDK",
+      "experimental orchestrator (static only)"
+    ],
+    "inaccessible_surfaces": [
+      "Gondolin/QEMU",
+      "Docker/OpenShell",
+      "production usage flags/configuration",
+      "maintainer design intent beyond repository docs"
+    ],
+    "platforms_tested": [
+      "linux x86_64, Node 22.19.0"
+    ],
+    "providers_tested": [
+      "siflow/qwen3.6-35ba3b",
+      "pi-ai faux provider"
+    ],
+    "search_limits": {
+      "file_limit_reached": false,
+      "max_file_size": 1000000,
+      "max_files": 20000,
+      "max_hits_per_category": 120
+    },
+    "unresolved_high_value_questions": [
+      "Q-001",
+      "Q-002",
+      "Q-003"
+    ]
+  },
+  "modules": {
+    "compaction": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/agent/src/harness",
+        "packages/coding-agent/src/core"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/coding-agent/src/core/compaction",
+        "packages/coding-agent/src/core/agent-session.ts",
+        "packages/agent/src/harness/compaction"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "X-SCENARIO-002",
+        "X-SCENARIO-003"
+      ],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": [
+        "未用真实模型触发 262K 上下文 overflow。"
+      ]
+    },
+    "context_assembly": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/coding-agent/src/core"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/coding-agent/src/core/system-prompt.ts",
+        "packages/coding-agent/src/core/resource-loader.ts",
+        "packages/coding-agent/src/core/agent-session.ts"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-001"
+      ],
+      "status": "partial",
+      "symbols": [],
+      "unresolved": [
+        "未代理捕获完整 provider request；未动态差分 skills/context files/extensions。"
+      ]
+    },
+    "core_loop": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/agent/src",
+        "packages/coding-agent/src/core"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/agent/src/agent-loop.ts",
+        "packages/agent/src/agent.ts",
+        "packages/coding-agent/src/core/agent-session.ts"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-001",
+        "R-SCENARIO-002",
+        "X-SCENARIO-001"
+      ],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": []
+    },
+    "interfaces": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/coding-agent/src",
+        "packages/coding-agent/src/modes",
+        "packages/coding-agent/src/modes/rpc"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/coding-agent/src/main.ts",
+        "packages/coding-agent/src/modes/print-mode.ts",
+        "packages/coding-agent/src/modes/rpc/rpc-mode.ts"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-001",
+        "R-SCENARIO-002"
+      ],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": []
+    },
+    "model_abstraction": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/ai/src",
+        "packages/coding-agent/docs",
+        "packages/coding-agent/src/core"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/ai/src/models.ts",
+        "packages/coding-agent/src/core/model-registry.ts",
+        "packages/coding-agent/docs/models.md"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-000",
+        "R-SCENARIO-001"
+      ],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": [
+        "SiFlow 服务端默认 thinking 与 Pi reasoning=false 存在兼容差异。"
+      ]
+    },
+    "observability": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/agent/docs",
+        "packages/agent/src",
+        "packages/coding-agent/docs"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/agent/src/types.ts",
+        "packages/coding-agent/docs/json.md",
+        "packages/agent/docs/observability.md"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-001",
+        "R-SCENARIO-002"
+      ],
+      "status": "partial",
+      "symbols": [],
+      "unresolved": [
+        "默认没有 trace/span correlation IDs；OTel adapter 设计未实现。"
+      ]
+    },
+    "orchestration": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/agent/src/harness",
+        "packages/coding-agent/src/core",
+        "packages/orchestrator/src"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/agent/src/harness/agent-harness.ts",
+        "packages/coding-agent/src/core/agent-session.ts",
+        "packages/orchestrator/src/supervisor.ts"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-001",
+        "X-SCENARIO-002"
+      ],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": [
+        "Coding Agent 迁移到新 AgentHarness 尚未完成。"
+      ]
+    },
+    "permissions_safety": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/coding-agent/docs",
+        "packages/coding-agent/examples/extensions",
+        "packages/coding-agent/src/core"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/coding-agent/docs/security.md",
+        "packages/coding-agent/src/core/project-trust.ts",
+        "packages/coding-agent/examples/extensions/protected-paths.ts"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": [
+        "未执行破坏性 allow/deny side-effect 场景；结论主要来自明确文档与源码。"
+      ]
+    },
+    "recovery": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/agent/src/harness",
+        "packages/coding-agent/src/core"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/coding-agent/src/core/agent-session.ts",
+        "packages/coding-agent/src/core/agent-session-runtime.ts",
+        "packages/agent/src/harness/agent-harness.ts"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-004",
+        "X-SCENARIO-003"
+      ],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": [
+        "未执行真实 SIGINT、tool timeout、进程 crash 或半持久 turn recovery。"
+      ]
+    },
+    "sandbox_execution": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/coding-agent/docs",
+        "packages/coding-agent/examples/extensions",
+        "packages/coding-agent/src/core/tools"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/coding-agent/src/core/tools/bash.ts",
+        "packages/coding-agent/docs/containerization.md",
+        "packages/coding-agent/examples/extensions/gondolin"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [],
+      "status": "partial",
+      "symbols": [],
+      "unresolved": [
+        "Gondolin 要求 Node >=23.6 与 QEMU，本轮 Node 22.19 环境未运行；Docker/OpenShell 未运行。"
+      ]
+    },
+    "sessions_persistence": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/agent/src/harness",
+        "packages/coding-agent/src/core"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/coding-agent/src/core/session-manager.ts",
+        "packages/coding-agent/src/core/agent-session-runtime.ts",
+        "packages/agent/src/harness/session"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-003",
+        "R-SCENARIO-004",
+        "X-SCENARIO-003"
+      ],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": [
+        "未做 corrupted JSONL 注入与跨版本 migration 动态测试。"
+      ]
+    },
+    "subagents": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/coding-agent/examples/extensions",
+        "packages/orchestrator"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/coding-agent/examples/extensions/subagent",
+        "packages/orchestrator/src"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [],
+      "status": "partial",
+      "symbols": [],
+      "unresolved": [
+        "核心无内置 subagent；可选 extension 与 experimental orchestrator 均未动态运行。"
+      ]
+    },
+    "tools_extensions": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/agent/src",
+        "packages/coding-agent/src/core"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/agent/src/agent-loop.ts",
+        "packages/coding-agent/src/core/agent-session.ts",
+        "packages/coding-agent/src/core/extensions"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-002",
+        "X-SCENARIO-001"
+      ],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": [
+        "未动态运行自定义 extension tool。"
+      ]
+    },
+    "workspace": {
+      "configurations": [
+        "v0.80.7",
+        "default-source",
+        "isolated-json-mode"
+      ],
+      "directories": [
+        "packages/coding-agent/src/core"
+      ],
+      "excluded_surfaces": [],
+      "files": [
+        "packages/coding-agent/src/core/tools",
+        "packages/coding-agent/src/core/agent-session-runtime.ts"
+      ],
+      "notes": "Source inspected at pinned commit; runtime occurrence is configuration-specific.",
+      "scenarios": [
+        "R-SCENARIO-002"
+      ],
+      "status": "analyzed",
+      "symbols": [],
+      "unresolved": [
+        "只验证只读 workspace；写/edit/bash 未动态执行。"
+      ]
+    }
+  },
+  "schema_version": "1.0"
+}

@@ -1,0 +1,46 @@
+Use case: infographic-diagram
+Asset type: reader-facing context lifecycle illustration
+Primary request: Explain what reaches the Pi model on each request. All context sources must visibly converge through the same ordered transformation pipeline. The image must be easy to understand at normal report width and architecturally exact.
+
+Mandatory layout and arrows:
+- On the left, draw three stacked source groups: "Startup / lazy", "Carry-forward", and "Runtime".
+- "Startup / lazy" contains "System prompt", "Project instructions", and "Skills". Put a small "lazy body" badge only beside "Skills".
+- "Carry-forward" contains "Active session branch" and "Compaction summary".
+- "Runtime" contains "User message", "Tool result", and "Extension input".
+- Draw one visible solid arrow from EACH of the three source groups into a single merge junction.
+- From that one merge junction, draw exactly one main pipeline from left to right: "transformContext" -> "convertToLlm" -> "Per-request context" -> "Model request".
+- No source item or source group may connect directly to "convertToLlm", "Per-request context", or "Model request". Every normal source must pass through "transformContext" first.
+- Show a thick curved feedback arrow from "Tool result" back to the shared merge junction, labeled only by the existing "Tool result" item. It represents the next model iteration and must re-enter before "transformContext".
+- Below the main pipeline, draw a small conditional marker "Near context limit". From "Per-request context", draw a dashed green arrow down to this marker, then a dashed green arrow to "Compaction summary". This is the only dashed feedback path.
+- Use simple icons for prompt document, project file, skill, session tree, summary, user, tool result, extension plug, merge, transforms, funnel, and model.
+
+Text (verbatim, case-sensitive):
+"Startup / lazy"
+"System prompt"
+"Project instructions"
+"Skills"
+"lazy body"
+"Carry-forward"
+"Active session branch"
+"Compaction summary"
+"Runtime"
+"User message"
+"Tool result"
+"Extension input"
+"transformContext"
+"convertToLlm"
+"Per-request context"
+"Model request"
+"Near context limit"
+
+Style and visual hierarchy:
+- Clean academic data-flow infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel color families, large modern sans-serif labels, and generous white space.
+- White background. Yellow startup sources, green durable/carry-forward state, teal runtime additions, coral transformations, and blue model boundary.
+- Make the shared merge junction and one ordered pipeline visually dominant. Lifecycle bands should remain obvious through spatial grouping and icons.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Constraints:
+- Use only the exact text listed above; no title, caption, legend, evidence IDs, source paths, paragraphs, vector-memory layer, database, retrieval system, or invented context source.
+- Absolutely no direct arrow from "Tool result", "Runtime", "Startup / lazy", or "Carry-forward" to "Model request".
+- Do not depict compaction as occurring every turn. Its two arrows must be dashed and conditional.
+- No gradients, shadows, 3D, photorealism, tiny print, dense tables, tangled arrows, decorative background, logos, or watermark.

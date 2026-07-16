@@ -1,0 +1,40 @@
+Use case: infographic-diagram
+Asset type: reader-facing runtime sequence illustration
+Primary request: Show the exact observed two-iteration Pi read-only turn as a compact, unmistakable loop. The reader should immediately see why one user request caused two model calls.
+
+Architecture facts and layout:
+- Use a vertical composition with one starting row, two large iteration bands, and one ending row.
+- Start with "User request" at the top.
+- The first band is labeled "Iteration 1" and contains, left to right: "Build context" -> "Model call 1" -> "read tool" -> "Tool result: 314159".
+- A thick curved arrow carries "Tool result: 314159" down and back into "Build context" in the second band.
+- The second band is labeled "Iteration 2" and contains, left to right: "Build context" -> "Model call 2" -> "Final answer".
+- End below the bands with two small ordered lifecycle markers: "agent_end" -> "agent_settled". Make their separation visually explicit.
+- Place a thin side rail labeled "AgentSession" around the complete turn, showing product-level orchestration outside the low-level iterations.
+- Place a second light side rail labeled "JSON / RPC events" with small event pulses, but do not turn it into the main path.
+- Use model, read-file, result-document, and completion icons so the repeated pattern is readable before the labels are read.
+
+Text (verbatim, case-sensitive):
+"User request"
+"Iteration 1"
+"Build context"
+"Model call 1"
+"read tool"
+"Tool result: 314159"
+"Iteration 2"
+"Model call 2"
+"Final answer"
+"agent_end"
+"agent_settled"
+"AgentSession"
+"JSON / RPC events"
+
+Style and visual hierarchy:
+- Clean academic runtime infographic with playful hand-sketched outlines, flat pastel color bands, large sans-serif labels, bold arrows, and generous whitespace.
+- White background. Coral orchestration, blue model work, teal tool/result work, green completion, and light gray event rails.
+- The two iterations must look structurally repeated while remaining easy to scan top-to-bottom.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Constraints:
+- Use only the exact text listed above; no title, caption, evidence IDs, source code, paragraphs, token counts other than 314159, recovery paths, retry paths, or session-resume claims.
+- Do not show permission approval, write, bash, compaction, subagents, or sandbox: none occurred in this observed trace.
+- No gradients, shadows, 3D, photorealism, tiny print, crossing arrows, decorative background, logos, or watermark.
