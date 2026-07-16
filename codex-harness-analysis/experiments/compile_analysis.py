@@ -447,7 +447,7 @@ Codex 的接口层比“CLI 包一层 core”更丰富，但共享同一个 thre
 
 app-server 不是另一个 agent runtime。它把 thread start/resume/fork、turn start/interrupt 与通知映射成双向 JSON-RPC；processor 与 outbound writer 分离，避免慢客户端直接卡住处理 loop。[文档]({source_url('codex-rs/app-server/README.md', 1)}) [源码]({source_url('codex-rs/app-server/src/lib.rs', 150)}) [D: `D-003`] [S: `S-023`]
 
-常规生命周期可压缩为：surface 创建/恢复 thread → session 接受 op → `RegularTask` 发出 `TurnStarted` → `run_turn` → flush rollout → `TurnComplete/TurnAborted` → session 仍可接受后续 turn。`RegularTask` 只在队列里存在新用户输入时继续启动 turn；tool follow-up 则发生在同一 `run_turn` 内。[源码]({source_url('codex-rs/core/src/tasks/regular.rs', 37)}) [S: `S-002`]
+常规生命周期可压缩为：surface 创建/恢复 thread → session 接受 op → `RegularTask` 发出 `TurnStarted` → `run_turn` → flush rollout → `TurnComplete/TurnAborted` → session 仍可接受后续 turn。tool follow-up 发生在同一次 `run_turn` 的 sampling loop 内；如果存在排队或 steer 的新用户输入，`RegularTask` 还可以在同一外层 turn 里再执行一次 `run_turn`。是否是新 turn 应以 `TurnStarted/TurnComplete` 及 `turn_id` 为准，不能按模型请求次数判断。[源码]({source_url('codex-rs/core/src/tasks/regular.rs', 37)}) [S: `S-002`]
 
 这一区分很关键：**turn、session、process 的终止条件不同**。一次 model/tool error 可以结束 turn，却不必销毁 thread；app-server 客户端断开也不能被简单等同于 durable thread 删除。
 
