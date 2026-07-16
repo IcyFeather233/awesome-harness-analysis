@@ -1,0 +1,43 @@
+Use case: infographic-diagram
+Asset type: reader-facing capability pipeline illustration
+Primary request: Show that tool registration, model exposure, routing, execution, and result feedback are separate control points.
+
+Architecture facts and layout:
+- Use four clear columns from left to right.
+- Column 1 "Sources" contains exactly: "Built-ins", "MCP", "Extensions", "Dynamic tools", "Multi-agent".
+- All source arrows enter "Tool registry" in column 2.
+- Continue through a narrow filter "Per-turn exposure" with badge "VISIBLE NOW" into "Responses API".
+- A model tool-call arrow goes to column 3 "Tool Router", then "Pre-tool hooks".
+- Continue to column 4 "Handler runtime", then return through "Tool result" -> "Context".
+- Draw a small lock icon on "Handler runtime" with labels "parallel read" and "exclusive write".
+- Use dashed arrows for MCP, Extensions, Dynamic tools, and Multi-agent because they are conditional in the tested configuration.
+
+Text (verbatim, case-sensitive):
+"Sources"
+"Built-ins"
+"MCP"
+"Extensions"
+"Dynamic tools"
+"Multi-agent"
+"Tool registry"
+"Per-turn exposure"
+"VISIBLE NOW"
+"Responses API"
+"Tool Router"
+"Pre-tool hooks"
+"Handler runtime"
+"Tool result"
+"Context"
+"parallel read"
+"exclusive write"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, and large modern sans-serif labels.
+- White background, generous whitespace, recognizable icons, thick arrows, and one unmistakable reading direction.
+- Use coral for orchestration, blue for model/capabilities, green for durable state, amber for policy, red only for failure, and neutral gray for external boundaries.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Global constraints:
+- Use only the exact text listed in the prompt. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, or watermark.
+- No gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, repeated components, or decorative background.
+- Keep every label horizontal and readable at 1000 pixels report width.

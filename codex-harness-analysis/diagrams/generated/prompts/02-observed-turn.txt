@@ -1,0 +1,39 @@
+Use case: infographic-diagram
+Asset type: reader-facing runtime sequence illustration
+Primary request: Show the exact deterministic two-request Codex read-tool turn and why the second request exists.
+
+Architecture facts and layout:
+- Use a vertical composition with a start row, two large iteration bands, and one ending row.
+- Start with "User request".
+- Band "Request 1" contains: "Build prompt" -> "Responses" -> "exec_command" -> "Read FACTS.txt".
+- A thick curved arrow labeled "function_call_output" carries the tool result into the second band.
+- Band "Request 2" contains: "Updated history" -> "Responses" -> "HXA-1445".
+- End with "Turn complete".
+- Put a slim side rail labeled "RegularTask" around the full turn and a smaller inner rail labeled "run_turn" around both requests.
+- Do not show permission, compaction, write, subagent, retry, or resume; none occurred in this trace.
+
+Text (verbatim, case-sensitive):
+"User request"
+"Request 1"
+"Build prompt"
+"Responses"
+"exec_command"
+"Read FACTS.txt"
+"function_call_output"
+"Request 2"
+"Updated history"
+"HXA-1445"
+"Turn complete"
+"RegularTask"
+"run_turn"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, and large modern sans-serif labels.
+- White background, generous whitespace, recognizable icons, thick arrows, and one unmistakable reading direction.
+- Use coral for orchestration, blue for model/capabilities, green for durable state, amber for policy, red only for failure, and neutral gray for external boundaries.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Global constraints:
+- Use only the exact text listed in the prompt. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, or watermark.
+- No gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, repeated components, or decorative background.
+- Keep every label horizontal and readable at 1000 pixels report width.

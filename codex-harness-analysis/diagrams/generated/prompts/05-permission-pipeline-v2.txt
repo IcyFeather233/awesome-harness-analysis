@@ -1,0 +1,42 @@
+Use case: infographic-diagram
+Asset type: reader-facing permission and sandbox decision illustration
+Primary request: Explain allow, ask, and deny as three distinct Exec Policy outcomes. User approval is conditional, not mandatory for every allowed command.
+
+Mandatory layout and arrows:
+- Start on the left: "Model tool call" -> "Exec Policy".
+- From Exec Policy, draw exactly three clearly separated branches.
+- Top green branch: label arrow "allow" and point directly to "Platform Sandbox". This branch must bypass User Approval.
+- Middle amber branch: label arrow "ask" and point to "User Approval", then to the same "Platform Sandbox".
+- Bottom red branch: "NEVER + escalation" -> "Denied before process" -> "Tool error to model". Add badge "OBSERVED". It must never touch User Approval, Platform Sandbox, Process, or Workspace.
+- After the two allowed branches merge at Platform Sandbox, continue one path: "Platform Sandbox" -> "Process" -> "Workspace".
+- Put "Rules + mode" above Exec Policy with an input arrow.
+- Put "Session cache" above User Approval with a two-way arrow.
+- Put "Filesystem profile" and "Network profile" above Platform Sandbox with input arrows.
+- Use decision, shield, user approval, OS boundary, process, folder, cache, network, and blocked-command icons.
+
+Text (verbatim, case-sensitive):
+"Model tool call"
+"Exec Policy"
+"allow"
+"ask"
+"User Approval"
+"Platform Sandbox"
+"Process"
+"Workspace"
+"Rules + mode"
+"Session cache"
+"Filesystem profile"
+"Network profile"
+"NEVER + escalation"
+"Denied before process"
+"Tool error to model"
+"OBSERVED"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, large modern sans-serif labels, white background, and generous whitespace.
+- One unmistakable reading direction. Coral orchestration, blue model/capability, green state/result, amber policy, red failure, gray conditional/external.
+- Similar visual language to a polished modern systems-research figure, but do not copy existing artwork.
+
+Constraints:
+- Use only the exact text listed. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, watermark, gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, or decorative words.
+- Labels must remain horizontal and readable at 1000 pixels report width.

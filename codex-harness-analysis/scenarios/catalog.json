@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "safety_gate": {
+    "authorization": "User explicitly authorized the supplied SiFlow endpoint for agent tests.",
+    "credentials": "Credentials were read from existing Codex configuration and never persisted in the bundle.",
+    "target_mutation": "The pinned source checkout was read-only and unchanged.",
+    "workspace": "/tmp/codex-analysis-workspace",
+    "home": "/tmp/codex-analysis-home",
+    "network": "Only the user-authorized SiFlow endpoint; deterministic scenarios used 127.0.0.1."
+  },
+  "scenarios": [
+    {
+      "id": "R-SCENARIO-001",
+      "title": "SiFlow minimal Responses compatibility",
+      "mode": "real",
+      "status": "failed_as_expected",
+      "result": "HTTP 400: Unexpected message role",
+      "claims_tested": [
+        "C-018"
+      ],
+      "trace": "traces/raw/real-siflow-minimal.jsonl"
+    },
+    {
+      "id": "R-SCENARIO-002",
+      "title": "SiFlow namespace tool compatibility",
+      "mode": "real",
+      "status": "failed_as_expected",
+      "result": "HTTP 400: namespace tool schema unsupported",
+      "claims_tested": [
+        "C-018"
+      ],
+      "trace": "traces/normalized/R-002-siflow-namespace.normalized.jsonl"
+    },
+    {
+      "id": "X-SCENARIO-001",
+      "title": "Text-only stop",
+      "mode": "scripted-responses",
+      "status": "passed",
+      "result": "SCRIPTED_OK and turn.completed",
+      "claims_tested": [
+        "C-002"
+      ],
+      "trace": "traces/normalized/X-001-text-stop.normalized.jsonl"
+    },
+    {
+      "id": "X-SCENARIO-002",
+      "title": "Read tool round trip",
+      "mode": "scripted-responses",
+      "status": "passed",
+      "result": "second request contained function_call_output; HXA-1445",
+      "claims_tested": [
+        "C-002",
+        "C-019"
+      ],
+      "trace": "traces/raw/read-tool-requests.jsonl"
+    },
+    {
+      "id": "X-SCENARIO-003",
+      "title": "Unknown tool recovery",
+      "mode": "scripted-responses",
+      "status": "passed",
+      "result": "unsupported call returned to model; turn completed",
+      "claims_tested": [
+        "C-020"
+      ],
+      "trace": "traces/normalized/X-003-unknown-tool.normalized.jsonl"
+    },
+    {
+      "id": "X-SCENARIO-004",
+      "title": "Denied escalation and side-effect check",
+      "mode": "scripted-responses",
+      "status": "passed",
+      "result": "never policy denied before process; hash unchanged",
+      "claims_tested": [
+        "C-009",
+        "C-020"
+      ],
+      "trace": "traces/normalized/X-004-denied-escalation.normalized.jsonl"
+    },
+    {
+      "id": "X-SCENARIO-005",
+      "title": "V1 subagent spawn",
+      "mode": "scripted-responses",
+      "status": "passed",
+      "result": "child thread created; independent request; depth-limited tool exposure",
+      "claims_tested": [
+        "C-012",
+        "C-013",
+        "C-022"
+      ],
+      "trace": "traces/raw/subagent-spawn-requests.jsonl"
+    },
+    {
+      "id": "X-SCENARIO-006",
+      "title": "Persist and resume",
+      "mode": "scripted-responses",
+      "status": "passed",
+      "result": "same thread id; restored assistant history; rollout JSONL present",
+      "claims_tested": [
+        "C-011",
+        "C-021"
+      ],
+      "trace": "traces/raw/resume-requests.jsonl"
+    }
+  ]
+}

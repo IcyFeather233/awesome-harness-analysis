@@ -1,0 +1,395 @@
+{
+  "schema_version": "1.0",
+  "global": {
+    "entrypoints_examined": [
+      "cli",
+      "tui",
+      "exec",
+      "app-server",
+      "mcp-server"
+    ],
+    "configurations_tested": [
+      "read-only/never",
+      "multi_agent disabled",
+      "multi_agent V1",
+      "persistent resume"
+    ],
+    "platforms_tested": [
+      "Linux x86_64 official musl binary"
+    ],
+    "providers_tested": [
+      "SiFlow qwen3.6-35ba3b (compatibility failed)",
+      "local deterministic Responses SSE"
+    ],
+    "inaccessible_surfaces": [
+      "macOS/Windows runtime",
+      "production configuration",
+      "remote execution",
+      "maintainer private rationale"
+    ],
+    "search_limits": {
+      "max_files": 20000,
+      "max_file_size": 1000000,
+      "max_hits_per_category": 160,
+      "file_limit_reached": false
+    },
+    "unresolved_high_value_questions": [
+      "compaction and corruption fault injection",
+      "MCP/dynamic tool permission coverage",
+      "V2 subagent runtime",
+      "OTel causal alignment"
+    ]
+  },
+  "modules": {
+    "interfaces": {
+      "status": "analyzed",
+      "directories": [
+        "codex-rs/app-server/src",
+        "codex-rs/cli/src"
+      ],
+      "files": [
+        "codex-rs/cli/src/main.rs",
+        "codex-rs/app-server/src/lib.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-006"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "core_loop": {
+      "status": "analyzed",
+      "directories": [
+        "codex-rs/core/src/session",
+        "codex-rs/core/src/tasks"
+      ],
+      "files": [
+        "codex-rs/core/src/tasks/regular.rs",
+        "codex-rs/core/src/session/turn.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-003"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "context_assembly": {
+      "status": "analyzed",
+      "directories": [
+        "codex-rs/core/src/context/world_state",
+        "codex-rs/core/src/context_manager",
+        "codex-rs/core/src/session"
+      ],
+      "files": [
+        "codex-rs/core/src/context_manager/history.rs",
+        "codex-rs/core/src/context/world_state/mod.rs",
+        "codex-rs/core/src/session/world_state.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-002",
+        "X-SCENARIO-006"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "compaction": {
+      "status": "partial",
+      "directories": [
+        "codex-rs/core/src",
+        "codex-rs/core/src/session"
+      ],
+      "files": [
+        "codex-rs/core/src/session/turn.rs",
+        "codex-rs/core/src/compact_remote_v2.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [],
+      "excluded_surfaces": [],
+      "unresolved": [
+        "未用 oversized tool output 或 token fixture 动态触发 pre-turn/mid-turn/remote compaction。"
+      ],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "model_abstraction": {
+      "status": "partial",
+      "directories": [
+        "codex-rs/core/src",
+        "codex-rs/model-provider-info/src"
+      ],
+      "files": [
+        "codex-rs/core/src/client.rs",
+        "codex-rs/model-provider-info/src/lib.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "R-SCENARIO-001",
+        "R-SCENARIO-002",
+        "X-SCENARIO-001"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [
+        "SiFlow 需要 role/namespace translation adapter 才能执行真实 agent turn；本报告没有修改 target code。"
+      ],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "tools_extensions": {
+      "status": "analyzed",
+      "directories": [
+        "codex-rs/core/src/tools"
+      ],
+      "files": [
+        "codex-rs/core/src/tools/spec_plan.rs",
+        "codex-rs/core/src/tools/router.rs",
+        "codex-rs/core/src/tools/registry.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-002",
+        "X-SCENARIO-003",
+        "X-SCENARIO-005"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "permissions_safety": {
+      "status": "analyzed",
+      "directories": [
+        "codex-rs/core/src",
+        "codex-rs/core/src/tools"
+      ],
+      "files": [
+        "codex-rs/core/src/exec_policy.rs",
+        "codex-rs/core/src/tools/sandboxing.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-004"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "sandbox_execution": {
+      "status": "partial",
+      "directories": [
+        "codex-rs/core",
+        "codex-rs/core/src"
+      ],
+      "files": [
+        "codex-rs/core/src/exec.rs",
+        "codex-rs/core/README.md"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-004"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [
+        "宿主没有 Rust toolchain，且当前执行环境无法直接复现所有 platform sandbox backend。"
+      ],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "workspace": {
+      "status": "partial",
+      "directories": [
+        "codex-rs/core/src/config",
+        "codex-rs/core/src/session"
+      ],
+      "files": [
+        "codex-rs/core/src/session/world_state.rs",
+        "codex-rs/core/src/config/mod.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-004",
+        "X-SCENARIO-005"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [
+        "未验证 worktree、remote environment 与并发 child 文件冲突。"
+      ],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "sessions_persistence": {
+      "status": "analyzed",
+      "directories": [
+        "codex-rs/rollout/src",
+        "codex-rs/thread-store/src"
+      ],
+      "files": [
+        "codex-rs/thread-store/src/store.rs",
+        "codex-rs/thread-store/src/live_thread.rs",
+        "codex-rs/rollout/src/recorder.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-006"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "subagents": {
+      "status": "analyzed",
+      "directories": [
+        "codex-rs/core/src",
+        "codex-rs/core/src/agent/control"
+      ],
+      "files": [
+        "codex-rs/core/src/codex_delegate.rs",
+        "codex-rs/core/src/agent/control/spawn.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-005"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "orchestration": {
+      "status": "analyzed",
+      "directories": [
+        "codex-rs/core/src/agent",
+        "codex-rs/core/src/session"
+      ],
+      "files": [
+        "codex-rs/core/src/session/turn.rs",
+        "codex-rs/core/src/agent/control.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-002",
+        "X-SCENARIO-005"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "observability": {
+      "status": "partial",
+      "directories": [
+        "codex-rs/core/src/tasks",
+        "codex-rs/otel"
+      ],
+      "files": [
+        "codex-rs/otel/README.md",
+        "codex-rs/core/src/tasks/mod.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [
+        "OTel exporter 关闭，未检查 collector 端 span 拓扑。"
+      ],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    },
+    "recovery": {
+      "status": "partial",
+      "directories": [
+        "codex-rs/core/src",
+        "codex-rs/core/src/tasks"
+      ],
+      "files": [
+        "codex-rs/core/src/tasks/mod.rs",
+        "codex-rs/core/src/client.rs"
+      ],
+      "symbols": [],
+      "configurations": [
+        "rust-v0.144.5",
+        "default-source",
+        "isolated-exec"
+      ],
+      "scenarios": [
+        "R-SCENARIO-001",
+        "R-SCENARIO-002",
+        "X-SCENARIO-003",
+        "X-SCENARIO-004",
+        "X-SCENARIO-006"
+      ],
+      "excluded_surfaces": [],
+      "unresolved": [
+        "未注入 stream idle timeout、tool process crash、rollout corruption 与 SIGINT。"
+      ],
+      "notes": "Pinned source inspected; runtime occurrence is scenario/configuration specific."
+    }
+  }
+}

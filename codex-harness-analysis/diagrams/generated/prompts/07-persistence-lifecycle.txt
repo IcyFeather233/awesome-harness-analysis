@@ -1,0 +1,40 @@
+Use case: infographic-diagram
+Asset type: reader-facing session persistence illustration
+Primary request: Explain what becomes durable, how a new process resumes it, and what is not rolled back.
+
+Architecture facts and layout:
+- Draw a left-to-right main path: "Turn items" -> "LiveThread" -> "ThreadStore" -> "Rollout JSONL" -> "New process" -> "Resume same thread" -> "Restored history".
+- Put a green badge "OBSERVED" above the path from Rollout JSONL through Restored history.
+- Draw a small flush arrow from "Turn complete" into "Rollout JSONL".
+- Below the main path, draw "Workspace" as a parallel state lane with label "not rolled back". It must not pass through Rollout JSONL.
+- Above "Restored history", draw a dashed optional branch "Compaction summary" labeled "CONDITIONAL".
+- Add a red warning side branch from "Rollout JSONL" to "Corruption / partial write" with badge "NOT TESTED".
+- Use event stream, live session, database adapter, JSONL document, new process, restore arrow, history stack, folder, summary, and warning icons.
+
+Text (verbatim, case-sensitive):
+"Turn items"
+"LiveThread"
+"ThreadStore"
+"Rollout JSONL"
+"New process"
+"Resume same thread"
+"Restored history"
+"OBSERVED"
+"Turn complete"
+"Workspace"
+"not rolled back"
+"Compaction summary"
+"CONDITIONAL"
+"Corruption / partial write"
+"NOT TESTED"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, and large modern sans-serif labels.
+- White background, generous whitespace, recognizable icons, thick arrows, and one unmistakable reading direction.
+- Use coral for orchestration, blue for model/capabilities, green for durable state, amber for policy, red only for failure, and neutral gray for external boundaries.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Global constraints:
+- Use only the exact text listed in the prompt. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, or watermark.
+- No gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, repeated components, or decorative background.
+- Keep every label horizontal and readable at 1000 pixels report width.

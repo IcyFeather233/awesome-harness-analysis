@@ -1,0 +1,41 @@
+Use case: infographic-diagram
+Asset type: reader-facing software architecture illustration
+Primary request: Explain Codex 0.144.5 as one obvious runtime path with governance, state, delegation, and telemetry as secondary branches. The image must be understandable in five seconds.
+
+Architecture facts and layout:
+- Draw one straight solid main path across the center with exactly six large stages: "Surfaces" -> "Thread / Session" -> "Turn loop" -> "Responses API" -> "Tool runtime" -> "Workspace".
+- Draw a two-segment feedback path: "Tool runtime" -> "Context + World state" -> "Turn loop". Put "tool output" only on the first segment. Both arrowheads must point away from Tool runtime and toward Turn loop. Never draw Context + World state pointing into Tool runtime.
+- Place "Context + World state" directly below the gap between "Turn loop" and "Responses API", connected into both.
+- Place "Rollout JSONL" below "Thread / Session" with a two-way durable-state arrow.
+- Place "Policy + Sandbox" above the gap between "Tool runtime" and "Workspace" as a mandatory governance branch before side effects.
+- Place "Child Session" above "Thread / Session" as a dashed conditional branch with badge "V1 / V2". Connect it to the same "Workspace" with a thin shared-state arrow.
+- Place "Events + OTel" below the main path as a thin observation rail, not a control-flow stage.
+- Use terminal, session, circular loop, cloud/model, wrench, folder, shield, database, child-agent, and pulse icons.
+
+Text (verbatim, case-sensitive):
+"Surfaces"
+"Thread / Session"
+"Turn loop"
+"Responses API"
+"Tool runtime"
+"Workspace"
+"tool output"
+"Context + World state"
+"Rollout JSONL"
+"Policy + Sandbox"
+"Child Session"
+"V1 / V2"
+"Events + OTel"
+
+Do not imply that every turn spawns a child or that context, policy, and persistence are sequential main-loop stages.
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, and large modern sans-serif labels.
+- White background, generous whitespace, recognizable icons, thick arrows, and one unmistakable reading direction.
+- Use coral for orchestration, blue for model/capabilities, green for durable state, amber for policy, red only for failure, and neutral gray for external boundaries.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Global constraints:
+- Use only the exact text listed in the prompt. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, or watermark.
+- No gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, repeated components, or decorative background.
+- Keep every label horizontal and readable at 1000 pixels report width.

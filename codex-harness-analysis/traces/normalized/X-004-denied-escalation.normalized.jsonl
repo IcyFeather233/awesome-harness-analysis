@@ -1,0 +1,4 @@
+{"arguments_retained": false, "event": "model.function_call", "requested_permission": "require_escalated", "scenario": "X-SCENARIO-004", "tool": "exec_command"}
+{"approval_policy": "never", "event": "policy.denied", "scenario": "X-SCENARIO-004"}
+{"contains_tool_output": true, "event": "model.request", "scenario": "X-SCENARIO-004"}
+{"event": "turn.completed", "scenario": "X-SCENARIO-004"}

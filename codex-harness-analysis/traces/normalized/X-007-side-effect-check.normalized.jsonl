@@ -1,0 +1,2 @@
+{"event": "filesystem.baseline", "facts_sha256": "27799224908738a2dacbb3a9de16743054adac7ef6c817061a832bd679b568ed", "files": ["FACTS.txt"], "scenario": "X-SCENARIO-004"}
+{"event": "filesystem.after", "facts_sha256": "27799224908738a2dacbb3a9de16743054adac7ef6c817061a832bd679b568ed", "files": ["FACTS.txt"], "forbidden_marker_present": false, "scenario": "X-SCENARIO-004"}

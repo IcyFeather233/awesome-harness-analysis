@@ -1,0 +1,7 @@
+WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir "/tmp" (codex_home: AbsolutePathBuf("/tmp/codex-analysis-home"))
+Reading additional input from stdin...
+{"type":"thread.started","thread_id":"019f6987-d8cf-7fd0-ab80-5ce26708b1bf"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Model metadata for `qwen3.6-35ba3b` not found. Defaulting to fallback metadata; this can degrade performance and cause issues."}}
+{"type":"turn.started"}
+{"type":"error","message":"{\"error\":{\"message\":\"Unexpected message role.\",\"type\":\"BadRequestError\",\"param\":null,\"code\":400}}"}
+{"type":"turn.failed","error":{"message":"{\"error\":{\"message\":\"Unexpected message role.\",\"type\":\"BadRequestError\",\"param\":null,\"code\":400}}"}}

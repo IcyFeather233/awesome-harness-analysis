@@ -1,0 +1,39 @@
+Use case: infographic-diagram
+Asset type: reader-facing capability pipeline illustration
+Primary request: Explain the seven ordered control points from capability sources to model-visible tools, execution, and feedback. Make the main path understandable in five seconds.
+
+Mandatory layout and arrows:
+- Draw one straight left-to-right main path with exactly seven large stages: "Capability sources" -> "Tool registry" -> "Per-turn exposure" -> "Responses API" -> "Router + Hooks" -> "Handler runtime" -> "Result to Context".
+- Inside or immediately below "Capability sources", show exactly three short source labels: "Built-ins", "MCP + Extensions", and "Dynamic + Multi-agent". They are parts of the same source stage, not separate destinations.
+- Put badge "VISIBLE NOW" on "Per-turn exposure".
+- Put label "tool call" only on the arrow from "Responses API" to "Router + Hooks".
+- Put two compact labels on "Handler runtime": "parallel read" and "exclusive write".
+- Every arrow must follow the seven-stage order. No shortcut may skip exposure, the model, router/hooks, or handler runtime.
+- Draw one small curved arrow from "Result to Context" back toward "Responses API" labeled "next request". Keep it below the main path.
+- Use grouped toolbox, database, filter, model cloud, router/shield, lock, and result-stack icons.
+
+Text (verbatim, case-sensitive):
+"Capability sources"
+"Built-ins"
+"MCP + Extensions"
+"Dynamic + Multi-agent"
+"Tool registry"
+"Per-turn exposure"
+"VISIBLE NOW"
+"Responses API"
+"tool call"
+"Router + Hooks"
+"Handler runtime"
+"parallel read"
+"exclusive write"
+"Result to Context"
+"next request"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, large modern sans-serif labels, white background, and generous whitespace.
+- One unmistakable horizontal reading direction. Blue for capability/model, coral for routing, green for execution/result, amber for exposure.
+- Similar visual language to a polished modern systems-research figure, but do not copy existing artwork.
+
+Constraints:
+- Use only the exact text listed. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, watermark, gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, or decorative words.
+- Labels must remain horizontal and readable at 1000 pixels report width.

@@ -1,0 +1,2254 @@
+{
+  "schema_version": "1.0",
+  "figures": [
+    {
+      "id": "codex-system-overview",
+      "title": "Codex System Overview",
+      "description": "Canonical runtime path and secondary boundaries.",
+      "width": 1600,
+      "height": 820,
+      "nodes": [
+        {
+          "id": "surface",
+          "kind": "hir",
+          "hir_ids": [
+            "N-CLI",
+            "N-AppServer",
+            "N-MCPServer"
+          ],
+          "claim_ids": [
+            "C-001"
+          ],
+          "evidence_ids": [
+            "S-001"
+          ],
+          "label": "Surfaces",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 20,
+          "y": 300,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "session",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ThreadManager",
+            "N-LiveThread"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-018"
+          ],
+          "label": "Thread / Session",
+          "subtitle": "",
+          "tone": "state",
+          "x": 220,
+          "y": 300,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "loop",
+          "kind": "hir",
+          "hir_ids": [
+            "N-RegularTask",
+            "N-TurnLoop"
+          ],
+          "claim_ids": [
+            "C-002"
+          ],
+          "evidence_ids": [
+            "S-002",
+            "S-003",
+            "X-002"
+          ],
+          "label": "Turn loop",
+          "subtitle": "",
+          "tone": "core",
+          "x": 420,
+          "y": 300,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "model",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ModelSession",
+            "N-Responses"
+          ],
+          "claim_ids": [
+            "C-006"
+          ],
+          "evidence_ids": [
+            "S-008",
+            "S-024"
+          ],
+          "label": "Responses API",
+          "subtitle": "",
+          "tone": "model",
+          "x": 620,
+          "y": 300,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "tools",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SpecPlan",
+            "N-ToolRouter",
+            "N-ToolRuntime"
+          ],
+          "claim_ids": [
+            "C-007",
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-009",
+            "S-010",
+            "S-025"
+          ],
+          "label": "Tool runtime",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 820,
+          "y": 300,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "policy",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ExecPolicy",
+            "N-Approval",
+            "N-Sandbox"
+          ],
+          "claim_ids": [
+            "C-009",
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-012",
+            "S-014"
+          ],
+          "label": "Exec Policy + Sandbox",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 1020,
+          "y": 300,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "workspace",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-009"
+          ],
+          "evidence_ids": [
+            "X-007"
+          ],
+          "label": "Workspace",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1220,
+          "y": 300,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "context",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Context",
+            "N-WorldState"
+          ],
+          "claim_ids": [
+            "C-003",
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-005",
+            "S-006",
+            "X-002"
+          ],
+          "label": "Context + World state",
+          "subtitle": "",
+          "tone": "state",
+          "x": 620,
+          "y": 520,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "rollout",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Rollout"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-019",
+            "X-006"
+          ],
+          "label": "Rollout JSONL",
+          "subtitle": "",
+          "tone": "state",
+          "x": 220,
+          "y": 520,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "child",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Subagent"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-016",
+            "X-005"
+          ],
+          "label": "Child Session",
+          "subtitle": "",
+          "tone": "muted",
+          "x": 220,
+          "y": 80,
+          "width": 170,
+          "height": 72
+        },
+        {
+          "id": "telemetry",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Telemetry"
+          ],
+          "claim_ids": [
+            "C-016"
+          ],
+          "evidence_ids": [
+            "S-021"
+          ],
+          "label": "Events + OTel",
+          "subtitle": "",
+          "tone": "observability",
+          "x": 820,
+          "y": 700,
+          "width": 170,
+          "height": 72
+        }
+      ],
+      "edges": [
+        {
+          "id": "o1",
+          "source": "surface",
+          "target": "session",
+          "points": [
+            [
+              190,
+              336
+            ],
+            [
+              220,
+              336
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-001"
+          ]
+        },
+        {
+          "id": "o2",
+          "source": "session",
+          "target": "loop",
+          "points": [
+            [
+              390,
+              336
+            ],
+            [
+              420,
+              336
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-002"
+          ]
+        },
+        {
+          "id": "o3",
+          "source": "loop",
+          "target": "model",
+          "points": [
+            [
+              590,
+              336
+            ],
+            [
+              620,
+              336
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        },
+        {
+          "id": "o4",
+          "source": "model",
+          "target": "tools",
+          "points": [
+            [
+              790,
+              336
+            ],
+            [
+              820,
+              336
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        },
+        {
+          "id": "o5",
+          "source": "tools",
+          "target": "policy",
+          "points": [
+            [
+              990,
+              336
+            ],
+            [
+              1020,
+              336
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-012"
+          ]
+        },
+        {
+          "id": "o6",
+          "source": "policy",
+          "target": "workspace",
+          "points": [
+            [
+              1190,
+              336
+            ],
+            [
+              1220,
+              336
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-014"
+          ]
+        },
+        {
+          "id": "o7",
+          "source": "tools",
+          "target": "context",
+          "points": [
+            [
+              905,
+              372
+            ],
+            [
+              905,
+              556
+            ],
+            [
+              790,
+              556
+            ]
+          ],
+          "label": "tool output",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        },
+        {
+          "id": "o8",
+          "source": "context",
+          "target": "loop",
+          "points": [
+            [
+              620,
+              556
+            ],
+            [
+              505,
+              372
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        },
+        {
+          "id": "o9",
+          "source": "context",
+          "target": "model",
+          "points": [
+            [
+              705,
+              520
+            ],
+            [
+              705,
+              372
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-004"
+          ]
+        },
+        {
+          "id": "o10",
+          "source": "session",
+          "target": "rollout",
+          "points": [
+            [
+              305,
+              372
+            ],
+            [
+              305,
+              520
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-006"
+          ]
+        },
+        {
+          "id": "o11",
+          "source": "session",
+          "target": "child",
+          "points": [
+            [
+              305,
+              300
+            ],
+            [
+              305,
+              152
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-005"
+          ]
+        },
+        {
+          "id": "o12",
+          "source": "child",
+          "target": "workspace",
+          "points": [
+            [
+              390,
+              116
+            ],
+            [
+              1305,
+              116
+            ],
+            [
+              1305,
+              300
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-015"
+          ]
+        },
+        {
+          "id": "o13",
+          "source": "loop",
+          "target": "telemetry",
+          "points": [
+            [
+              505,
+              372
+            ],
+            [
+              905,
+              700
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-021"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "codex-observed-turn",
+      "title": "Observed Read Tool Turn",
+      "description": "Two deterministic Responses requests around one read tool call.",
+      "width": 900,
+      "height": 1200,
+      "nodes": [
+        {
+          "id": "loop2",
+          "kind": "hir",
+          "hir_ids": [
+            "N-TurnLoop"
+          ],
+          "claim_ids": [
+            "C-002"
+          ],
+          "evidence_ids": [
+            "X-002"
+          ],
+          "label": "Turn loop",
+          "subtitle": "",
+          "tone": "core",
+          "x": 350,
+          "y": 80,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "ctx2",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "X-002"
+          ],
+          "label": "Context",
+          "subtitle": "",
+          "tone": "state",
+          "x": 100,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "model2",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Responses"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "X-002"
+          ],
+          "label": "Responses",
+          "subtitle": "",
+          "tone": "model",
+          "x": 350,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "tool2",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRuntime"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "X-002"
+          ],
+          "label": "exec_command",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 600,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "history2",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "X-002"
+          ],
+          "label": "Updated history",
+          "subtitle": "",
+          "tone": "state",
+          "x": 100,
+          "y": 650,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "final2",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Exit"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "X-002"
+          ],
+          "label": "Final answer",
+          "subtitle": "",
+          "tone": "observability",
+          "x": 600,
+          "y": 650,
+          "width": 180,
+          "height": 76
+        }
+      ],
+      "edges": [
+        {
+          "id": "t1",
+          "source": "ctx2",
+          "target": "model2",
+          "points": [
+            [
+              280,
+              338
+            ],
+            [
+              350,
+              338
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        },
+        {
+          "id": "t2",
+          "source": "model2",
+          "target": "tool2",
+          "points": [
+            [
+              530,
+              338
+            ],
+            [
+              600,
+              338
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        },
+        {
+          "id": "t3",
+          "source": "tool2",
+          "target": "history2",
+          "points": [
+            [
+              690,
+              376
+            ],
+            [
+              690,
+              520
+            ],
+            [
+              190,
+              520
+            ],
+            [
+              190,
+              650
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        },
+        {
+          "id": "t4",
+          "source": "history2",
+          "target": "model2",
+          "points": [
+            [
+              280,
+              688
+            ],
+            [
+              440,
+              688
+            ],
+            [
+              440,
+              376
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        },
+        {
+          "id": "t5",
+          "source": "model2",
+          "target": "final2",
+          "points": [
+            [
+              530,
+              338
+            ],
+            [
+              760,
+              338
+            ],
+            [
+              760,
+              688
+            ],
+            [
+              780,
+              688
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "codex-context-lifecycle",
+      "title": "Context Lifecycle",
+      "description": "Context sources, transformations and conditional compaction.",
+      "width": 1400,
+      "height": 760,
+      "nodes": [
+        {
+          "id": "hist3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-005"
+          ],
+          "label": "History",
+          "subtitle": "",
+          "tone": "state",
+          "x": 60,
+          "y": 200,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "world3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-WorldState"
+          ],
+          "claim_ids": [
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-006"
+          ],
+          "label": "World state",
+          "subtitle": "",
+          "tone": "state",
+          "x": 60,
+          "y": 380,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "spec3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SpecPlan"
+          ],
+          "claim_ids": [
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-009"
+          ],
+          "label": "Tool specs",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 60,
+          "y": 560,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "ctx3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-005"
+          ],
+          "label": "Context Manager",
+          "subtitle": "",
+          "tone": "core",
+          "x": 420,
+          "y": 350,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "model3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Responses"
+          ],
+          "claim_ids": [
+            "C-006"
+          ],
+          "evidence_ids": [
+            "S-024"
+          ],
+          "label": "Responses",
+          "subtitle": "",
+          "tone": "model",
+          "x": 800,
+          "y": 350,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "compact3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Compactor"
+          ],
+          "claim_ids": [
+            "C-005"
+          ],
+          "evidence_ids": [
+            "S-007"
+          ],
+          "label": "Compactor",
+          "subtitle": "",
+          "tone": "muted",
+          "x": 420,
+          "y": 80,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "memory3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Memory"
+          ],
+          "claim_ids": [
+            "C-014"
+          ],
+          "evidence_ids": [
+            "S-020"
+          ],
+          "label": "Long-term memory",
+          "subtitle": "",
+          "tone": "muted",
+          "x": 800,
+          "y": 80,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "runtime3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRuntime"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "X-002"
+          ],
+          "label": "Tool runtime",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1040,
+          "y": 520,
+          "width": 170,
+          "height": 72
+        }
+      ],
+      "edges": [
+        {
+          "id": "c1",
+          "source": "hist3",
+          "target": "ctx3",
+          "points": [
+            [
+              240,
+              238
+            ],
+            [
+              420,
+              388
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-005"
+          ]
+        },
+        {
+          "id": "c2",
+          "source": "world3",
+          "target": "ctx3",
+          "points": [
+            [
+              240,
+              418
+            ],
+            [
+              420,
+              388
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-006"
+          ]
+        },
+        {
+          "id": "c3",
+          "source": "spec3",
+          "target": "ctx3",
+          "points": [
+            [
+              240,
+              598
+            ],
+            [
+              420,
+              388
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-009"
+          ]
+        },
+        {
+          "id": "c4",
+          "source": "ctx3",
+          "target": "model3",
+          "points": [
+            [
+              600,
+              388
+            ],
+            [
+              800,
+              388
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-004"
+          ]
+        },
+        {
+          "id": "c5",
+          "source": "compact3",
+          "target": "ctx3",
+          "points": [
+            [
+              510,
+              156
+            ],
+            [
+              510,
+              350
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-007"
+          ]
+        },
+        {
+          "id": "c6",
+          "source": "memory3",
+          "target": "ctx3",
+          "points": [
+            [
+              800,
+              118
+            ],
+            [
+              600,
+              350
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-020"
+          ]
+        },
+        {
+          "id": "c7",
+          "source": "model3",
+          "target": "runtime3",
+          "points": [
+            [
+              980,
+              388
+            ],
+            [
+              1125,
+              520
+            ]
+          ],
+          "label": "tool call",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        },
+        {
+          "id": "c8",
+          "source": "runtime3",
+          "target": "hist3",
+          "points": [
+            [
+              1040,
+              556
+            ],
+            [
+              150,
+              556
+            ],
+            [
+              150,
+              276
+            ]
+          ],
+          "label": "tool output",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "codex-tool-surface",
+      "title": "Tool And Extension Surface",
+      "description": "Registration, exposure, routing and feedback.",
+      "width": 1400,
+      "height": 720,
+      "nodes": [
+        {
+          "id": "mcp4",
+          "kind": "hir",
+          "hir_ids": [
+            "N-MCP"
+          ],
+          "claim_ids": [
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-026"
+          ],
+          "label": "MCP / Dynamic",
+          "subtitle": "",
+          "tone": "muted",
+          "x": 50,
+          "y": 150,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "reg4",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SpecPlan"
+          ],
+          "claim_ids": [
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-009"
+          ],
+          "label": "Registry",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 300,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "model4",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Responses"
+          ],
+          "claim_ids": [
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-004"
+          ],
+          "label": "Responses",
+          "subtitle": "",
+          "tone": "model",
+          "x": 550,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "router4",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRouter"
+          ],
+          "claim_ids": [
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-010"
+          ],
+          "label": "Router",
+          "subtitle": "",
+          "tone": "core",
+          "x": 800,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "hook4",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Hooks"
+          ],
+          "claim_ids": [
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-011"
+          ],
+          "label": "Hooks",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 800,
+          "y": 100,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "runtime4",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRuntime"
+          ],
+          "claim_ids": [
+            "C-008",
+            "C-023"
+          ],
+          "evidence_ids": [
+            "S-025"
+          ],
+          "label": "Runtime",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1050,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "ctx4",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "X-002"
+          ],
+          "label": "Context",
+          "subtitle": "",
+          "tone": "state",
+          "x": 550,
+          "y": 550,
+          "width": 180,
+          "height": 76
+        }
+      ],
+      "edges": [
+        {
+          "id": "u1",
+          "source": "mcp4",
+          "target": "reg4",
+          "points": [
+            [
+              230,
+              188
+            ],
+            [
+              390,
+              300
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-026"
+          ]
+        },
+        {
+          "id": "u2",
+          "source": "reg4",
+          "target": "model4",
+          "points": [
+            [
+              480,
+              338
+            ],
+            [
+              550,
+              338
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-009"
+          ]
+        },
+        {
+          "id": "u3",
+          "source": "model4",
+          "target": "router4",
+          "points": [
+            [
+              730,
+              338
+            ],
+            [
+              800,
+              338
+            ]
+          ],
+          "label": "tool call",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-010",
+            "X-002"
+          ]
+        },
+        {
+          "id": "u4",
+          "source": "router4",
+          "target": "hook4",
+          "points": [
+            [
+              890,
+              300
+            ],
+            [
+              890,
+              176
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-011"
+          ]
+        },
+        {
+          "id": "u5",
+          "source": "hook4",
+          "target": "runtime4",
+          "points": [
+            [
+              980,
+              138
+            ],
+            [
+              1140,
+              300
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-011"
+          ]
+        },
+        {
+          "id": "u6",
+          "source": "runtime4",
+          "target": "ctx4",
+          "points": [
+            [
+              1140,
+              376
+            ],
+            [
+              1140,
+              588
+            ],
+            [
+              730,
+              588
+            ]
+          ],
+          "label": "tool result",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-002"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "codex-permission-pipeline",
+      "title": "Permission Pipeline",
+      "description": "Policy decision and platform sandbox before side effects.",
+      "width": 1400,
+      "height": 720,
+      "nodes": [
+        {
+          "id": "call5",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRuntime"
+          ],
+          "claim_ids": [
+            "C-009"
+          ],
+          "evidence_ids": [
+            "X-004"
+          ],
+          "label": "Tool call",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 50,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "policy5",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ExecPolicy"
+          ],
+          "claim_ids": [
+            "C-009"
+          ],
+          "evidence_ids": [
+            "S-012",
+            "X-004"
+          ],
+          "label": "Exec Policy",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 300,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "approval5",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Approval"
+          ],
+          "claim_ids": [
+            "C-009"
+          ],
+          "evidence_ids": [
+            "S-013"
+          ],
+          "label": "User Approval",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 550,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "sandbox5",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Sandbox"
+          ],
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-014"
+          ],
+          "label": "Sandbox",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 800,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "process5",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ExecBackend"
+          ],
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-014"
+          ],
+          "label": "Process",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1050,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "deny5",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRuntime"
+          ],
+          "claim_ids": [
+            "C-020"
+          ],
+          "evidence_ids": [
+            "X-004",
+            "X-007"
+          ],
+          "label": "Denied",
+          "subtitle": "",
+          "tone": "risk",
+          "x": 550,
+          "y": 550,
+          "width": 180,
+          "height": 76
+        }
+      ],
+      "edges": [
+        {
+          "id": "p1",
+          "source": "call5",
+          "target": "policy5",
+          "points": [
+            [
+              230,
+              338
+            ],
+            [
+              300,
+              338
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-012"
+          ]
+        },
+        {
+          "id": "p2",
+          "source": "policy5",
+          "target": "sandbox5",
+          "points": [
+            [
+              480,
+              320
+            ],
+            [
+              800,
+              320
+            ]
+          ],
+          "label": "allow",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-012",
+            "S-014"
+          ]
+        },
+        {
+          "id": "p3",
+          "source": "policy5",
+          "target": "approval5",
+          "points": [
+            [
+              480,
+              350
+            ],
+            [
+              550,
+              350
+            ]
+          ],
+          "label": "ask",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-012",
+            "S-013"
+          ]
+        },
+        {
+          "id": "p4",
+          "source": "approval5",
+          "target": "sandbox5",
+          "points": [
+            [
+              730,
+              350
+            ],
+            [
+              800,
+              350
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-013",
+            "S-014"
+          ]
+        },
+        {
+          "id": "p5",
+          "source": "sandbox5",
+          "target": "process5",
+          "points": [
+            [
+              980,
+              338
+            ],
+            [
+              1050,
+              338
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-014"
+          ]
+        },
+        {
+          "id": "p6",
+          "source": "policy5",
+          "target": "deny5",
+          "points": [
+            [
+              390,
+              376
+            ],
+            [
+              640,
+              550
+            ]
+          ],
+          "label": "deny",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-004"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "codex-subagent-topology",
+      "title": "Subagent Topology",
+      "description": "Independent child state, inherited policy, shared workspace.",
+      "width": 1400,
+      "height": 760,
+      "nodes": [
+        {
+          "id": "root6",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ThreadManager"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "X-005"
+          ],
+          "label": "Root Session",
+          "subtitle": "",
+          "tone": "core",
+          "x": 100,
+          "y": 260,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "control6",
+          "kind": "hir",
+          "hir_ids": [
+            "N-AgentControl"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-015"
+          ],
+          "label": "AgentControl",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 450,
+          "y": 80,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "child6",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Subagent"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-016",
+            "X-005"
+          ],
+          "label": "Child Session",
+          "subtitle": "",
+          "tone": "core",
+          "x": 700,
+          "y": 260,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "ctx6",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-022"
+          ],
+          "evidence_ids": [
+            "X-005"
+          ],
+          "label": "Child context",
+          "subtitle": "",
+          "tone": "state",
+          "x": 1000,
+          "y": 180,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "workspace6",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-015"
+          ],
+          "label": "Shared workspace",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 450,
+          "y": 560,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "v26",
+          "kind": "hir",
+          "hir_ids": [
+            "N-AgentControl"
+          ],
+          "claim_ids": [
+            "C-013"
+          ],
+          "evidence_ids": [
+            "S-015"
+          ],
+          "label": "V2 mailbox",
+          "subtitle": "",
+          "tone": "muted",
+          "x": 1000,
+          "y": 500,
+          "width": 180,
+          "height": 76
+        }
+      ],
+      "edges": [
+        {
+          "id": "a1",
+          "source": "control6",
+          "target": "root6",
+          "points": [
+            [
+              540,
+              156
+            ],
+            [
+              190,
+              260
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-015"
+          ]
+        },
+        {
+          "id": "a2",
+          "source": "root6",
+          "target": "child6",
+          "points": [
+            [
+              280,
+              298
+            ],
+            [
+              700,
+              298
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-005"
+          ]
+        },
+        {
+          "id": "a3",
+          "source": "child6",
+          "target": "ctx6",
+          "points": [
+            [
+              880,
+              298
+            ],
+            [
+              1000,
+              218
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-005"
+          ]
+        },
+        {
+          "id": "a4",
+          "source": "root6",
+          "target": "workspace6",
+          "points": [
+            [
+              190,
+              336
+            ],
+            [
+              540,
+              560
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-015"
+          ]
+        },
+        {
+          "id": "a5",
+          "source": "child6",
+          "target": "workspace6",
+          "points": [
+            [
+              790,
+              336
+            ],
+            [
+              540,
+              560
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-016"
+          ]
+        },
+        {
+          "id": "a6",
+          "source": "control6",
+          "target": "v26",
+          "points": [
+            [
+              630,
+              118
+            ],
+            [
+              1090,
+              500
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-015"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "codex-persistence-lifecycle",
+      "title": "Persistence Lifecycle",
+      "description": "Append, flush and cross-process resume.",
+      "width": 1400,
+      "height": 720,
+      "nodes": [
+        {
+          "id": "turn7",
+          "kind": "hir",
+          "hir_ids": [
+            "N-TurnLoop"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-003"
+          ],
+          "label": "Turn items",
+          "subtitle": "",
+          "tone": "core",
+          "x": 50,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "live7",
+          "kind": "hir",
+          "hir_ids": [
+            "N-LiveThread"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-018"
+          ],
+          "label": "LiveThread",
+          "subtitle": "",
+          "tone": "state",
+          "x": 300,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "rollout7",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Rollout"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-019",
+            "X-006"
+          ],
+          "label": "Rollout JSONL",
+          "subtitle": "",
+          "tone": "state",
+          "x": 550,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "process7",
+          "kind": "hir",
+          "hir_ids": [
+            "N-CLI"
+          ],
+          "claim_ids": [
+            "C-021"
+          ],
+          "evidence_ids": [
+            "X-006"
+          ],
+          "label": "New process",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 800,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "restore7",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Context"
+          ],
+          "claim_ids": [
+            "C-021"
+          ],
+          "evidence_ids": [
+            "X-006"
+          ],
+          "label": "Restored history",
+          "subtitle": "",
+          "tone": "state",
+          "x": 1050,
+          "y": 300,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "workspace7",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-021"
+          ],
+          "evidence_ids": [
+            "X-007"
+          ],
+          "label": "Workspace",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 550,
+          "y": 550,
+          "width": 180,
+          "height": 76
+        }
+      ],
+      "edges": [
+        {
+          "id": "r1",
+          "source": "turn7",
+          "target": "live7",
+          "points": [
+            [
+              230,
+              338
+            ],
+            [
+              300,
+              338
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-018"
+          ]
+        },
+        {
+          "id": "r2",
+          "source": "live7",
+          "target": "rollout7",
+          "points": [
+            [
+              480,
+              338
+            ],
+            [
+              550,
+              338
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-019"
+          ]
+        },
+        {
+          "id": "r3",
+          "source": "rollout7",
+          "target": "process7",
+          "points": [
+            [
+              730,
+              338
+            ],
+            [
+              800,
+              338
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-006"
+          ]
+        },
+        {
+          "id": "r4",
+          "source": "process7",
+          "target": "restore7",
+          "points": [
+            [
+              980,
+              338
+            ],
+            [
+              1050,
+              338
+            ]
+          ],
+          "label": "",
+          "status": "experimental",
+          "claim_ids": [],
+          "evidence_ids": [
+            "X-006"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "codex-design-space",
+      "title": "Design Space",
+      "description": "Constraints, mechanisms and analyst synthesis.",
+      "width": 1400,
+      "height": 780,
+      "nodes": [
+        {
+          "id": "d1",
+          "kind": "hir",
+          "hir_ids": [
+            "N-LiveThread",
+            "N-Rollout"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-018",
+            "S-019"
+          ],
+          "label": "Durable thread",
+          "subtitle": "",
+          "tone": "state",
+          "x": 100,
+          "y": 100,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "d2",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Context",
+            "N-WorldState"
+          ],
+          "claim_ids": [
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-005",
+            "S-006"
+          ],
+          "label": "Incremental context",
+          "subtitle": "",
+          "tone": "core",
+          "x": 100,
+          "y": 280,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "d3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SpecPlan"
+          ],
+          "claim_ids": [
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-009"
+          ],
+          "label": "Conditional tools",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 100,
+          "y": 460,
+          "width": 180,
+          "height": 76
+        },
+        {
+          "id": "d4",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ExecPolicy",
+            "N-Sandbox"
+          ],
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-012",
+            "S-014"
+          ],
+          "label": "Layered safety",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 100,
+          "y": 640,
+          "width": 180,
+          "height": 76
+        }
+      ],
+      "edges": []
+    }
+  ]
+}

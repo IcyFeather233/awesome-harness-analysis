@@ -1,0 +1,4 @@
+{"event": "thread.started", "scenario": "R-SCENARIO-002"}
+{"event": "turn.started", "scenario": "R-SCENARIO-002"}
+{"category": "unsupported_namespace_tool_schema", "event": "provider.rejected", "request_body_retained": false, "scenario": "R-SCENARIO-002", "status": 400}
+{"event": "turn.failed", "scenario": "R-SCENARIO-002", "side_effects": "none_observed"}

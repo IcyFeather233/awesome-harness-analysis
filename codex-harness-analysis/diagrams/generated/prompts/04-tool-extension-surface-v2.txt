@@ -1,0 +1,41 @@
+Use case: infographic-diagram
+Asset type: reader-facing capability pipeline illustration
+Primary request: Show registration, exposure, model proposal, routing, hooks, execution, and feedback as separate ordered control points.
+
+Mandatory layout and arrows:
+- Across the very top, place exactly five compact source icons: "Built-ins", "MCP", "Extensions", "Dynamic tools", "Multi-agent".
+- Their five arrows must converge into one and only one node "Tool registry" below. Use dashed arrows for all except Built-ins. No source may connect to exposure, model, router, hooks, runtime, result, or context.
+- From Tool registry, draw one dominant left-to-right main path with exactly this order: "Tool registry" -> "Per-turn exposure" -> "Responses API" -> "Tool Router" -> "Pre-tool hooks" -> "Handler runtime" -> "Tool result" -> "Context".
+- Put badge "VISIBLE NOW" on Per-turn exposure.
+- Put label "tool call" only on Responses API to Tool Router.
+- Put two small lines inside or below Handler runtime: "parallel read" and "exclusive write".
+- Do not draw any shortcut from Tool registry to Tool Router, from Responses API to Pre-tool hooks, or from a source to a later stage.
+- Use toolbox, plug, puzzle, function, agents, database, filter, model cloud, router, shield, lock, result, and context-stack icons.
+
+Text (verbatim, case-sensitive):
+"Built-ins"
+"MCP"
+"Extensions"
+"Dynamic tools"
+"Multi-agent"
+"Tool registry"
+"Per-turn exposure"
+"VISIBLE NOW"
+"Responses API"
+"tool call"
+"Tool Router"
+"Pre-tool hooks"
+"Handler runtime"
+"parallel read"
+"exclusive write"
+"Tool result"
+"Context"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, large modern sans-serif labels, white background, and generous whitespace.
+- One unmistakable reading direction. Coral orchestration, blue model/capability, green state/result, amber policy, red failure, gray conditional/external.
+- Similar visual language to a polished modern systems-research figure, but do not copy existing artwork.
+
+Constraints:
+- Use only the exact text listed. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, watermark, gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, or decorative words.
+- Labels must remain horizontal and readable at 1000 pixels report width.

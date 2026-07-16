@@ -1,0 +1,66 @@
+{
+  "analysis_status": "complete_with_known_gaps",
+  "created_at": "2026-07-16T05:39:43.832311+00:00",
+  "completed_at": "2026-07-16T07:56:34.598587+00:00",
+  "schema_version": "1.0",
+  "target": {
+    "repository_root": "/volume/med/work/users/mzchen/lab/codex",
+    "commit": "87db9bc18ba5bc82c1cb4e4381b44f693ee35623",
+    "tag": "rust-v0.144.5",
+    "tag_object": "efea0e66996d4e7f4f805f3df32a169d327f2f73",
+    "branch": null,
+    "dirty": false,
+    "changed_path_count": 0
+  },
+  "scope": {
+    "entrypoints": [
+      "cli",
+      "tui",
+      "exec",
+      "app-server",
+      "mcp-server"
+    ],
+    "configurations": [
+      "rust-v0.144.5",
+      "default",
+      "read-only/never",
+      "V1 multi_agent condition"
+    ],
+    "enabled_features": [
+      "multi_agent only in X-SCENARIO-005",
+      "exec_permission_approvals only in X-SCENARIO-004"
+    ],
+    "disabled_features": [
+      "memories",
+      "multi_agent_v2",
+      "OTel exporters"
+    ],
+    "inaccessible_surfaces": [
+      "production flags/frequency",
+      "macOS/Windows sandbox runtime",
+      "remote environments",
+      "maintainer intent beyond repository docs"
+    ]
+  },
+  "execution": {
+    "model_mode": "real SiFlow compatibility probes plus deterministic local Responses fixture",
+    "model_provider": "siflow/qwen3.6-35ba3b and local scripted-responses",
+    "isolation": "Disposable /tmp CODEX_HOME and workspace; target source checkout read-only",
+    "network_policy": "User-authorized SiFlow only; deterministic fixtures on 127.0.0.1",
+    "filesystem_policy": "read-only/never; explicit denied-side-effect hash check",
+    "credential_policy": "Credentials loaded from existing Codex configuration; never persisted; request contents hashed",
+    "runtime_versions": {
+      "codex": "0.144.5 official musl binary",
+      "python": "3.10",
+      "rust": "not installed",
+      "cargo": "not installed",
+      "just": "not installed"
+    }
+  },
+  "tooling": {
+    "skill": "harness-analysis",
+    "skill_commit": "b44224f0c2666d6461e7be4fb4af840ce67e05cd",
+    "skill_schema_version": "1.0",
+    "image_skill": "gpt-image-2"
+  }
+}

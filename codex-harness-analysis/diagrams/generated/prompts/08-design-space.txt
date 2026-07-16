@@ -1,0 +1,45 @@
+Use case: infographic-diagram
+Asset type: reader-facing architecture decision map
+Primary request: Compare four recurring Codex harness design questions as aligned rows from constraint to recovered mechanism to analyst-synthesized tradeoff.
+
+Architecture facts and layout:
+- Create exactly three vertical columns labeled "Constraint", "Recovered mechanism", and "Analyst synthesis".
+- Create exactly four aligned rows.
+- Row 1: "Resume across processes" -> "LiveThread + Rollout" -> "Flush and corruption boundary".
+- Row 2: "Incremental context" -> "History + World state diff" -> "Lower repetition, more state sync".
+- Row 3: "Conditional capabilities" -> "Registry + Exposure" -> "Provider and mode matrix".
+- Row 4: "Controlled side effects" -> "Exec Policy + Sandbox" -> "Cross-platform verification".
+- Use solid arrows from Constraint to Recovered mechanism. Use dotted amber arrows from Recovered mechanism to Analyst synthesis.
+- Put a small badge "INFERENCE" at the top of the third column.
+- Use resume, context layers, toolbox/filter, shield/sandbox, tradeoff scale, and verification icons.
+
+Text (verbatim, case-sensitive):
+"Constraint"
+"Recovered mechanism"
+"Analyst synthesis"
+"Resume across processes"
+"LiveThread + Rollout"
+"Flush and corruption boundary"
+"Incremental context"
+"History + World state diff"
+"Lower repetition, more state sync"
+"Conditional capabilities"
+"Registry + Exposure"
+"Provider and mode matrix"
+"Controlled side effects"
+"Exec Policy + Sandbox"
+"Cross-platform verification"
+"INFERENCE"
+
+Do not imply that the third-column tradeoffs are documented author intent.
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, and large modern sans-serif labels.
+- White background, generous whitespace, recognizable icons, thick arrows, and one unmistakable reading direction.
+- Use coral for orchestration, blue for model/capabilities, green for durable state, amber for policy, red only for failure, and neutral gray for external boundaries.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Global constraints:
+- Use only the exact text listed in the prompt. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, or watermark.
+- No gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, repeated components, or decorative background.
+- Keep every label horizontal and readable at 1000 pixels report width.

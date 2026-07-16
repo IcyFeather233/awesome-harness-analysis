@@ -1,0 +1,40 @@
+Use case: infographic-diagram
+Asset type: reader-facing context data-flow illustration
+Primary request: Explain how Codex constructs model context while keeping durable history, dynamic world state, tool exposure, and compaction distinct.
+
+Architecture facts and layout:
+- Draw five source icons on the left: "Base instructions", "History", "World state diff", "User input", and "Visible tool specs".
+- All five arrows merge into one large center component "Context Manager". No source may bypass it directly to the model.
+- Continue right through "StepContext + Prompt" -> "Responses API".
+- Draw a solid feedback arrow from "Tool output" below the model back into "History".
+- Draw a dashed conditional loop from "Token limit" -> "Compaction" -> "History replacement" -> "Context Manager" with badge "WHEN NEEDED".
+- Place "Long-term memory" as a muted dashed optional source into "Context Manager" with badge "EXPERIMENTAL".
+- Use document stack, timeline, world/globe, user message, toolbox, funnel, token gauge, summary, memory, and cloud icons.
+
+Text (verbatim, case-sensitive):
+"Base instructions"
+"History"
+"World state diff"
+"User input"
+"Visible tool specs"
+"Context Manager"
+"StepContext + Prompt"
+"Responses API"
+"Tool output"
+"Token limit"
+"Compaction"
+"History replacement"
+"WHEN NEEDED"
+"Long-term memory"
+"EXPERIMENTAL"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, and large modern sans-serif labels.
+- White background, generous whitespace, recognizable icons, thick arrows, and one unmistakable reading direction.
+- Use coral for orchestration, blue for model/capabilities, green for durable state, amber for policy, red only for failure, and neutral gray for external boundaries.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Global constraints:
+- Use only the exact text listed in the prompt. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, or watermark.
+- No gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, repeated components, or decorative background.
+- Keep every label horizontal and readable at 1000 pixels report width.

@@ -1,0 +1,40 @@
+Use case: infographic-diagram
+Asset type: reader-facing multi-agent topology illustration
+Primary request: Explain V1 child-session isolation and sharing, while keeping V2 visibly separate and untested.
+
+Architecture facts and layout:
+- Place a large "Root Session" on the left, governed by a top rail "AgentControl".
+- A solid arrow labeled "spawn_agent" goes to "Child Session" on the right. Add badge "V1 OBSERVED".
+- Inside or immediately beside the child, show three distinct owned items: "Own thread", "Own context", "Own history".
+- Between root and child, show inherited configuration as a thin top arrow labeled "model + policy + cwd".
+- At the bottom, place one shared "Workspace" connected from both root and child. Label the shared connection "shared files".
+- Place a hard stop after child spawn labeled "max depth 1"; do not draw grandchildren.
+- Place "V2 mailbox" as a muted dashed branch below AgentControl with badge "NOT TESTED"; do not merge it into the V1 observed path.
+- Use root-agent, child-agent, thread, message stack, history, folder, governance rail, mailbox, and stop icons.
+
+Text (verbatim, case-sensitive):
+"Root Session"
+"AgentControl"
+"spawn_agent"
+"Child Session"
+"V1 OBSERVED"
+"Own thread"
+"Own context"
+"Own history"
+"model + policy + cwd"
+"Workspace"
+"shared files"
+"max depth 1"
+"V2 mailbox"
+"NOT TESTED"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, and large modern sans-serif labels.
+- White background, generous whitespace, recognizable icons, thick arrows, and one unmistakable reading direction.
+- Use coral for orchestration, blue for model/capabilities, green for durable state, amber for policy, red only for failure, and neutral gray for external boundaries.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Global constraints:
+- Use only the exact text listed in the prompt. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, or watermark.
+- No gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, repeated components, or decorative background.
+- Keep every label horizontal and readable at 1000 pixels report width.

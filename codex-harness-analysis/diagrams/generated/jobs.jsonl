@@ -1,0 +1,8 @@
+{"prompt_file":"diagrams/generated/prompts/01-system-overview-v3.txt","out":"codex-system-overview.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/02-observed-turn.txt","out":"codex-observed-turn.png","model":"gpt-image-2","size":"1024x1536","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/03-context-lifecycle-v2.txt","out":"codex-context-lifecycle.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/04-tool-extension-surface-v3.txt","out":"codex-tool-extension-surface.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/05-permission-pipeline-v2.txt","out":"codex-permission-pipeline.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/06-subagent-topology.txt","out":"codex-subagent-topology.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/07-persistence-lifecycle.txt","out":"codex-persistence-lifecycle.png","model":"gpt-image-2","size":"1536x1024","quality":"high"}
+{"prompt_file":"diagrams/generated/prompts/08-design-space.txt","out":"codex-design-space.png","model":"gpt-image-2","size":"2048x1152","quality":"high"}

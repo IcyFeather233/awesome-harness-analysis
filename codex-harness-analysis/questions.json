@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "questions": [
+    {
+      "id": "Q-001",
+      "priority": "high",
+      "status": "open",
+      "question": "role/namespace translation 后，真实 SiFlow tool loop 与 deterministic trace 是否一致？",
+      "next_experiment": "部署透明 adapter，分别保留 stock/adapted request hashes。"
+    },
+    {
+      "id": "Q-002",
+      "priority": "high",
+      "status": "open",
+      "question": "MCP、dynamic、hosted tools 是否共享 exec policy/sandbox，哪些 handler 有独立副作用边界？",
+      "next_experiment": "为每类 tool 构造 deny/side-effect matrix。"
+    },
+    {
+      "id": "Q-003",
+      "priority": "high",
+      "status": "open",
+      "question": "pre-turn/mid-turn/remote/local compaction 的 replacement 与 persistence 次序是什么？",
+      "next_experiment": "oversized scripted output + token snapshots + resume。"
+    },
+    {
+      "id": "Q-004",
+      "priority": "medium",
+      "status": "open",
+      "question": "rollout 截断、flush failure 与 schema drift 时 resume 的失败模型是什么？",
+      "next_experiment": "复制合成 rollout 并逐段 corruption。"
+    },
+    {
+      "id": "Q-005",
+      "priority": "medium",
+      "status": "open",
+      "question": "V2 mailbox preemption 和 child cancellation 如何与父 turn events 对齐？",
+      "next_experiment": "启用 V2 scripted child hang/cancel scenario。"
+    }
+  ]
+}

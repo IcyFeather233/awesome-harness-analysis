@@ -1,0 +1,247 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-16T07:56:53.840187+00:00",
+  "generator": {
+    "skill": "/volume/med/work/users/mzchen/skills/gpt-image-2",
+    "model": "gpt-image-2",
+    "credential_source": "Codex configuration; values not persisted"
+  },
+  "figures": [
+    {
+      "figure_id": "codex-system-overview",
+      "file": "codex-system-overview.png",
+      "prompt_file": "prompts/01-system-overview-v3.txt",
+      "model": "gpt-image-2",
+      "requested_size": "1536x1024",
+      "actual_size": "1755x896",
+      "quality": "high",
+      "prompt_sha256": "0c1dd55543379e75578a7161fdb39603be0c6401c72a949d265d84f99f9e4a36",
+      "output_sha256": "c822b79329b9a946628a7630e74abdfaa1c870e5ca47ece9c8c376dd59af44ce",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "main path",
+        "secondary branches",
+        "tool feedback",
+        "policy boundary",
+        "conditional child",
+        "durable state"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
+    },
+    {
+      "figure_id": "codex-observed-turn",
+      "file": "codex-observed-turn.png",
+      "prompt_file": "prompts/02-observed-turn.txt",
+      "model": "gpt-image-2",
+      "requested_size": "1024x1536",
+      "actual_size": "1024x1536",
+      "quality": "high",
+      "prompt_sha256": "03b93c90ea99cafaec560a89617ab451c66b70ed993de47ad3d68929697e4ca8",
+      "output_sha256": "a093a2ab59912f8ff77a916009ef8c58e9d91952262d4f304adad3617ae11a19",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "two-request order",
+        "tool-result feedback",
+        "excluded unobserved paths",
+        "lifecycle rails"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
+    },
+    {
+      "figure_id": "codex-context-lifecycle",
+      "file": "codex-context-lifecycle.png",
+      "prompt_file": "prompts/03-context-lifecycle-v2.txt",
+      "model": "gpt-image-2",
+      "requested_size": "1536x1024",
+      "actual_size": "1693x929",
+      "quality": "high",
+      "prompt_sha256": "d5b5d14f99286e7002311ebc2652bd2da05d174e71a34e47c6dec4cb1d8d4813",
+      "output_sha256": "bd09ecbe9d237f0132b424fc55049dfa17710c9faa67499eae7828d9cc543d90",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "single context merge",
+        "world state",
+        "tool exposure",
+        "conditional compaction",
+        "no model bypass"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ],
+      "review_notes": [
+        "The two History icons are views of the same ContextManager history, repeated to keep the tool-output feedback loop free of crossing arrows."
+      ]
+    },
+    {
+      "figure_id": "codex-tool-extension-surface",
+      "file": "codex-tool-extension-surface.png",
+      "prompt_file": "prompts/04-tool-extension-surface-v3.txt",
+      "model": "gpt-image-2",
+      "requested_size": "1536x1024",
+      "actual_size": "1805x871",
+      "quality": "high",
+      "prompt_sha256": "e131c1ee8e65a778ea0bed271896159e227de7bb57fb127255ffea76e3c015d6",
+      "output_sha256": "50d79c3362c60497d8c9b58fa6593af716b046d117586906a1885682f832e407",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "source separation",
+        "registry versus exposure",
+        "router and hooks",
+        "result feedback",
+        "read/write execution"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ],
+      "review_notes": [
+        "The model rendered the edge label as tool call only and added 1-7 stage numbers; the ordered architecture and edge direction are unchanged."
+      ]
+    },
+    {
+      "figure_id": "codex-permission-pipeline",
+      "file": "codex-permission-pipeline.png",
+      "prompt_file": "prompts/05-permission-pipeline-v2.txt",
+      "model": "gpt-image-2",
+      "requested_size": "1536x1024",
+      "actual_size": "1823x863",
+      "quality": "high",
+      "prompt_sha256": "c9af969b2731ccc3257e734186c99ee91fb348de04ac3f8c426db46e09de87ea",
+      "output_sha256": "f14cfc1d26128821cd4a427b2340cddfaa35ae02d75ae6a6876440da5e39993f",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "allowed path",
+        "observed denial",
+        "policy versus sandbox",
+        "denial before process"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
+    },
+    {
+      "figure_id": "codex-subagent-topology",
+      "file": "codex-subagent-topology.png",
+      "prompt_file": "prompts/06-subagent-topology.txt",
+      "model": "gpt-image-2",
+      "requested_size": "1536x1024",
+      "actual_size": "1690x931",
+      "quality": "high",
+      "prompt_sha256": "64dcf17ada3b3c918e6c017d218dc71ffd525d883c2117ef4302b8c9f816e6cf",
+      "output_sha256": "7216ddb8ecc69f58d075b0da0c5a001528bf3c6845dcb663cceb0f18c92eea71",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "independent child state",
+        "inherited config",
+        "shared workspace",
+        "depth limit",
+        "V2 untested"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
+    },
+    {
+      "figure_id": "codex-persistence-lifecycle",
+      "file": "codex-persistence-lifecycle.png",
+      "prompt_file": "prompts/07-persistence-lifecycle.txt",
+      "model": "gpt-image-2",
+      "requested_size": "1536x1024",
+      "actual_size": "1821x864",
+      "quality": "high",
+      "prompt_sha256": "a60f7d9754492223b393d223f78d364402971a41870ea339c998df78501ed3f8",
+      "output_sha256": "061c2b10d1146f38bf43c5f08f9100cfe802e61a0cfef2982dff083bdf0b5ec0",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "append and flush",
+        "cross-process resume",
+        "workspace not rolled back",
+        "untested corruption"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
+    },
+    {
+      "figure_id": "codex-design-space",
+      "file": "codex-design-space.png",
+      "prompt_file": "prompts/08-design-space.txt",
+      "model": "gpt-image-2",
+      "requested_size": "2048x1152",
+      "actual_size": "1536x1024",
+      "quality": "high",
+      "prompt_sha256": "a53be1a3c387fd243a64cf262825616df5c5ae546d6a6456d5d3d27b3f9d6c77",
+      "output_sha256": "e5f1fda69b3a0962bd47ff098ceaa147e6fb5d8bd5e2b18def37877798aebf71",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "four aligned rows",
+        "constraint",
+        "recovered mechanism",
+        "inference separation"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
+    }
+  ],
+  "review_note": "Semantic review is performed against prompts, story specs and report captions; generated raster is explanatory, not evidence truth.",
+  "rejected": [
+    {
+      "file": "rejected/codex-system-overview-v1.png",
+      "prompt_file": "prompts/01-system-overview.txt",
+      "semantic_review": "rejected",
+      "reason": "Tool output arrow pointed from Context into Tool runtime instead of feeding Context and the next turn."
+    },
+    {
+      "file": "rejected/codex-system-overview-v2.png",
+      "prompt_file": "prompts/01-system-overview-v2.txt",
+      "semantic_review": "rejected",
+      "reason": "A direct Tool runtime to Workspace edge competed with the policy branch and implied a bypass."
+    },
+    {
+      "file": "rejected/codex-context-lifecycle-v1.png",
+      "prompt_file": "prompts/03-context-lifecycle.txt",
+      "semantic_review": "rejected",
+      "reason": "Tool output stopped below Responses API instead of returning to History."
+    },
+    {
+      "file": "rejected/codex-tool-extension-surface-v1.png",
+      "prompt_file": "prompts/04-tool-extension-surface.txt",
+      "semantic_review": "rejected",
+      "reason": "Conditional sources connected to later pipeline stages and registry bypassed the model before routing."
+    },
+    {
+      "file": "rejected/codex-permission-pipeline-v1.png",
+      "prompt_file": "prompts/05-permission-pipeline.txt",
+      "semantic_review": "rejected",
+      "reason": "User approval was drawn as mandatory for every allowed command instead of only the ask branch."
+    }
+  ]
+}

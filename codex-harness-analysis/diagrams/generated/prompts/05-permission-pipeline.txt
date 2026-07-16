@@ -1,0 +1,41 @@
+Use case: infographic-diagram
+Asset type: reader-facing security boundary illustration
+Primary request: Explain the exact Codex command side-effect path and the experimentally observed Never-policy denial.
+
+Architecture facts and layout:
+- Draw one dominant horizontal allowed path: "Model tool call" -> "Exec Policy" -> "Approval" -> "Platform Sandbox" -> "Process" -> "Workspace".
+- Put "Rules + mode" above "Exec Policy" with an input arrow.
+- Put "Session cache" above "Approval" with a two-way arrow.
+- Put "Filesystem profile" and "Network profile" above "Platform Sandbox" as policy inputs.
+- From "Exec Policy", draw a prominent red branch downward: "NEVER + escalation" -> "Denied before process" -> "Tool error to model". Add badge "OBSERVED".
+- The red branch must end before "Platform Sandbox" and "Process".
+- Use shield, decision split, user approval, OS boundary, process, folder, and blocked-command icons.
+
+Text (verbatim, case-sensitive):
+"Model tool call"
+"Exec Policy"
+"Approval"
+"Platform Sandbox"
+"Process"
+"Workspace"
+"Rules + mode"
+"Session cache"
+"Filesystem profile"
+"Network profile"
+"NEVER + escalation"
+"Denied before process"
+"Tool error to model"
+"OBSERVED"
+
+Do not draw the observed denied request as entering the sandbox or process. Do not imply that approval alone is the sandbox.
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, and large modern sans-serif labels.
+- White background, generous whitespace, recognizable icons, thick arrows, and one unmistakable reading direction.
+- Use coral for orchestration, blue for model/capabilities, green for durable state, amber for policy, red only for failure, and neutral gray for external boundaries.
+- Similar visual language to a polished modern systems-research figure, but do not copy any existing figure or artwork.
+
+Global constraints:
+- Use only the exact text listed in the prompt. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, or watermark.
+- No gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, repeated components, or decorative background.
+- Keep every label horizontal and readable at 1000 pixels report width.

@@ -1,0 +1,42 @@
+Use case: infographic-diagram
+Asset type: reader-facing context data-flow illustration
+Primary request: Explain context construction and show the complete tool-result feedback loop without any bypass.
+
+Mandatory layout and arrows:
+- Put five source icons in a vertical stack on the left: "Base instructions", "History", "World state diff", "User input", "Visible tool specs".
+- Every source arrow must point into exactly one large center node "Context Manager". No source may point to any later node.
+- Continue one solid main path to the right: "Context Manager" -> "StepContext + Prompt" -> "Responses API".
+- Directly below "Responses API", draw a complete solid feedback path in this exact order: "Responses API" -> "Tool runtime" -> "Tool output" -> "History" -> "Context Manager".
+- Put the label "tool call" only on the Responses API to Tool runtime arrow. Put "next request" only on the History to Context Manager arrow.
+- Below Context Manager, draw one dashed conditional chain: "Token limit" -> "Compaction" -> "History replacement" -> "Context Manager". Add badge "WHEN NEEDED".
+- Place "Long-term memory" as a separate dashed optional source into Context Manager with badge "EXPERIMENTAL".
+- Arrowheads must make the full loop direction unambiguous. Never end Tool output without connecting it to History. Never draw Tool output directly into Responses API.
+
+Text (verbatim, case-sensitive):
+"Base instructions"
+"History"
+"World state diff"
+"User input"
+"Visible tool specs"
+"Context Manager"
+"StepContext + Prompt"
+"Responses API"
+"Tool runtime"
+"Tool output"
+"tool call"
+"next request"
+"Token limit"
+"Compaction"
+"History replacement"
+"WHEN NEEDED"
+"Long-term memory"
+"EXPERIMENTAL"
+
+Style and visual hierarchy:
+- Clean academic systems infographic with friendly hand-sketched geometry, bold dark-gray outlines, flat pastel fills, large modern sans-serif labels, white background, and generous whitespace.
+- One unmistakable reading direction. Coral orchestration, blue model/capability, green state/result, amber policy, red failure, gray conditional/external.
+- Similar visual language to a polished modern systems-research figure, but do not copy existing artwork.
+
+Constraints:
+- Use only the exact text listed. No title, caption, legend, evidence IDs, source paths, paragraphs, logos, watermark, gradients, shadows, 3D, photorealism, tiny print, nested cards, crossing arrows, or decorative words.
+- Labels must remain horizontal and readable at 1000 pixels report width.

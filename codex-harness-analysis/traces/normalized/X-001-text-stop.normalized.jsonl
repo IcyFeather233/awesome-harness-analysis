@@ -1,0 +1,5 @@
+{"event": "thread.started", "scenario": "X-SCENARIO-001"}
+{"event": "turn.started", "scenario": "X-SCENARIO-001"}
+{"event": "model.request", "input_count": 3, "scenario": "X-SCENARIO-001"}
+{"event": "assistant.message", "scenario": "X-SCENARIO-001", "text_token": "SCRIPTED_OK"}
+{"event": "turn.completed", "scenario": "X-SCENARIO-001"}

@@ -1,0 +1,4 @@
+{"event": "model.function_call", "scenario": "X-SCENARIO-003", "tool": "definitely_not_a_tool"}
+{"category": "unsupported_call", "event": "tool.failed", "scenario": "X-SCENARIO-003"}
+{"contains_tool_output": true, "event": "model.request", "scenario": "X-SCENARIO-003"}
+{"event": "turn.completed", "scenario": "X-SCENARIO-003"}

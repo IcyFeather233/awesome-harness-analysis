@@ -1,0 +1,1132 @@
+{
+  "schema_version": "1.0",
+  "repository": {
+    "root": "/volume/med/work/users/mzchen/lab/codex",
+    "commit": "87db9bc18ba5bc82c1cb4e4381b44f693ee35623",
+    "entrypoints": [
+      "cli",
+      "tui",
+      "exec",
+      "app-server",
+      "mcp-server"
+    ],
+    "configurations": [
+      "default",
+      "read-only/never",
+      "V1 multi_agent"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "N-CLI",
+      "type": "Interface",
+      "name": "CLI/TUI/exec",
+      "summary": "Human and automation surfaces.",
+      "attributes": {
+        "layer": "interface",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-001",
+        "R-001"
+      ],
+      "confidence": "high",
+      "status": "runtime_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-AppServer",
+      "type": "Interface",
+      "name": "App Server",
+      "summary": "Bidirectional JSON-RPC thread API.",
+      "attributes": {
+        "layer": "interface",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "D-003",
+        "S-023"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-MCPServer",
+      "type": "Interface",
+      "name": "MCP Server",
+      "summary": "Codex exposed as an MCP server surface.",
+      "attributes": {
+        "layer": "interface",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-001"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-ThreadManager",
+      "type": "Session",
+      "name": "Thread Manager",
+      "summary": "Creates, resumes, forks and owns sessions.",
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "D-003",
+        "S-018"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-RegularTask",
+      "type": "AgentLoop",
+      "name": "Regular Task",
+      "summary": "Starts a turn and drains queued user input.",
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-002",
+        "X-001"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-TurnLoop",
+      "type": "AgentLoop",
+      "name": "Turn Loop",
+      "summary": "Model/tool iteration and stop decisions.",
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-003",
+        "X-002"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-Context",
+      "type": "ContextBuilder",
+      "name": "Context Manager",
+      "summary": "Model-visible history and token accounting.",
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "carry-forward",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-005",
+        "X-002"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-WorldState",
+      "type": "ContextTransformer",
+      "name": "World State",
+      "summary": "Typed snapshots and diffs for dynamic state.",
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "per-turn",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-006"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-Compactor",
+      "type": "Compactor",
+      "name": "Compactor",
+      "summary": "Remote/local summary and history replacement.",
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "threshold/overflow/manual",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-007"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-ModelSession",
+      "type": "ModelAdapter",
+      "name": "Model Client Session",
+      "summary": "Stable transport and retry state.",
+      "attributes": {
+        "layer": "infrastructure",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-008",
+        "S-024"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-Responses",
+      "type": "ModelCall",
+      "name": "Responses API",
+      "summary": "Streaming model boundary.",
+      "attributes": {
+        "layer": "infrastructure",
+        "lifecycle": "runtime",
+        "trust_zone": "external"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-024",
+        "X-001"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-SpecPlan",
+      "type": "ToolRegistry",
+      "name": "Tool Spec Plan",
+      "summary": "Registry plus model-visible exposure.",
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-009",
+        "X-005"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-ToolRouter",
+      "type": "Router",
+      "name": "Tool Router",
+      "summary": "Parses and binds response tool calls.",
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-010",
+        "X-002"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-ToolRuntime",
+      "type": "Tool",
+      "name": "Tool Runtime",
+      "summary": "Parallel/exclusive handler execution.",
+      "attributes": {
+        "layer": "execution",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-025",
+        "X-002"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-MCP",
+      "type": "MCPServer",
+      "name": "MCP/Extensions",
+      "summary": "Externally supplied capability surface.",
+      "attributes": {
+        "layer": "extension",
+        "lifecycle": "runtime",
+        "trust_zone": "external"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-026"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-Hooks",
+      "type": "Hook",
+      "name": "Hooks",
+      "summary": "Pre-tool policy/rewrite and lifecycle hooks.",
+      "attributes": {
+        "layer": "extension",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-011"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-ExecPolicy",
+      "type": "PolicyRule",
+      "name": "Exec Policy",
+      "summary": "Rule and approval-mode decision.",
+      "attributes": {
+        "layer": "governance",
+        "lifecycle": "runtime",
+        "trust_zone": "policy"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-012",
+        "X-004"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-Approval",
+      "type": "PermissionGate",
+      "name": "Approval Cache",
+      "summary": "Per-call and per-session approval state.",
+      "attributes": {
+        "layer": "governance",
+        "lifecycle": "runtime",
+        "trust_zone": "policy"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-013",
+        "X-004"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-Sandbox",
+      "type": "Sandbox",
+      "name": "Sandbox Manager",
+      "summary": "Platform-specific permission transform.",
+      "attributes": {
+        "layer": "governance",
+        "lifecycle": "runtime",
+        "trust_zone": "sandbox"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "D-002",
+        "S-014"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-ExecBackend",
+      "type": "ExecutionBackend",
+      "name": "Execution Backend",
+      "summary": "Process/filesystem/network side effects.",
+      "attributes": {
+        "layer": "execution",
+        "lifecycle": "runtime",
+        "trust_zone": "sandbox"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-014",
+        "X-007"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-Workspace",
+      "type": "Workspace",
+      "name": "Workspace",
+      "summary": "Shared working directory and files.",
+      "attributes": {
+        "layer": "state",
+        "lifecycle": "runtime",
+        "trust_zone": "workspace"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-015",
+        "X-007"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-LiveThread",
+      "type": "SessionStore",
+      "name": "Live Thread",
+      "summary": "Storage-neutral active persistence boundary.",
+      "attributes": {
+        "layer": "state",
+        "lifecycle": "durable",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "D-004",
+        "S-018",
+        "X-006"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-Rollout",
+      "type": "Checkpoint",
+      "name": "Rollout JSONL",
+      "summary": "Append-oriented durable event history.",
+      "attributes": {
+        "layer": "state",
+        "lifecycle": "durable",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-019",
+        "X-006"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-Memory",
+      "type": "MemoryStore",
+      "name": "Two-phase Memory",
+      "summary": "Experimental extraction and consolidation.",
+      "attributes": {
+        "layer": "state",
+        "lifecycle": "durable",
+        "trust_zone": "process"
+      },
+      "conditions": {
+        "feature": "memories",
+        "default": false
+      },
+      "evidence_ids": [
+        "D-005",
+        "S-020"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-AgentControl",
+      "type": "Planner",
+      "name": "Agent Control",
+      "summary": "Shared governance for one root agent tree.",
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {
+        "feature": "multi_agent"
+      },
+      "evidence_ids": [
+        "S-015",
+        "S-016",
+        "X-005"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-Subagent",
+      "type": "Subagent",
+      "name": "Child Session",
+      "summary": "Independent child context/history with inherited policy.",
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {
+        "feature": "multi_agent"
+      },
+      "evidence_ids": [
+        "S-016",
+        "X-005"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "N-Telemetry",
+      "type": "TelemetrySink",
+      "name": "Events + OTel",
+      "summary": "Product events, logs, traces and metrics.",
+      "attributes": {
+        "layer": "observability",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "D-006",
+        "S-021"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-Recovery",
+      "type": "RecoveryPolicy",
+      "name": "Recovery",
+      "summary": "Bounded retry, cancellation and flush behavior.",
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-008",
+        "S-022"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "N-Exit",
+      "type": "ExitCondition",
+      "name": "Turn Complete",
+      "summary": "No follow-up, queued input or cancellation.",
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-002",
+        "S-003",
+        "X-001"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    }
+  ],
+  "edges": [
+    {
+      "id": "E-CLI-Thread",
+      "source": "N-CLI",
+      "target": "N-ThreadManager",
+      "type": "enters",
+      "label": "start/resume",
+      "conditions": {},
+      "evidence_ids": [
+        "S-001",
+        "X-006"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-App-Thread",
+      "source": "N-AppServer",
+      "target": "N-ThreadManager",
+      "type": "enters",
+      "label": "JSON-RPC",
+      "conditions": {},
+      "evidence_ids": [
+        "D-003",
+        "S-023"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-MCP-Thread",
+      "source": "N-MCPServer",
+      "target": "N-ThreadManager",
+      "type": "enters",
+      "label": "server op",
+      "conditions": {},
+      "evidence_ids": [
+        "S-001"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Thread-Task",
+      "source": "N-ThreadManager",
+      "target": "N-RegularTask",
+      "type": "calls",
+      "label": "start turn",
+      "conditions": {},
+      "evidence_ids": [
+        "S-002",
+        "X-001"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Task-Loop",
+      "source": "N-RegularTask",
+      "target": "N-TurnLoop",
+      "type": "calls",
+      "label": "run_turn",
+      "conditions": {},
+      "evidence_ids": [
+        "S-002",
+        "X-001"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Loop-Context",
+      "source": "N-TurnLoop",
+      "target": "N-Context",
+      "type": "assembles",
+      "label": "history",
+      "conditions": {},
+      "evidence_ids": [
+        "S-003",
+        "S-005",
+        "X-002"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-World-Context",
+      "source": "N-WorldState",
+      "target": "N-Context",
+      "type": "injects",
+      "label": "snapshot/diff",
+      "conditions": {},
+      "evidence_ids": [
+        "S-006"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Context-Compact",
+      "source": "N-Context",
+      "target": "N-Compactor",
+      "type": "compacts",
+      "label": "over budget",
+      "conditions": {},
+      "evidence_ids": [
+        "S-007"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Compact-Context",
+      "source": "N-Compactor",
+      "target": "N-Context",
+      "type": "returns",
+      "label": "replacement",
+      "conditions": {},
+      "evidence_ids": [
+        "S-007"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Context-Model",
+      "source": "N-Context",
+      "target": "N-ModelSession",
+      "type": "calls",
+      "label": "prompt",
+      "conditions": {},
+      "evidence_ids": [
+        "S-004",
+        "X-002"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Spec-Model",
+      "source": "N-SpecPlan",
+      "target": "N-ModelSession",
+      "type": "injects",
+      "label": "visible specs",
+      "conditions": {},
+      "evidence_ids": [
+        "S-004",
+        "S-009",
+        "X-005"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Session-Responses",
+      "source": "N-ModelSession",
+      "target": "N-Responses",
+      "type": "calls",
+      "label": "stream",
+      "conditions": {},
+      "evidence_ids": [
+        "S-008",
+        "S-024",
+        "X-001"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Responses-Router",
+      "source": "N-Responses",
+      "target": "N-ToolRouter",
+      "type": "proposes",
+      "label": "tool call",
+      "conditions": {},
+      "evidence_ids": [
+        "S-010",
+        "X-002"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Router-Runtime",
+      "source": "N-ToolRouter",
+      "target": "N-ToolRuntime",
+      "type": "executes",
+      "label": "dispatch",
+      "conditions": {},
+      "evidence_ids": [
+        "S-010",
+        "S-025",
+        "X-002"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-MCP-Spec",
+      "source": "N-MCP",
+      "target": "N-SpecPlan",
+      "type": "registers",
+      "label": "specs",
+      "conditions": {},
+      "evidence_ids": [
+        "S-026"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Spec-Router",
+      "source": "N-SpecPlan",
+      "target": "N-ToolRouter",
+      "type": "registers",
+      "label": "handlers",
+      "conditions": {},
+      "evidence_ids": [
+        "S-009",
+        "S-010"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Hooks-Runtime",
+      "source": "N-Hooks",
+      "target": "N-ToolRuntime",
+      "type": "triggers",
+      "label": "pre/post",
+      "conditions": {},
+      "evidence_ids": [
+        "S-011"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Runtime-Policy",
+      "source": "N-ToolRuntime",
+      "target": "N-ExecPolicy",
+      "type": "authorizes",
+      "label": "command",
+      "conditions": {},
+      "evidence_ids": [
+        "S-012",
+        "X-004"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Policy-Approval",
+      "source": "N-ExecPolicy",
+      "target": "N-Approval",
+      "type": "routes_if",
+      "label": "ask/cache",
+      "conditions": {},
+      "evidence_ids": [
+        "S-012",
+        "S-013"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Policy-Deny",
+      "source": "N-ExecPolicy",
+      "target": "N-ToolRuntime",
+      "type": "denies",
+      "label": "model-facing error",
+      "conditions": {},
+      "evidence_ids": [
+        "S-012",
+        "X-004"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Approval-Sandbox",
+      "source": "N-Approval",
+      "target": "N-Sandbox",
+      "type": "authorizes",
+      "label": "approved",
+      "conditions": {},
+      "evidence_ids": [
+        "S-013",
+        "S-014"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Sandbox-Exec",
+      "source": "N-Sandbox",
+      "target": "N-ExecBackend",
+      "type": "executes",
+      "label": "transform",
+      "conditions": {},
+      "evidence_ids": [
+        "D-002",
+        "S-014"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Exec-Workspace",
+      "source": "N-ExecBackend",
+      "target": "N-Workspace",
+      "type": "writes",
+      "label": "side effect",
+      "conditions": {},
+      "evidence_ids": [
+        "S-014",
+        "X-007"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Runtime-Context",
+      "source": "N-ToolRuntime",
+      "target": "N-Context",
+      "type": "appends_to_context",
+      "label": "tool output",
+      "conditions": {},
+      "evidence_ids": [
+        "S-003",
+        "X-002"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Loop-Live",
+      "source": "N-TurnLoop",
+      "target": "N-LiveThread",
+      "type": "persists",
+      "label": "items",
+      "conditions": {},
+      "evidence_ids": [
+        "S-018",
+        "X-006"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Live-Rollout",
+      "source": "N-LiveThread",
+      "target": "N-Rollout",
+      "type": "persists",
+      "label": "append/flush",
+      "conditions": {},
+      "evidence_ids": [
+        "S-019",
+        "X-006"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Rollout-Live",
+      "source": "N-Rollout",
+      "target": "N-LiveThread",
+      "type": "restores",
+      "label": "resume",
+      "conditions": {},
+      "evidence_ids": [
+        "S-018",
+        "X-006"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Rollout-Memory",
+      "source": "N-Rollout",
+      "target": "N-Memory",
+      "type": "reads",
+      "label": "phase 1",
+      "conditions": {
+        "feature": "memories"
+      },
+      "evidence_ids": [
+        "D-005",
+        "S-020"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Agent-Child",
+      "source": "N-AgentControl",
+      "target": "N-Subagent",
+      "type": "delegates",
+      "label": "spawn",
+      "conditions": {
+        "feature": "multi_agent"
+      },
+      "evidence_ids": [
+        "S-016",
+        "X-005"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Child-Workspace",
+      "source": "N-Subagent",
+      "target": "N-Workspace",
+      "type": "shares_workspace_with",
+      "label": "same cwd",
+      "conditions": {},
+      "evidence_ids": [
+        "S-015",
+        "S-016"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Child-Context",
+      "source": "N-Subagent",
+      "target": "N-Context",
+      "type": "isolates_context_from",
+      "label": "own history",
+      "conditions": {},
+      "evidence_ids": [
+        "S-016",
+        "X-005"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Child-Loop",
+      "source": "N-Subagent",
+      "target": "N-TurnLoop",
+      "type": "calls",
+      "label": "child turn",
+      "conditions": {},
+      "evidence_ids": [
+        "S-016",
+        "X-005"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    },
+    {
+      "id": "E-Task-Telemetry",
+      "source": "N-RegularTask",
+      "target": "N-Telemetry",
+      "type": "emits_trace",
+      "label": "turn span",
+      "conditions": {},
+      "evidence_ids": [
+        "S-021"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Runtime-Telemetry",
+      "source": "N-ToolRuntime",
+      "target": "N-Telemetry",
+      "type": "emits_trace",
+      "label": "tool log",
+      "conditions": {},
+      "evidence_ids": [
+        "S-021"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Model-Recovery",
+      "source": "N-ModelSession",
+      "target": "N-Recovery",
+      "type": "retries",
+      "label": "bounded",
+      "conditions": {},
+      "evidence_ids": [
+        "S-008"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Recovery-Loop",
+      "source": "N-Recovery",
+      "target": "N-TurnLoop",
+      "type": "returns",
+      "label": "continue/fail",
+      "conditions": {},
+      "evidence_ids": [
+        "S-022"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": []
+    },
+    {
+      "id": "E-Loop-Exit",
+      "source": "N-TurnLoop",
+      "target": "N-Exit",
+      "type": "exits_to",
+      "label": "no follow-up",
+      "conditions": {},
+      "evidence_ids": [
+        "S-003",
+        "X-001"
+      ],
+      "confidence": "high",
+      "status": "experimental_verified",
+      "source_refs": []
+    }
+  ]
+}
