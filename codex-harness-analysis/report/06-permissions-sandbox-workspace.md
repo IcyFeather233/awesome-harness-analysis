@@ -4,6 +4,17 @@
 
 > 图 5（gpt-image-2 读者插图）：三分支明确区分 allow 直达 sandbox、ask 经 User Approval，以及 deny；红色拒绝支路是 `X-SCENARIO-004` 实际发生路径，sandbox backend 未执行。Evidence: `D-002`, `S-012`–`S-014`, `X-004`, `X-007`, `I-002`。
 
+<!-- EXPLANATION:permission-figure -->
+## 图 5 的三条分支
+
+`Exec Policy` 不是 sandbox，它先回答“是否允许进入执行阶段”：
+
+- `allow`：规则和 mode 已足以授权，不弹用户确认，直接进入 `Platform Sandbox`。
+- `ask`：需要 `User Approval`；`Session cache` 只可能复用同一 session 中明确批准的 decision，然后同样进入 sandbox。
+- `NEVER + escalation`：当前 policy 明确不允许询问提权，直接产生 `Tool error to model`；图中的 `OBSERVED` 只标记这条本轮实验路径。
+
+两个 allow/ask 分支汇合后，`Filesystem profile` 和 `Network profile` 决定 sandbox 给 process 的实际能力，`Process` 才可能读取/写入 `Workspace`。所以“允许命令”不等于“无限制执行”，“用户批准”也不等于“关闭 sandbox”。[S: `S-012`–`S-014`] [X: `X-004`, `X-007`]
+
 ## 决策层
 
 `ExecPolicy` 先把复合命令拆成 segments，综合 rules 与 fallback。只有每个 segment 都显式 allow 才能绕过额外 sandbox 决策；危险/未知命令在不同 approval mode 下会 forbid、prompt 或依赖 sandbox。[源码](https://github.com/openai/codex/blob/87db9bc18ba5bc82c1cb4e4381b44f693ee35623/codex-rs/core/src/exec_policy.rs#L169) [S: `S-012`]

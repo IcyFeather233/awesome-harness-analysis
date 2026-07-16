@@ -6,6 +6,8 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from augment_mailbox_evidence import augment_structured_evidence
+from enrich_report_explanations import enrich_reports
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -561,7 +563,7 @@ REPORTS["07-subagents-delegation.md"] = f"""
 
 ![Codex subagent topology](../diagrams/generated/codex-subagent-topology.png)
 
-> 图 6（gpt-image-2 读者插图）：V1/V2 是两条条件路径；本轮只运行 V1。Child 拥有独立 context/history/thread，继承 policy/cwd，workspace 共享；默认 `max_depth=1` 使 child 不再暴露 spawn namespace。Evidence: `S-015`–`S-017`, `X-005`。
+> 图 6（gpt-image-2 读者插图）：V1/V2 是两条条件路径；本轮只运行 V1。Child 拥有独立 context/history/thread，继承 policy/cwd，workspace 共享；默认 `max_depth=1` 使 child 不再暴露 spawn namespace。Evidence: `S-015`–`S-017`, `S-027`, `X-005`。
 
 ## 静态拓扑
 
@@ -763,6 +765,8 @@ def compile_bundle() -> None:
 
     for filename, body in REPORTS.items():
         write_text(ROOT / "report" / filename, body)
+    augment_structured_evidence()
+    enrich_reports()
 
 
 if __name__ == "__main__":

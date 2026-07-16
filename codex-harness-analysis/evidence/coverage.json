@@ -297,7 +297,9 @@
       ],
       "files": [
         "codex-rs/core/src/codex_delegate.rs",
-        "codex-rs/core/src/agent/control/spawn.rs"
+        "codex-rs/core/src/agent/control/spawn.rs",
+        "codex-rs/core/src/state/turn.rs",
+        "codex-rs/core/src/session/input_queue.rs"
       ],
       "symbols": [],
       "configurations": [
@@ -320,7 +322,9 @@
       ],
       "files": [
         "codex-rs/core/src/session/turn.rs",
-        "codex-rs/core/src/agent/control.rs"
+        "codex-rs/core/src/agent/control.rs",
+        "codex-rs/core/src/state/turn.rs",
+        "codex-rs/core/src/session/input_queue.rs"
       ],
       "symbols": [],
       "configurations": [

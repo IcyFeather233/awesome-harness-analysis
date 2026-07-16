@@ -10,4 +10,14 @@ app-server 不是另一个 agent runtime。它把 thread start/resume/fork、tur
 
 这一区分很关键：**turn、session、process 的终止条件不同**。一次 model/tool error 可以结束 turn，却不必销毁 thread；app-server 客户端断开也不能被简单等同于 durable thread 删除。
 
+<!-- EXPLANATION:lifecycle-terms -->
+## 四层生命周期不要混在一起
+
+- **Interface lifecycle**：TUI、`exec`、app-server 或 MCP server 何时连接和退出。
+- **Thread lifecycle**：durable thread 的 start、resume、fork、archive/delete。
+- **Session lifecycle**：当前进程何时加载并持有一个 thread，何时 flush/shutdown。
+- **Turn lifecycle**：一次输入如何开始、发生多次 model/tool iteration、完成或中止。
+
+例如 app-server websocket 断开只说明 interface 消失；只要 thread 已持久化，它仍可由另一个进程 resume。相反，`TurnAborted` 只结束当前 turn，session 仍可接受下一条输入。[D: `D-003`, `D-004`] [S: `S-002`, `S-018`]
+
 动态验证覆盖了 `exec` 的 start 与 resume，但没有启动 TUI、app-server websocket 或 MCP server。因此“共享 core”是高置信静态结论，接口特有背压/序列化行为仍是局部覆盖。

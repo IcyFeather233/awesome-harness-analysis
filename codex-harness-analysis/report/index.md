@@ -6,6 +6,30 @@
 
 > 图 1（gpt-image-2 读者插图）：中央主轴是本轮恢复出的 canonical path；exec governance 位于主轴；持久化、subagent 与 telemetry 是有明确注入点的支路。图片不是架构真值，结构依据见 [HIR](../hir.json)、[claims](../evidence/claims.jsonl) 与[图像元数据](../diagrams/generated/metadata.json)。Evidence: `S-001`–`S-019`, `X-001`, `X-002`, `X-004`, `X-005`, `X-006`。
 
+<!-- EXPLANATION:report-glossary -->
+## 先读懂图 1：这些方框不是源码目录
+
+图 1 把多个 Rust 类型聚合成读者可理解的运行职责。例如 `Thread / Session` 同时概括 thread manager、session 和 active persistence handle；`Tool runtime` 概括 tool spec、router 与 handler execution。它不是“一个方框对应一个文件”的包依赖图。
+
+从左到右的实线是一次使用 `exec_command` 时的主路径：入口创建或恢复 thread，turn loop 组装请求，Responses API 返回模型输出，tool runtime 解释工具调用，`Exec Policy + Sandbox` 决定并约束副作用，最后才触达 workspace。下方红色回路表示 tool output 先进入 context，再触发下一次 model request；它不是 tool 直接调用模型。
+
+图中常用词可以先这样理解：
+
+| 术语 | 本报告中的准确含义 |
+|---|---|
+| thread | 可持久化、可 resume/fork 的会话身份和历史容器 |
+| session | 当前进程中负责处理该 thread 的运行对象 |
+| turn | 一次用户请求到 `TurnComplete/TurnAborted` 的调度单位；内部可有多次模型请求 |
+| `StepContext` | 某次 sampling/tool invocation 固定使用的 model、cwd、policy、tools 等请求级快照 |
+| context | 模型可见 history、动态 world state、当前输入和 tool specs 的组合 |
+| rollout | 按顺序记录 session items 的 durable JSONL 事件历史 |
+| registry | 当前进程已经有实现的工具集合 |
+| exposure | 本次 model request 实际向模型公开的工具子集 |
+| mailbox | V2 agent 之间暂存 completion/message 的 session-scoped 通信队列 |
+| OTel | OpenTelemetry；独立于产品事件的 logs/traces/metrics 输出层 |
+
+图片只承担“快速建立心智模型”；条件、例外和精确定义以相应章节、[HIR](../hir.json)和 evidence 为准。
+
 ## 一句话结论
 
 Codex 0.144.5 不是“一个 while-loop 加几个工具”，而是一个以 **thread/session 为耐久边界、turn 为调度边界、StepContext 为请求边界、policy+sandbox 为副作用边界** 的分层 harness。核心复杂度集中在四处：增量 context/world state、动态 tool exposure、跨 turn/session 的恢复语义，以及 feature-gated 的多 agent 树。

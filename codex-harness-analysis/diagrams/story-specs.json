@@ -1798,7 +1798,8 @@
             "C-013"
           ],
           "evidence_ids": [
-            "S-015"
+            "S-015",
+            "S-027"
           ],
           "label": "V2 mailbox",
           "subtitle": "",
@@ -1933,7 +1934,8 @@
           "status": "static",
           "claim_ids": [],
           "evidence_ids": [
-            "S-015"
+            "S-015",
+            "S-027"
           ]
         }
       ]

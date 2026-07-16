@@ -7,6 +7,15 @@
 - unsupported tool: router 记录 error，但把结果回流并允许 turn 完成。[X: `X-003`]
 - forbidden escalation: `never` policy 在进程执行前拒绝。[X: `X-004`, `X-007`]
 
+<!-- EXPLANATION:failure-terms -->
+## 这里的“失败”分三类
+
+- **Provider dialect failure**：HTTP endpoint 存在，但不接受 Codex 使用的 message role 或 tool schema；这不是 agent loop 自身失败。
+- **Handled tool failure**：unknown tool 或 policy deny 被包装为 model-facing output，当前 turn 仍可能恢复并完成。
+- **Durability/recovery failure**：timeout、process crash、partial rollout、corruption 或 workspace drift，可能影响跨 turn/process 恢复；本轮大多尚未故障注入。
+
+因此下面的开放问题既包括产品风险，也包括分析覆盖缺口。`V2 mailbox preemption` 指 parent 在 reasoning/commentary 期间收到 child mail 时提前结束当前 sampling、转入吸收消息的 follow-up；它不等于强制终止整个 parent session。[S: `S-027`]
+
 ## 高价值未知项
 
 1. pre-turn、mid-turn、remote/local compaction 是否在同一超长 scenario 下保持语义等价？

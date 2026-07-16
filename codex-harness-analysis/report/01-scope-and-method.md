@@ -25,6 +25,13 @@
 
 测试使用独立 `/tmp/codex-analysis-home` 与 `/tmp/codex-analysis-workspace`，默认 `approval_policy=never`、`sandbox_mode=read-only`、memories/V1/V2 multi-agent 关闭；subagent 场景只临时启用 V1。真实网络只访问用户明确授权的 SiFlow endpoint；fixture 只监听 `127.0.0.1`。凭据没有写入 bundle，provider request 只保留 item type、role、tool name 与内容哈希。
 
+<!-- EXPLANATION:method-terms -->
+## 如何理解“验证过”
+
+本文把“源码中存在”“本轮真的发生过”和“推断的设计代价”分开。`S` 证据能证明一条路径在固定 commit 中可见；`R/X` 能证明它至少在某个命名配置下发生；二者都不能证明生产使用频率。`partial` 也不是“模块只读了一半”，而是指静态机制已经恢复，但关键平台、feature flag 或失败路径没有动态覆盖。
+
+因此，图上的 `OBSERVED` 只对应具体 scenario；`CONDITIONAL`、`EXPERIMENTAL`、`V1/V2` 或 `NOT TESTED` 都必须结合 manifest 中的 feature/configuration 阅读。
+
 ## 主要限制
 
 没有 Rust toolchain，因此未运行仓库 `just test`；没有动态触发 compaction、MCP、OTel exporter、真实 sandbox backend、V2 multi-agent、memory consolidation、fork/corrupt rollout。真实 SiFlow 也无法完整接收 stock Codex 请求方言，详见运行实验。

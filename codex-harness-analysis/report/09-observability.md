@@ -2,6 +2,15 @@
 
 Codex 有两套互补表面：用户/host 可消费的 thread、turn、item、tool events；以及 OTel logs/traces/metrics。
 
+<!-- EXPLANATION:observability-terms -->
+## 三类可观测数据
+
+- **Product events**：`thread.started`、`turn.started`、item/tool/turn completion 等，供 TUI、`exec --json` 和 app-server 客户端驱动 UI 或业务状态。
+- **OTel span/log/metric**：供 collector 和 tracing backend 做跨组件关联；span 表示有父子关系的耗时操作，metric 表示可聚合计数/时延，log 记录离散事件。
+- **Rollout items**：durable session history，主要用于 resume/replay；它不是为低开销监控设计的 telemetry stream。
+
+三者可能共享 conversation/turn/call id，但目的和保留策略不同。报告中的 provider-side sanitized request log 是本次分析额外加的观察点，不是 Codex 默认对外 API。
+
 任务层创建 turn span，带 conversation/turn/model/token 等字段；tool runtime 发 `codex.tool_call` log，含 trace id、conversation id、turn id、tool/call id 与 duration。[源码](https://github.com/openai/codex/blob/87db9bc18ba5bc82c1cb4e4381b44f693ee35623/codex-rs/core/src/tasks/mod.rs#L384) [S: `S-021`]
 
 OTel 配置默认不记录 user prompts，exporter 可单独关闭，shutdown 必须显式完成。[文档](https://github.com/openai/codex/blob/87db9bc18ba5bc82c1cb4e4381b44f693ee35623/codex-rs/otel/README.md#L1) [D: `D-006`]

@@ -2,6 +2,13 @@
 
 下表的“当前机制”来自代码；“documented intent”只有文档直接支持时才填写；其余 tradeoff 是分析者综合。
 
+<!-- EXPLANATION:decision-table -->
+## 怎么读这张表
+
+`当前机制` 只陈述源码实际做法；`Documented intent` 只有仓库文档能直接支持时才填写；`代价/替代方案` 是分析者综合。`置信度=中` 往往不是因为没找到代码，而是因为作者动机未记录、关键 feature 未运行，或结论跨越了多个平台/configuration。
+
+例如“child 独立 context、共享 workspace”的结构证据很明确，但“为什么选择这种隔离粒度”没有作者声明，所以 tradeoff 只能写成可观察后果，不能写成设计团队的真实动机。
+
 | 决策 | 当前机制 | Documented intent | 代价/替代方案 | 条件 | 证据 | 置信度 |
 |---|---|---|---|---|---|---|
 | 耐久状态归 thread | LiveThread + append rollout | thread-store 文档说明 storage-neutral boundary | resume/fork 清晰；需处理 flush、corruption、workspace drift | local store | `D-004`, `S-018`, `S-019`, `X-006` | 高 |

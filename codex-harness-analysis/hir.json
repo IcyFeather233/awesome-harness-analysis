@@ -1127,6 +1127,29 @@
       "confidence": "high",
       "status": "experimental_verified",
       "source_refs": []
+    },
+    {
+      "id": "E-Child-Mailbox",
+      "source": "N-Subagent",
+      "target": "N-AgentControl",
+      "type": "returns",
+      "label": "V2 completion/mailbox",
+      "conditions": {
+        "feature": "multi_agent_v2"
+      },
+      "evidence_ids": [
+        "S-027"
+      ],
+      "confidence": "high",
+      "status": "static_only",
+      "source_refs": [
+        {
+          "path": "codex-rs/core/src/state/turn.rs",
+          "start_line": 35,
+          "end_line": 55,
+          "symbol": "MailboxDeliveryPhase"
+        }
+      ]
     }
   ]
 }

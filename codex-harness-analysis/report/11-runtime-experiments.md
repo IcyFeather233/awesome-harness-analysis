@@ -13,6 +13,13 @@
 | X-005 | deterministic SSE + V1 | child 是否独立 request/depth-limited | child thread + 独立 digest/tool surface | 无 |
 | X-006 | deterministic SSE + persistence | resume 是否恢复同 thread/history | id 相同，input 3→5 | 仅临时 rollout |
 
+<!-- EXPLANATION:experiment-modes -->
+## 表中模式与结果怎么解释
+
+`R-*` 是官方 Codex binary 连接真实 SiFlow endpoint 的兼容性观察；失败仍是有效结果，因为它说明 stock request 在模型输出前被哪一层拒绝。`X-*` 是 deterministic Responses fixture：fixture 不理解任务，只按预先写好的 call id/item type 强制 Codex 走指定分支，因此适合验证 harness control flow。
+
+`passed` 表示预先声明的区分性断言成立，不表示整个功能面都正确。例如 X-004 证明 `never` 在该 escalation 请求上先于 process 拒绝，并用文件哈希检查了无副作用；它没有证明所有 shell/MCP/dynamic tool 都经过同一 gate。详细配置和 trace 路径在 [scenario catalog](../scenarios/catalog.json)。
+
 ## 为什么真实模型没有伪装成成功
 
 SiFlow 的 `/responses` 基础 SSE probe 能返回 reasoning/message/completed，说明 endpoint 不是完全不支持 Responses。但 Codex 发出的真实请求包含更具体的 dialect：developer role，以及 V1 的 namespace tool schema。当前 endpoint 均拒绝，因此本报告不声称完成“真实模型 agent tool turn”。[R: `R-002`, `R-003`]
