@@ -2,7 +2,7 @@
 
 ![Permission pipeline](../diagrams/generated/pi-permission-boundaries.png)
 
-> 图 5（gpt-image-2 读者插图）：中心实线是默认 side-effect path；startup-only project trust、可选 extension gate、外部 container/VM 和 custom-tool host path 被空间分离，不能读成全局强制审批。可复现的[技术 permission SVG](../diagrams/permission-pipeline.svg)保留完整 evidence 映射。Evidence: `D-002`, `D-004`, `D-007`, `S-003`, `S-006`, `S-007`, `S-017`, `R-002`, `X-001`。
+> 图 5（gpt-image-2 读者插图）：中心实线是默认 side-effect path；startup-only project trust、可选 extension gate、外部 container/VM 和 custom-tool host path 被空间分离，不能读成全局强制审批。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；边界结论来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `D-002`, `D-004`, `D-007`, `S-003`, `S-006`, `S-007`, `S-017`, `R-002`, `X-001`。
 
 ## 三个容易混淆的边界
 

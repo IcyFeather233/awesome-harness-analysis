@@ -2,7 +2,7 @@
 
 ![Persistence lifecycle](../diagrams/generated/pi-persistence-lifecycle.png)
 
-> 图 7（gpt-image-2 读者插图）：主轴展示 live branch 的 append、JSONL persistence、resume 和 context rebuild；compaction 是条件路径，workspace 明确不随 session branch 回滚。可复现的[技术 persistence SVG](../diagrams/persistence-lifecycle.svg)保留完整 evidence 映射。`R-SCENARIO-003/004` 观察到 create/persist/restore；compaction/retry 来自定向 tests。Evidence: `S-008`, `S-009`, `S-010`, `S-014`, `R-003`, `R-004`, `X-003`。
+> 图 7（gpt-image-2 读者插图）：主轴展示 live branch 的 append、JSONL persistence、resume 和 context rebuild；compaction 是条件路径，workspace 明确不随 session branch 回滚。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；持久化关系来自[Harness IR](../hir.json)和下列 Evidence IDs。`R-SCENARIO-003/004` 观察到 create/persist/restore；compaction/retry 来自定向 tests。Evidence: `S-008`, `S-009`, `S-010`, `S-014`, `R-003`, `R-004`, `X-003`。
 
 ## JSONL v3
 

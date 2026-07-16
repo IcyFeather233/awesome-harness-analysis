@@ -14,9 +14,8 @@
       "requested_size": "1536x1024",
       "actual_size": "1774x887",
       "quality": "high",
-      "prompt_sha256": "cffd30bffb7e0780c7a649c384561f2b014422928f07a0988851910e0f5104d1",
+      "prompt_sha256": "a1c40ef0ccca8b8b7c86fb3c2ba17542ebda59e3a4d95ac0b8c5064e146e2268",
       "output_sha256": "fe9a47176563a30ebfcfaed072c4c9e3fdcd1e5116731e35f6a46719ab851064",
-      "deterministic_counterpart": "../narrative/pi-system-story.svg",
       "semantic_review": "passed",
       "reviewed_dimensions": [
         "labels",
@@ -25,6 +24,12 @@
         "optional paths",
         "isolation boundary",
         "unsupported components"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
       ]
     },
     {
@@ -34,9 +39,8 @@
       "requested_size": "1024x1536",
       "actual_size": "1024x1536",
       "quality": "high",
-      "prompt_sha256": "18b726bddc7f6bea2265d717ce9eaf157113dfa7d5436c7044488d67e3f3ceba",
+      "prompt_sha256": "ad7ace8f6430436f3bdb2a1473844a82589aa65b731b4388fb3b5e6ab06cfe4e",
       "output_sha256": "001f773342e81cdadfb97696299cc69f2f2aa96e0bd00a22299eb111a70eebf9",
-      "deterministic_counterpart": "../narrative/pi-observed-turn.svg",
       "semantic_review": "passed",
       "reviewed_dimensions": [
         "labels",
@@ -44,6 +48,12 @@
         "tool-result feedback",
         "lifecycle separation",
         "excluded paths"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
       ]
     },
     {
@@ -55,7 +65,6 @@
       "quality": "high",
       "prompt_sha256": "7786b9033660d6348ad807a91b537cb6d72f4cbe616ce467dce247968170956c",
       "output_sha256": "3593822cb5ff331d0e06f555daa8e35e21f4c3f891ba66fdfdd640b1612d75a3",
-      "deterministic_counterpart": "../narrative/pi-context-assembly.svg",
       "semantic_review": "passed",
       "reviewed_dimensions": [
         "labels",
@@ -63,6 +72,12 @@
         "transformation order",
         "conditional compaction",
         "no direct model bypass"
+      ],
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
       ]
     },
     {
@@ -70,7 +85,6 @@
       "file": "pi-extension-surface.png",
       "prompt_file": "prompts/04-extension-surface.txt",
       "requested_size": "1536x1024",
-      "deterministic_counterpart": "../narrative/pi-extension-injection.svg",
       "reviewed_dimensions": [
         "labels",
         "three separate control points",
@@ -83,16 +97,21 @@
       ],
       "actual_size": "1693x929",
       "quality": "high",
-      "prompt_sha256": "1826f1f72885b9adfce5702764e1ccf2aee3faba60e88ab0a185dc7866cf3d93",
+      "prompt_sha256": "9224116291dead19096430a272ecb1382b4abd22843b1e1842b56ebaa2ea9f63",
       "output_sha256": "4c6f771053ba490b3a87d38120011f0e90d2d57de92d729d1d792701eeee24b4",
-      "semantic_review": "passed"
+      "semantic_review": "passed",
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
     },
     {
       "figure_id": "pi-permission-boundaries",
       "file": "pi-permission-boundaries.png",
       "prompt_file": "prompts/05-permission-boundaries.txt",
       "requested_size": "1536x1024",
-      "deterministic_counterpart": "../permission-pipeline.svg",
       "reviewed_dimensions": [
         "labels",
         "default side-effect path",
@@ -103,16 +122,21 @@
       ],
       "actual_size": "1692x930",
       "quality": "high",
-      "prompt_sha256": "a44c40e0a5fb257fdd6a468bed8c297fd9e0c719c9ddf77dc3e0c14d2a8eadec",
+      "prompt_sha256": "f868acb37073ced3988efb2adee0f3f1ae357ef7da4277dd99f25bd978c57868",
       "output_sha256": "d0404704c5948ed55448da0958ad2f598c5a10870cff0b2e68e78d541865ae2e",
-      "semantic_review": "passed"
+      "semantic_review": "passed",
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
     },
     {
       "figure_id": "pi-subagent-topology",
       "file": "pi-subagent-topology.png",
       "prompt_file": "prompts/06-subagent-topology.txt",
       "requested_size": "1536x1024",
-      "deterministic_counterpart": "../subagent-topology.svg",
       "reviewed_dimensions": [
         "labels",
         "no default subagents",
@@ -123,16 +147,21 @@
       ],
       "actual_size": "1536x1024",
       "quality": "high",
-      "prompt_sha256": "39274366ef3b23cf6fcc0e2eee20f3899c3ca6f40e11d49d79d9ac49d2844c5c",
+      "prompt_sha256": "1f82f7276206b580cfc15b5feebe82bf9818de84421b841c70f9d6bc55f2ee37",
       "output_sha256": "87d1f68c325b7c1e98b444564fcee64271f71b117ed76b2ac39002a9bfe619be",
-      "semantic_review": "passed"
+      "semantic_review": "passed",
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
     },
     {
       "figure_id": "pi-persistence-lifecycle",
       "file": "pi-persistence-lifecycle.png",
       "prompt_file": "prompts/07-persistence-lifecycle.txt",
       "requested_size": "1536x1024",
-      "deterministic_counterpart": "../persistence-lifecycle.svg",
       "reviewed_dimensions": [
         "labels",
         "append path",
@@ -146,16 +175,21 @@
       ],
       "actual_size": "1693x929",
       "quality": "high",
-      "prompt_sha256": "1aefd82c6690909d729d015c83dadf26e8ec645ff2f587fce157f8c134d8fa05",
+      "prompt_sha256": "69479817d1fe3483ca36715aeb96aa52be6f5abd2e8b180bc260aff8c8b95ae9",
       "output_sha256": "3f2812abee531767fd8a40cc7e17cf0e8d355154919390dbed872747e8613574",
-      "semantic_review": "passed"
+      "semantic_review": "passed",
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
     },
     {
       "figure_id": "pi-design-space",
       "file": "pi-design-space.png",
       "prompt_file": "prompts/08-design-space.txt",
       "requested_size": "2048x1152",
-      "deterministic_counterpart": "../narrative/pi-design-space.svg",
       "reviewed_dimensions": [
         "labels",
         "four-row alignment",
@@ -168,7 +202,13 @@
       "quality": "high",
       "prompt_sha256": "26519877cc2ca0c1c72b29774bb44803628c47a8fcb5170be36570c98aaf4c79",
       "output_sha256": "c3e4833f12b079e8129122546d463c0bf37285975b043ab32b0e2280e449b4f1",
-      "semantic_review": "passed"
+      "semantic_review": "passed",
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "../story-specs.json"
+      ]
     }
   ],
   "rejected": [

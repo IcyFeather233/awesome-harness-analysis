@@ -4,10 +4,10 @@ This directory is the optional reader-facing raster layer for the Pi report. The
 
 For every generated PNG:
 
-1. Keep the deterministic narrative SVG and technical HIR projection.
+1. Keep the HIR, claims/evidence, story spec, and Mermaid source model.
 2. Verify every label, arrow, component count, optional-path style, and boundary against the prompt and story spec.
 3. Reject any image that invents a component, changes direction, turns an optional path into a default path, or adds unsupported behavior.
-4. Display the PNG as a reader illustration and link its caption to the deterministic SVG and evidence IDs.
+4. Display the PNG as the report figure and link its caption to generated metadata, HIR, and evidence IDs.
 5. Record the model, size, quality, prompt file, generation time, and review result in `metadata.json`.
 
 The local generator expects `OPENAI_BASE_URL`/`OPENAI_API_KEY` or `OAI_BASE_URL`/`OAI_API_KEY`. Do not store either credential in this analysis bundle.

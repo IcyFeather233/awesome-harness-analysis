@@ -10,7 +10,7 @@ Pi 是一个“薄核心、强扩展、外部隔离”的 agent harness：`pi-ai
 
 ![Pi system overview](../diagrams/generated/pi-system-overview.png)
 
-> 图 1（gpt-image-2 读者插图）：六步主轴优先解释 Pi 的当前运行路径；迁移、可选 gate、durable state 和外部隔离被降为支路。图像经过标签、箭头、可选性和边界语义审查；它不是证据真值。可复现的[叙事 SVG](../diagrams/narrative/pi-system-story.svg)和[技术总览](../diagrams/system-overview.svg)保留完整 evidence 映射。Evidence: `S-001`, `S-002`, `S-008`, `S-012`, `S-013`, `S-017`, `R-001`, `R-002`, `R-004`, `X-002`, `X-003`。
+> 图 1（gpt-image-2 读者插图）：六步主轴优先解释 Pi 的当前运行路径；迁移、可选 gate、durable state 和外部隔离被降为支路。图像经过标签、箭头、可选性和边界语义审查；它不是证据真值。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；结构事实来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `S-001`, `S-002`, `S-008`, `S-012`, `S-013`, `S-017`, `R-001`, `R-002`, `R-004`, `X-002`, `X-003`。
 
 ## 阅读框架
 

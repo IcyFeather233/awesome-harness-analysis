@@ -17,7 +17,7 @@ Pi 的架构不能只用“有哪些 package”来解释。更有区分度的问
 
 ![Pi design space](../diagrams/generated/pi-design-space.png)
 
-> 图 A（gpt-image-2 读者插图）：左列是文档化产品立场，中列是源码恢复出的机制，右列是分析者根据实现和失败边界归纳的权衡；点线表示分析推断，不代表作者声明。可复现的[叙事 SVG](../diagrams/narrative/pi-design-space.svg)保留 claim/evidence 映射。Evidence: `D-001`, `D-002`, `D-003`, `D-004`, `D-007`, `D-008`, `S-001`, `S-003`, `S-007`, `S-008`, `S-011`, `S-017`, `R-004`, `X-002`。
+> 图 A（gpt-image-2 读者插图）：左列是文档化产品立场，中列是源码恢复出的机制，右列是分析者根据实现和失败边界归纳的权衡；点线表示分析推断，不代表作者声明。图像 provenance 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；设计映射来自[story spec](../diagrams/story-specs.json)和下列 Evidence IDs。Evidence: `D-001`, `D-002`, `D-003`, `D-004`, `D-007`, `D-008`, `S-001`, `S-003`, `S-007`, `S-008`, `S-011`, `S-017`, `R-004`, `X-002`。
 
 ## 贯穿案例：一次真实 read turn
 
@@ -35,7 +35,7 @@ Pi 的架构不能只用“有哪些 package”来解释。更有区分度的问
 
 ![Observed Pi turn](../diagrams/generated/pi-observed-turn.png)
 
-> 图 B（gpt-image-2 读者插图）：严格展示同一次真实 read trace 的两轮迭代、`314159` 回填，以及 `agent_end -> agent_settled`；未把 retry、compaction 或 resume 伪装成该场景发生的分支。可复现的[叙事 SVG](../diagrams/narrative/pi-observed-turn.svg)保留完整 evidence 映射。Evidence: `S-001`, `S-002`, `S-008`, `S-009`, `S-010`, `R-002`, `R-003`, `R-004`, `X-003`。
+> 图 B（gpt-image-2 读者插图）：严格展示同一次真实 read trace 的两轮迭代、`314159` 回填，以及 `agent_end -> agent_settled`；未把 retry、compaction 或 resume 伪装成该场景发生的分支。图像 provenance 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；运行事实来自 `R-SCENARIO-002` 和下列 Evidence IDs。Evidence: `S-001`, `S-002`, `S-008`, `S-009`, `S-010`, `R-002`, `R-003`, `R-004`, `X-003`。
 
 ## 这个案例不能证明什么
 

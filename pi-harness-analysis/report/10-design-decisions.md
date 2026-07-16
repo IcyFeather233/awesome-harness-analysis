@@ -4,7 +4,7 @@
 
 ![Pi design space](../diagrams/generated/pi-design-space.png)
 
-> 图 8（gpt-image-2 读者插图）：四行分别从 documented stance 映射到 recovered mechanism，再以橙色点线连接 analyst-synthesized tradeoff；右列不表示作者声明。可复现的[叙事 SVG](../diagrams/narrative/pi-design-space.svg)保留 claim/evidence 映射。Evidence: D-001, D-002, D-003, D-004, D-007, D-008, S-001, S-003, S-007, S-008, S-011, S-017, R-004, X-002。
+> 图 8（gpt-image-2 读者插图）：四行分别从 documented stance 映射到 recovered mechanism，再以橙色点线连接 analyst-synthesized tradeoff；右列不表示作者声明。图像 provenance 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；设计映射来自[story spec](../diagrams/story-specs.json)和下列 Evidence IDs。Evidence: D-001, D-002, D-003, D-004, D-007, D-008, S-001, S-003, S-007, S-008, S-011, S-017, R-004, X-002。
 
 ## 决策记录
 

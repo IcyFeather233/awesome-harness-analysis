@@ -2,7 +2,7 @@
 
 ![Observed runtime turn](../diagrams/generated/pi-observed-turn.png)
 
-> 图 2（gpt-image-2 读者插图）：严格复现 `R-SCENARIO-002` 的两次模型迭代、`314159` tool result 回填，以及 `agent_end` 与 `agent_settled` 的分离；没有混入未发生的写入、审批、压缩或恢复路径。可复现的[叙事 SVG](../diagrams/narrative/pi-observed-turn.svg)和[技术 turn flow](../diagrams/turn-flow.svg)保留完整 evidence 映射。Evidence: `S-001`, `S-002`, `S-008`, `S-009`, `S-010`, `R-002`, `R-003`, `R-004`, `X-003`。
+> 图 2（gpt-image-2 读者插图）：严格复现 `R-SCENARIO-002` 的两次模型迭代、`314159` tool result 回填，以及 `agent_end` 与 `agent_settled` 的分离；没有混入未发生的写入、审批、压缩或恢复路径。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；事件顺序来自 `R-SCENARIO-002`、[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `S-001`, `S-002`, `S-008`, `S-009`, `S-010`, `R-002`, `R-003`, `R-004`, `X-003`。
 
 ## 贯穿案例中的循环
 

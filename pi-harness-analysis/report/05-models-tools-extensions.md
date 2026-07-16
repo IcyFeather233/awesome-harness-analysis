@@ -2,7 +2,7 @@
 
 ![Tool and extension surface](../diagrams/generated/pi-extension-surface.png)
 
-> 图 4（gpt-image-2 读者插图）：三列分别回答模型看到什么、能调用什么、action 如何运行；默认 host path 与可选 gate/container 明确分离。可复现的[叙事 SVG](../diagrams/narrative/pi-extension-injection.svg)和[技术 extension view](../diagrams/tool-extension-surface.svg)保留完整 evidence 映射。Evidence: `D-002`, `D-004`, `D-007`, `S-001`, `S-002`, `S-003`, `S-007`, `S-015`, `S-017`, `R-002`。
+> 图 4（gpt-image-2 读者插图）：三列分别回答模型看到什么、能调用什么、action 如何运行；默认 host path 与可选 gate/container 明确分离。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；三类控制点来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `D-002`, `D-004`, `D-007`, `S-001`, `S-002`, `S-003`, `S-007`, `S-015`, `S-017`, `R-002`。
 
 ## Model boundary
 

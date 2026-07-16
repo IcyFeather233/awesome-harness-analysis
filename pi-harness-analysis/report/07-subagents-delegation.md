@@ -2,7 +2,7 @@
 
 ![Subagent topology](../diagrams/generated/pi-subagent-topology.png)
 
-> 图 6（gpt-image-2 读者插图）：核心默认无 subagent；可选 subagent extension 与 experimental orchestrator 是两条不同条件路径。Child 隔离 context/process 但共享 cwd/workspace，orchestrator 不是 loop delegation。可复现的[技术 topology SVG](../diagrams/subagent-topology.svg)保留完整 evidence 映射。Evidence: `D-004`, `D-006`, `D-010`, `S-015`, `S-016`。
+> 图 6（gpt-image-2 读者插图）：核心默认无 subagent；可选 subagent extension 与 experimental orchestrator 是两条不同条件路径。Child 隔离 context/process 但共享 cwd/workspace，orchestrator 不是 loop delegation。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；topology 结论来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `D-004`, `D-006`, `D-010`, `S-015`, `S-016`。
 
 ## 默认核心
 

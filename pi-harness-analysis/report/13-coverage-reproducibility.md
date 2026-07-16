@@ -11,9 +11,9 @@
 - Scenarios：[catalog.json](../scenarios/catalog.json)
 - Raw traces：`traces/raw/`
 - Redacted normalized traces：`traces/normalized/`
-- Diagram sources/SVG/metadata：`diagrams/`
+- Diagram source models/metadata：`diagrams/`
 - Narrative story spec：[story-specs.json](../diagrams/story-specs.json)
-- Narrative SVG/metadata：`diagrams/narrative/`
+- Reader PNG/prompt/review metadata：`diagrams/generated/`
 
 ## 关键复现命令
 
@@ -25,26 +25,22 @@ python3 reproduce/normalize_pi_trace.py   traces/raw/R-002-read-tool.jsonl   tra
 python3 reproduce/compile_analysis.py
 
 # 严格校验
-python3 ../harness-analysis/scripts/validate_analysis.py . --strict
+python3 ../../harness-analysis-skill/scripts/validate_analysis.py . --strict
 
-# 重渲染图
-python3 ../harness-analysis/scripts/render_diagrams.py .
-
-# 重渲染正文叙事图，并校验 HIR/claim/evidence 引用
-python3 ../harness-analysis/scripts/render_story_diagrams.py .
+# gpt-image-2 prompts 和发布图位于 diagrams/generated/；metadata 固定 prompt/output hash
 
 # 重写报告
 python3 reproduce/compile_report.py
 
-# 检查 Markdown links、SVG accessibility、正文图密度与元数据
-python3 ../harness-analysis/scripts/audit_outputs.py . --strict
+# 检查 Markdown links、8 张正文 PNG、hash 与 semantic review metadata
+python3 ../../harness-analysis-skill/scripts/audit_outputs.py . --strict
 ```
 
 ## 验证结果
 
 - Analysis validator：`0 errors, 0 warnings`
-- XML parse：8/8 技术 SVG + 5/5 叙事 SVG valid
-- Output audit：Markdown links、report-facing SVG 与 narrative metadata 通过 strict
+- PNG decode/hash：8/8 reader figures valid
+- Output audit：Markdown links、8 张 report-facing PNG、prompt/output hash 与 semantic review metadata 通过 strict
 - Diagram density：overview 16 nodes；turn 11；context 9；permission 11；subagent 10；persistence 7
 - Narrative density：system 12 nodes；observed turn 12；context 8；extension 11；design space 12
 - Tests：39 + 61 + 31 = 131 passed

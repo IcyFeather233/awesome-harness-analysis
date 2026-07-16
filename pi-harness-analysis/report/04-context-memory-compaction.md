@@ -2,7 +2,7 @@
 
 ![Context lifecycle](../diagrams/generated/pi-context-lifecycle-v2.png)
 
-> 图 3（gpt-image-2 读者插图）：startup/lazy、carry-forward 和 runtime 三类来源先汇入同一入口，再依次经过 `transformContext -> convertToLlm -> Per-request context -> Model request`；compaction 是虚线条件回路。第一版因错误画出 tool result 直达 model 而被拒绝，本图为修正并复审后的 v2。可复现的[叙事 SVG](../diagrams/narrative/pi-context-assembly.svg)和[技术 context view](../diagrams/context-lifecycle.svg)保留完整 evidence 映射。Evidence: `S-001`, `S-002`, `S-004`, `S-005`, `S-008`, `S-009`, `R-001`, `R-002`, `R-004`, `X-003`。
+> 图 3（gpt-image-2 读者插图）：startup/lazy、carry-forward 和 runtime 三类来源先汇入同一入口，再依次经过 `transformContext -> convertToLlm -> Per-request context -> Model request`；compaction 是虚线条件回路。第一版因错误画出 tool result 直达 model 而被拒绝，本图为修正并复审后的 v2。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；context 数据流来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `S-001`, `S-002`, `S-004`, `S-005`, `S-008`, `S-009`, `R-001`, `R-002`, `R-004`, `X-003`。
 
 ## Context 来源
 
