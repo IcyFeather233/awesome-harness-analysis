@@ -1,0 +1,61 @@
+# Permission Pipeline
+
+Policy decisions and trust boundaries before side effects.
+
+~~~mermaid
+flowchart LR
+  %% Permission Pipeline
+  classDef observed fill:#E8F5E9,stroke:#2E7D32,color:#14261A,stroke-width:2px;
+  classDef staticOnly fill:#F8FAFC,stroke:#64748B,color:#1E293B,stroke-width:1.5px;
+  classDef inferred fill:#FFF7ED,stroke:#B45309,color:#431407,stroke-width:1.5px;
+  classDef conflicted fill:#FEF2F2,stroke:#B91C1C,color:#450A0A,stroke-width:2.5px;
+  classDef unknown fill:#F8FAFC,stroke:#94A3B8,color:#475569,stroke-width:1.5px;
+  subgraph g_a6eac9f69b8c["Ungrouped"]
+    direction LR
+    n_a0434817a984["Shared query loop<br/>AgentLoop"]
+    n_2e2b09fcdb36["AgentTool<br/>Tool"]
+  end
+  subgraph g_37e10465723c["child-process"]
+    direction LR
+    n_9b238fc5ebe1["Hooks<br/>Hook"]
+    n_443a63655f36["Sandbox runtime<br/>Sandbox"]
+  end
+  subgraph g_562e8626af22["external"]
+    direction LR
+    n_ac3388b1dba8["Events and traces<br/>TelemetrySink"]
+  end
+  subgraph g_2f012c904bef["host"]
+    direction LR
+    n_81a313ce89fa["Shell/process backend<br/>ExecutionBackend"]
+    n_a4140d217a0c["Agent worktree<br/>Workspace"]
+    n_94fdf21bba59["Current workspace<br/>Workspace"]
+  end
+  subgraph g_49c26ae2b967["process"]
+    direction LR
+    n_c3d9dc875a4e["Permission gate<br/>PermissionGate"]
+    n_f0e74a923b0d["Policy and modes<br/>PolicyRule"]
+    n_11dec12887d9["Tool execution router<br/>Router"]
+    n_86fc78b36f0b["Built-in tools<br/>Tool"]
+  end
+  class n_a0434817a984,n_81a313ce89fa,n_9b238fc5ebe1,n_c3d9dc875a4e,n_f0e74a923b0d,n_11dec12887d9,n_443a63655f36,n_ac3388b1dba8,n_2e2b09fcdb36,n_86fc78b36f0b,n_a4140d217a0c,n_94fdf21bba59 staticOnly;
+  n_2e2b09fcdb36 -.->|"isolation=worktree"| n_a4140d217a0c
+  n_86fc78b36f0b -.->|"executes"| n_81a313ce89fa
+  n_9b238fc5ebe1 -.->|"separate audit path"| n_81a313ce89fa
+  n_c3d9dc875a4e -.->|"authorizes"| n_86fc78b36f0b
+  n_f0e74a923b0d -.->|"authorizes"| n_c3d9dc875a4e
+  n_a0434817a984 -.->|"calls"| n_2e2b09fcdb36
+  n_a0434817a984 -.->|"emits_trace"| n_ac3388b1dba8
+  n_443a63655f36 -.->|"optional wrapper"| n_81a313ce89fa
+  n_81a313ce89fa -.->|"writes"| n_94fdf21bba59
+  n_11dec12887d9 -.->|"calls"| n_c3d9dc875a4e
+  linkStyle 0 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 1 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 2 stroke:#B45309,stroke-width:1.5px,stroke-dasharray:2 4;
+  linkStyle 3 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 4 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 5 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 6 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 7 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 8 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 9 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+~~~

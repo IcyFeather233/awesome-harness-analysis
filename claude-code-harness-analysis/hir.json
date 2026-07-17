@@ -1,0 +1,1339 @@
+{
+  "schema_version": "1.0",
+  "repository": {
+    "root": "/volume/med/work/users/mzchen/work/claude-code",
+    "commit": "16a676ffa36eadbfb28eec39007dff73941346b1",
+    "entrypoints": [
+      "src/entrypoints/cli.tsx",
+      "src/main.tsx",
+      "src/QueryEngine.ts"
+    ],
+    "configurations": [
+      "source-visible external/default candidate"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "N-CLI",
+      "type": "Interface",
+      "name": "CLI surfaces",
+      "summary": "Interactive, print, server, bridge and special subcommands.",
+      "attributes": {
+        "layer": "interface",
+        "trust_zone": "host"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-002",
+        "S-003"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-CLIEntry",
+      "type": "Entrypoint",
+      "name": "CLI bootstrap",
+      "summary": "Fast-path dispatcher before the full Commander main.",
+      "attributes": {
+        "layer": "interface",
+        "lifecycle": "startup/reload"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-002"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Interactive",
+      "type": "Interface",
+      "name": "Interactive REPL",
+      "summary": "Ink/React surface with QueryGuard and UI approvals.",
+      "attributes": {
+        "layer": "interface",
+        "trust_zone": "host"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-004"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Headless",
+      "type": "Interface",
+      "name": "Print / SDK",
+      "summary": "Non-interactive QueryEngine and structured output path.",
+      "attributes": {
+        "layer": "interface",
+        "trust_zone": "host"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-003",
+        "S-005"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Session",
+      "type": "Session",
+      "name": "Live session",
+      "summary": "Session id, app state, messages, permission state and runtime services.",
+      "attributes": {
+        "layer": "state",
+        "persistence_tier": "live"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-003",
+        "S-029"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-QueryLoop",
+      "type": "AgentLoop",
+      "name": "Shared query loop",
+      "summary": "Mutable model/tool iteration shared by interactive and headless paths.",
+      "attributes": {
+        "layer": "orchestration",
+        "agent_role": "Primary",
+        "persistence_tier": "live"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-006",
+        "S-007",
+        "S-008"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-ContextBuilder",
+      "type": "ContextBuilder",
+      "name": "Context assembly",
+      "summary": "Builds model-visible system, user, system-context and messages.",
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "per-turn"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-010",
+        "S-011",
+        "S-013"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-SystemPrompt",
+      "type": "PromptSource",
+      "name": "System prompt",
+      "summary": "Tool/mode/model-aware static and dynamic instruction sections.",
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "startup/reload"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-011"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-ClaudeMd",
+      "type": "PromptSource",
+      "name": "CLAUDE.md + rules",
+      "summary": "Managed, user, project, local, add-dir and nested instruction sources.",
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "startup/lazy"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-012"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Attachments",
+      "type": "ContextTransformer",
+      "name": "Runtime attachments",
+      "summary": "Memory, skill, MCP, agent, task and queued-message deltas.",
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "per-turn"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-013"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Compactor",
+      "type": "Compactor",
+      "name": "Compaction pipeline",
+      "summary": "Budget, optional snip, microcompact, optional collapse, autocompact and hard-limit recovery.",
+      "attributes": {
+        "layer": "context-capability",
+        "lifecycle": "threshold/overflow/manual",
+        "stage_count": 5
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-014",
+        "S-015"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-ModelAdapter",
+      "type": "ModelAdapter",
+      "name": "Anthropic provider adapter",
+      "summary": "Direct, Bedrock, Vertex and Foundry client selection plus retry.",
+      "attributes": {
+        "layer": "infrastructure",
+        "trust_zone": "network"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-016",
+        "S-018"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-ModelCall",
+      "type": "ModelCall",
+      "name": "Messages stream",
+      "summary": "Anthropic beta Messages request and raw streaming response.",
+      "attributes": {
+        "layer": "infrastructure",
+        "trust_zone": "external",
+        "lifecycle": "per-turn"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-017"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-ToolRegistry",
+      "type": "ToolRegistry",
+      "name": "Capability pool",
+      "summary": "Built-ins plus dynamic MCP tools with filtering/dedup/order.",
+      "attributes": {
+        "layer": "context-capability",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-019",
+        "S-020",
+        "S-021"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-ToolRouter",
+      "type": "Router",
+      "name": "Tool execution router",
+      "summary": "Lookup, schema validation, hooks, permission and dispatch.",
+      "attributes": {
+        "layer": "orchestration",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-022"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-BuiltinTools",
+      "type": "Tool",
+      "name": "Built-in tools",
+      "summary": "Bash, read/edit/write, search, task, agent, plan and other gated tools.",
+      "attributes": {
+        "layer": "context-capability",
+        "trust_zone": "process",
+        "lifecycle": "tool-call"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-019"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-MCP",
+      "type": "MCPServer",
+      "name": "MCP tools",
+      "summary": "Dynamically connected external capability servers.",
+      "attributes": {
+        "layer": "extension",
+        "trust_zone": "external",
+        "lifecycle": "startup/reload"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-020"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Plugins",
+      "type": "Plugin",
+      "name": "Plugins",
+      "summary": "Packaging and distribution across commands, agents, skills, hooks, MCP and other registries.",
+      "attributes": {
+        "layer": "extension",
+        "trust_zone": "resource-loading"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-003",
+        "S-020",
+        "S-046"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Skills",
+      "type": "Skill",
+      "name": "Skills",
+      "summary": "Prompt/workflow content loaded explicitly, lazily or by agents.",
+      "attributes": {
+        "layer": "extension",
+        "lifecycle": "startup/lazy"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-013",
+        "S-033"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Hooks",
+      "type": "Hook",
+      "name": "Hooks",
+      "summary": "Twenty-seven lifecycle events that may observe, modify, block or extend execution.",
+      "attributes": {
+        "layer": "extension",
+        "trust_zone": "child-process",
+        "event_count": 27
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-022",
+        "S-028",
+        "S-043"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Permission",
+      "type": "PermissionGate",
+      "name": "Permission gate",
+      "summary": "Rule/mode/safety evaluation before canonical tool side effects.",
+      "attributes": {
+        "layer": "governance",
+        "trust_zone": "process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-023",
+        "S-024"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Policy",
+      "type": "PolicyRule",
+      "name": "Policy and modes",
+      "summary": "Allow/ask/deny rules, managed settings and permission modes; session grants are not restored from transcript.",
+      "attributes": {
+        "layer": "governance",
+        "trust_zone": "process",
+        "session_grants_durable": false
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-023",
+        "S-024",
+        "S-044"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Sandbox",
+      "type": "Sandbox",
+      "name": "Sandbox runtime",
+      "summary": "Optional platform execution wrapper for command/filesystem/network constraints.",
+      "attributes": {
+        "layer": "governance",
+        "trust_zone": "child-process"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-026",
+        "S-027"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Shell",
+      "type": "ExecutionBackend",
+      "name": "Shell/process backend",
+      "summary": "Spawns Bash commands with cwd/env/cancellation and optional sandbox wrapper.",
+      "attributes": {
+        "layer": "execution",
+        "trust_zone": "host"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-025",
+        "S-027"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Workspace",
+      "type": "Workspace",
+      "name": "Current workspace",
+      "summary": "Shared cwd and files unless an explicit worktree is selected.",
+      "attributes": {
+        "layer": "execution",
+        "trust_zone": "host",
+        "persistence_tier": "filesystem"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-025",
+        "S-032",
+        "S-035"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-SessionStore",
+      "type": "SessionStore",
+      "name": "Transcript JSONL",
+      "summary": "Project-scoped append-oriented message and metadata storage.",
+      "attributes": {
+        "layer": "state",
+        "persistence_tier": "durable"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-029"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Recovery",
+      "type": "RecoveryPolicy",
+      "name": "Retry and recovery",
+      "summary": "Provider retry, compaction recovery, cancellation and graceful shutdown.",
+      "attributes": {
+        "layer": "infrastructure",
+        "persistence_tier": "live"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-008",
+        "S-018",
+        "S-041"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-AgentTool",
+      "type": "Tool",
+      "name": "AgentTool",
+      "summary": "Delegation entry for normal, forked, sync, async and worktree children.",
+      "attributes": {
+        "layer": "orchestration",
+        "agent_role": "supervisor"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-032"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Subagent",
+      "type": "Subagent",
+      "name": "Agent child",
+      "summary": "Recursive query loop with separate agent context/tools/MCP/transcript.",
+      "attributes": {
+        "layer": "orchestration",
+        "agent_role": "worker",
+        "persistence_tier": "live"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-032",
+        "S-033"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Team",
+      "type": "Subagent",
+      "name": "Swarm teammate",
+      "summary": "In-process or terminal-pane team member with independent task identity.",
+      "attributes": {
+        "layer": "orchestration",
+        "agent_role": "worker",
+        "persistence_tier": "live"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-034",
+        "S-036"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Mailbox",
+      "type": "Artifact",
+      "name": "Team mailbox",
+      "summary": "File-locked durable inbox for teammate messages and protocols.",
+      "attributes": {
+        "layer": "state",
+        "persistence_tier": "durable"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-037"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Worktree",
+      "type": "Workspace",
+      "name": "Agent worktree",
+      "summary": "Optional isolated git working tree retained when modified.",
+      "attributes": {
+        "layer": "execution",
+        "trust_zone": "host",
+        "persistence_tier": "filesystem"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-032",
+        "S-035"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Telemetry",
+      "type": "TelemetrySink",
+      "name": "Events and traces",
+      "summary": "Analytics, OTel, query profile and optional Perfetto trace.",
+      "attributes": {
+        "layer": "observability",
+        "trust_zone": "external"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-038",
+        "S-039",
+        "S-040"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "N-Exit",
+      "type": "ExitCondition",
+      "name": "Turn/session exit",
+      "summary": "Completed, limits, hook stop, abort, error or process shutdown.",
+      "attributes": {
+        "layer": "orchestration",
+        "persistence_tier": "live"
+      },
+      "conditions": {},
+      "evidence_ids": [
+        "S-008",
+        "S-041"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    }
+  ],
+  "edges": [
+    {
+      "id": "E-001",
+      "source": "N-CLI",
+      "target": "N-CLIEntry",
+      "type": "enters",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-002"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-002",
+      "source": "N-CLIEntry",
+      "target": "N-Interactive",
+      "type": "routes_if",
+      "label": "default",
+      "conditions": {},
+      "evidence_ids": [
+        "S-002",
+        "S-003"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-003",
+      "source": "N-CLIEntry",
+      "target": "N-Headless",
+      "type": "routes_if",
+      "label": "--print / SDK",
+      "conditions": {},
+      "evidence_ids": [
+        "S-002",
+        "S-003"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-004",
+      "source": "N-Interactive",
+      "target": "N-Session",
+      "type": "enters",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-004"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-005",
+      "source": "N-Headless",
+      "target": "N-Session",
+      "type": "enters",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-005"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-006",
+      "source": "N-Session",
+      "target": "N-QueryLoop",
+      "type": "calls",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-004",
+        "S-005",
+        "S-006"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-007",
+      "source": "N-QueryLoop",
+      "target": "N-ContextBuilder",
+      "type": "assembles",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-006",
+        "S-010"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-008",
+      "source": "N-SystemPrompt",
+      "target": "N-ContextBuilder",
+      "type": "injects",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-011"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-009",
+      "source": "N-ClaudeMd",
+      "target": "N-ContextBuilder",
+      "type": "injects",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-012"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-010",
+      "source": "N-Attachments",
+      "target": "N-ContextBuilder",
+      "type": "injects",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-013"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-011",
+      "source": "N-SessionStore",
+      "target": "N-ContextBuilder",
+      "type": "restores",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-029",
+        "S-030"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-012",
+      "source": "N-ContextBuilder",
+      "target": "N-Compactor",
+      "type": "calls",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-014"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-013",
+      "source": "N-Compactor",
+      "target": "N-ContextBuilder",
+      "type": "compacts",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-015"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-014",
+      "source": "N-ContextBuilder",
+      "target": "N-ModelCall",
+      "type": "calls",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-007",
+        "S-017"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-015",
+      "source": "N-ModelAdapter",
+      "target": "N-ModelCall",
+      "type": "calls",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-016",
+        "S-017"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-016",
+      "source": "N-ModelCall",
+      "target": "N-ToolRouter",
+      "type": "proposes",
+      "label": "tool_use",
+      "conditions": {},
+      "evidence_ids": [
+        "S-007",
+        "S-022"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-017",
+      "source": "N-ToolRegistry",
+      "target": "N-ModelCall",
+      "type": "registers",
+      "label": "visible schemas",
+      "conditions": {},
+      "evidence_ids": [
+        "S-019",
+        "S-020"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-018",
+      "source": "N-ToolRegistry",
+      "target": "N-BuiltinTools",
+      "type": "registers",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-019"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-019",
+      "source": "N-MCP",
+      "target": "N-ToolRegistry",
+      "type": "registers",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-020"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-020",
+      "source": "N-Plugins",
+      "target": "N-MCP",
+      "type": "registers",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-003",
+        "S-020"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-021",
+      "source": "N-Skills",
+      "target": "N-ContextBuilder",
+      "type": "injects",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-013",
+        "S-033"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-022",
+      "source": "N-ToolRouter",
+      "target": "N-Hooks",
+      "type": "triggers",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-022"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-023",
+      "source": "N-ToolRouter",
+      "target": "N-Permission",
+      "type": "calls",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-022",
+        "S-024"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-024",
+      "source": "N-Policy",
+      "target": "N-Permission",
+      "type": "authorizes",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-023",
+        "S-024"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-025",
+      "source": "N-Permission",
+      "target": "N-BuiltinTools",
+      "type": "authorizes",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-022",
+        "S-024"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-026",
+      "source": "N-Permission",
+      "target": "N-Exit",
+      "type": "denies",
+      "label": "model-facing denial",
+      "conditions": {},
+      "evidence_ids": [
+        "S-022",
+        "S-024"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-027",
+      "source": "N-BuiltinTools",
+      "target": "N-Shell",
+      "type": "executes",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-025"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-028",
+      "source": "N-Sandbox",
+      "target": "N-Shell",
+      "type": "executes",
+      "label": "optional wrapper",
+      "conditions": {
+        "feature": "sandbox.enabled"
+      },
+      "evidence_ids": [
+        "S-026",
+        "S-027"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-029",
+      "source": "N-Shell",
+      "target": "N-Workspace",
+      "type": "writes",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-025",
+        "S-027"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-030",
+      "source": "N-BuiltinTools",
+      "target": "N-ContextBuilder",
+      "type": "returns",
+      "label": "tool_result",
+      "conditions": {},
+      "evidence_ids": [
+        "S-009",
+        "S-022"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-031",
+      "source": "N-ContextBuilder",
+      "target": "N-QueryLoop",
+      "type": "returns",
+      "label": "follow-up",
+      "conditions": {},
+      "evidence_ids": [
+        "S-008"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-032",
+      "source": "N-QueryLoop",
+      "target": "N-SessionStore",
+      "type": "persists",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-029"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-033",
+      "source": "N-QueryLoop",
+      "target": "N-Recovery",
+      "type": "calls",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-008",
+        "S-018"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-034",
+      "source": "N-Recovery",
+      "target": "N-ModelCall",
+      "type": "retries",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-018"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-035",
+      "source": "N-Recovery",
+      "target": "N-Compactor",
+      "type": "falls_back_to",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-008",
+        "S-014"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-036",
+      "source": "N-QueryLoop",
+      "target": "N-Exit",
+      "type": "exits_to",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-008"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-037",
+      "source": "N-QueryLoop",
+      "target": "N-AgentTool",
+      "type": "calls",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-032"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-038",
+      "source": "N-AgentTool",
+      "target": "N-Subagent",
+      "type": "delegates",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-032",
+        "S-033"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-039",
+      "source": "N-Subagent",
+      "target": "N-QueryLoop",
+      "type": "calls",
+      "label": "recursive query",
+      "conditions": {},
+      "evidence_ids": [
+        "S-033"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-040",
+      "source": "N-Subagent",
+      "target": "N-QueryLoop",
+      "type": "isolates_context_from",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-033"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-041",
+      "source": "N-Subagent",
+      "target": "N-Workspace",
+      "type": "shares_workspace_with",
+      "label": "default",
+      "conditions": {},
+      "evidence_ids": [
+        "S-032"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-042",
+      "source": "N-AgentTool",
+      "target": "N-Worktree",
+      "type": "calls",
+      "label": "isolation=worktree",
+      "conditions": {},
+      "evidence_ids": [
+        "S-032",
+        "S-035"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-043",
+      "source": "N-Subagent",
+      "target": "N-Worktree",
+      "type": "writes",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-032",
+        "S-035"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-044",
+      "source": "N-Subagent",
+      "target": "N-QueryLoop",
+      "type": "returns",
+      "label": "result/notification",
+      "conditions": {},
+      "evidence_ids": [
+        "S-032",
+        "S-033"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-045",
+      "source": "N-Session",
+      "target": "N-Team",
+      "type": "delegates",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-034",
+        "S-036"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-046",
+      "source": "N-Team",
+      "target": "N-Mailbox",
+      "type": "writes",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-037"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-047",
+      "source": "N-Mailbox",
+      "target": "N-Team",
+      "type": "returns",
+      "label": "unread attachment",
+      "conditions": {},
+      "evidence_ids": [
+        "S-037"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-048",
+      "source": "N-QueryLoop",
+      "target": "N-Telemetry",
+      "type": "emits_trace",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-038",
+        "S-039"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-049",
+      "source": "N-Subagent",
+      "target": "N-Telemetry",
+      "type": "emits_trace",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-040"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-050",
+      "source": "N-Exit",
+      "target": "N-SessionStore",
+      "type": "persists",
+      "label": "",
+      "conditions": {},
+      "evidence_ids": [
+        "S-041"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-051",
+      "source": "N-Hooks",
+      "target": "N-Shell",
+      "type": "executes",
+      "label": "separate audit path",
+      "conditions": {},
+      "evidence_ids": [
+        "S-028",
+        "I-001"
+      ],
+      "confidence": "medium",
+      "status": "inferred"
+    },
+    {
+      "id": "E-052",
+      "source": "N-Plugins",
+      "target": "N-Skills",
+      "type": "registers",
+      "label": "packaged skill",
+      "conditions": {},
+      "evidence_ids": [
+        "S-046"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-053",
+      "source": "N-Plugins",
+      "target": "N-Hooks",
+      "type": "registers",
+      "label": "packaged hook",
+      "conditions": {},
+      "evidence_ids": [
+        "S-043",
+        "S-046"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    },
+    {
+      "id": "E-054",
+      "source": "N-Hooks",
+      "target": "N-ContextBuilder",
+      "type": "injects",
+      "label": "lifecycle context",
+      "conditions": {},
+      "evidence_ids": [
+        "S-028",
+        "S-043"
+      ],
+      "confidence": "high",
+      "status": "static_only"
+    }
+  ]
+}

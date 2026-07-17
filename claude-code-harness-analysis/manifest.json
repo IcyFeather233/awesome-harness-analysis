@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "analysis_status": "static_complete_runtime_limited",
+  "created_at": "2026-07-16T14:11:53.407326+00:00",
+  "target": {
+    "repository_root": "/volume/med/work/users/mzchen/work/claude-code",
+    "repository_url": "https://github.com/IcyFeather233/claude-code",
+    "commit": "16a676ffa36eadbfb28eec39007dff73941346b1",
+    "branch": "main",
+    "tag": null,
+    "dirty": false,
+    "source_kind": "public source-only mirror",
+    "official_release_identity": "strong fingerprint match to the v2.1.88 corpus analyzed by arXiv:2604.14228v2; exact artifact identity unproven"
+  },
+  "scope": {
+    "entrypoints": [
+      "src/entrypoints/cli.tsx",
+      "src/main.tsx",
+      "src/QueryEngine.ts"
+    ],
+    "configurations": [
+      "source-visible external/default candidate"
+    ],
+    "enabled_features": [],
+    "disabled_features": [],
+    "inaccessible_surfaces": [
+      "original package.json and lockfile",
+      "original bun:bundle feature manifest",
+      "657 unresolved relative imports",
+      "official build/release metadata"
+    ],
+    "documentary_sources": [
+      "https://www.anthropic.com/news/our-framework-for-developing-safe-and-trustworthy-agents",
+      "https://code.claude.com/docs/en/how-claude-code-works",
+      "https://www.anthropic.com/engineering/claude-code-auto-mode",
+      "https://www.anthropic.com/engineering/claude-code-sandboxing",
+      "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "https://code.claude.com/docs/en/memory",
+      "https://code.claude.com/docs/en/agent-teams",
+      "https://www.anthropic.com/constitution"
+    ]
+  },
+  "execution": {
+    "runtime_versions": {
+      "python": "3",
+      "target_bun": "unavailable",
+      "target_node": "unavailable"
+    },
+    "model_mode": "protocol_probe_only",
+    "model_provider": "siflow/qwen3.6-35ba3b",
+    "network_policy": "Public paper/first-party documentation retrieval and two sanitized provider probes were authorized and executed.",
+    "filesystem_policy": "Target repository read-only; generated artifacts stay in analysis bundle.",
+    "credential_policy": "No credential was read, sent or stored.",
+    "isolation": "No target harness process executed."
+  },
+  "tooling": {
+    "skill": "harness-analysis",
+    "skill_commit": "uncommitted paper-benchmark revision"
+  },
+  "snapshot_integrity": {
+    "source_file_count": 1902,
+    "typescript_source_file_count": 1884,
+    "javascript_source_file_count": 18,
+    "missing_relative_import_count": 657,
+    "present_build_manifests": [],
+    "paper_benchmark": "arXiv:2604.14228v2 (Claude Code v2.1.88)",
+    "identity_confidence": "strong fingerprint match; not cryptographically proven"
+  }
+}

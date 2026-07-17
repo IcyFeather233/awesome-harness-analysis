@@ -1,0 +1,131 @@
+# Layered Architecture
+
+Responsibilities grouped by their architectural layer.
+
+~~~mermaid
+flowchart TB
+  %% Layered Architecture
+  classDef observed fill:#E8F5E9,stroke:#2E7D32,color:#14261A,stroke-width:2px;
+  classDef staticOnly fill:#F8FAFC,stroke:#64748B,color:#1E293B,stroke-width:1.5px;
+  classDef inferred fill:#FFF7ED,stroke:#B45309,color:#431407,stroke-width:1.5px;
+  classDef conflicted fill:#FEF2F2,stroke:#B91C1C,color:#450A0A,stroke-width:2.5px;
+  classDef unknown fill:#F8FAFC,stroke:#94A3B8,color:#475569,stroke-width:1.5px;
+  subgraph g_28bc19020736["context-capability"]
+    direction TB
+    n_2fb97928aabe["Compaction pipeline<br/>Compactor"]
+    n_bd9215348ff0["Context assembly<br/>ContextBuilder"]
+    n_d9b8a40d18ab["Runtime attachments<br/>ContextTransformer"]
+    n_3dc2f841a9b3["CLAUDE.md + rules<br/>PromptSource"]
+    n_c0e68bae1418["System prompt<br/>PromptSource"]
+    n_86fc78b36f0b["Built-in tools<br/>Tool"]
+    n_26809c922930["Capability pool<br/>ToolRegistry"]
+  end
+  subgraph g_4f094061e6a1["execution"]
+    direction TB
+    n_81a313ce89fa["Shell/process backend<br/>ExecutionBackend"]
+    n_a4140d217a0c["Agent worktree<br/>Workspace"]
+    n_94fdf21bba59["Current workspace<br/>Workspace"]
+  end
+  subgraph g_ec7611e9f4ec["extension"]
+    direction TB
+    n_9b238fc5ebe1["Hooks<br/>Hook"]
+    n_f511c0b08c07["MCP tools<br/>MCPServer"]
+    n_cfe23a1db507["Plugins<br/>Plugin"]
+    n_31daf978586a["Skills<br/>Skill"]
+  end
+  subgraph g_8723ff5ff3ee["governance"]
+    direction TB
+    n_c3d9dc875a4e["Permission gate<br/>PermissionGate"]
+    n_f0e74a923b0d["Policy and modes<br/>PolicyRule"]
+    n_443a63655f36["Sandbox runtime<br/>Sandbox"]
+  end
+  subgraph g_215bf50cac07["infrastructure"]
+    direction TB
+    n_84c56edfb7c8["Anthropic provider adapter<br/>ModelAdapter"]
+    n_6327a3e9cdd9["Messages stream<br/>ModelCall"]
+    n_8caa797d111a["Retry and recovery<br/>RecoveryPolicy"]
+  end
+  subgraph g_2f995d99d5f5["interface"]
+    direction TB
+    n_4c2f5cbf902d["CLI bootstrap<br/>Entrypoint"]
+    n_d82b55feeebb["CLI surfaces<br/>Interface"]
+    n_6362d0c51a53["Interactive REPL<br/>Interface"]
+    n_d9cf81ae0317["Print / SDK<br/>Interface"]
+  end
+  subgraph g_956f59a87276["observability"]
+    direction TB
+    n_ac3388b1dba8["Events and traces<br/>TelemetrySink"]
+  end
+  subgraph g_2c174a8c5967["orchestration"]
+    direction TB
+    n_a0434817a984["Shared query loop<br/>AgentLoop"]
+    n_9021d26f0f99["Turn/session exit<br/>ExitCondition"]
+    n_11dec12887d9["Tool execution router<br/>Router"]
+    n_deaa5a1626b3["Agent child<br/>Subagent"]
+    n_824bfa49fd13["Swarm teammate<br/>Subagent"]
+    n_2e2b09fcdb36["AgentTool<br/>Tool"]
+  end
+  subgraph g_9aa3032ea548["state"]
+    direction TB
+    n_eeb4b33d30fe["Team mailbox<br/>Artifact"]
+    n_6fad310cfe27["Live session<br/>Session"]
+    n_110ebbcc690b["Transcript JSONL<br/>SessionStore"]
+  end
+  class n_a0434817a984,n_eeb4b33d30fe,n_2fb97928aabe,n_bd9215348ff0,n_d9b8a40d18ab,n_4c2f5cbf902d,n_81a313ce89fa,n_9021d26f0f99,n_9b238fc5ebe1,n_d82b55feeebb,n_6362d0c51a53,n_d9cf81ae0317,n_f511c0b08c07,n_84c56edfb7c8,n_6327a3e9cdd9,n_c3d9dc875a4e,n_cfe23a1db507,n_f0e74a923b0d,n_3dc2f841a9b3,n_c0e68bae1418,n_8caa797d111a,n_11dec12887d9,n_443a63655f36,n_6fad310cfe27,n_110ebbcc690b,n_31daf978586a,n_deaa5a1626b3,n_824bfa49fd13,n_ac3388b1dba8,n_2e2b09fcdb36,n_86fc78b36f0b,n_26809c922930,n_a4140d217a0c,n_94fdf21bba59 staticOnly;
+  n_2e2b09fcdb36 -.->|"isolation=worktree"| n_a4140d217a0c
+  n_d9b8a40d18ab -.->|"injects"| n_bd9215348ff0
+  n_86fc78b36f0b -.->|"executes"| n_81a313ce89fa
+  n_d82b55feeebb -.->|"enters"| n_4c2f5cbf902d
+  n_3dc2f841a9b3 -.->|"injects"| n_bd9215348ff0
+  n_bd9215348ff0 -.->|"calls"| n_2fb97928aabe
+  n_bd9215348ff0 -.->|"calls"| n_6327a3e9cdd9
+  n_9021d26f0f99 -.->|"persists"| n_110ebbcc690b
+  n_d9cf81ae0317 -.->|"enters"| n_6fad310cfe27
+  n_9b238fc5ebe1 -.->|"separate audit path"| n_81a313ce89fa
+  n_6362d0c51a53 -.->|"enters"| n_6fad310cfe27
+  n_f511c0b08c07 -.->|"registers"| n_26809c922930
+  n_84c56edfb7c8 -.->|"calls"| n_6327a3e9cdd9
+  n_c3d9dc875a4e -.->|"authorizes"| n_86fc78b36f0b
+  n_cfe23a1db507 -.->|"registers"| n_f511c0b08c07
+  n_f0e74a923b0d -.->|"authorizes"| n_c3d9dc875a4e
+  n_a0434817a984 -.->|"calls"| n_2e2b09fcdb36
+  n_a0434817a984 -.->|"assembles"| n_bd9215348ff0
+  n_a0434817a984 -.->|"calls"| n_8caa797d111a
+  n_a0434817a984 -.->|"persists"| n_110ebbcc690b
+  n_443a63655f36 -.->|"optional wrapper"| n_81a313ce89fa
+  n_6fad310cfe27 -.->|"calls"| n_a0434817a984
+  n_31daf978586a -.->|"injects"| n_bd9215348ff0
+  n_deaa5a1626b3 -.->|"recursive query"| n_a0434817a984
+  n_c0e68bae1418 -.->|"injects"| n_bd9215348ff0
+  n_26809c922930 -.->|"registers"| n_86fc78b36f0b
+  n_26809c922930 -.->|"visible schemas"| n_6327a3e9cdd9
+  n_11dec12887d9 -.->|"calls"| n_c3d9dc875a4e
+  linkStyle 0 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 1 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 2 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 3 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 4 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 5 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 6 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 7 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 8 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 9 stroke:#B45309,stroke-width:1.5px,stroke-dasharray:2 4;
+  linkStyle 10 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 11 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 12 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 13 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 14 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 15 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 16 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 17 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 18 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 19 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 20 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 21 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 22 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 23 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 24 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 25 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 26 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 27 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+~~~

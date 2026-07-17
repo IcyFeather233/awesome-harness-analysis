@@ -1,0 +1,197 @@
+{
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "id": "X-SCENARIO-001",
+      "title": "Source snapshot completeness",
+      "mode": "fault",
+      "status": "completed",
+      "claims_tested": [
+        "C-001",
+        "C-025"
+      ],
+      "configuration": {
+        "commit": "16a676ffa36eadbfb28eec39007dff73941346b1",
+        "entrypoint": "source tree"
+      },
+      "expected_discriminating_events": [
+        "manifest.present",
+        "relative_import.resolved"
+      ],
+      "forbidden_events": [],
+      "result": {
+        "outcome": "failed_precondition",
+        "source_files": 1902,
+        "relative_imports": 12958,
+        "missing_relative_imports": 657,
+        "build_manifests": [],
+        "evidence_ids": [
+          "X-001"
+        ]
+      },
+      "notes": "This is a source integrity experiment, not a Claude Code runtime execution."
+    },
+    {
+      "id": "X-SCENARIO-002",
+      "title": "SiFlow Anthropic Messages dialect probe",
+      "mode": "real",
+      "status": "completed",
+      "claims_tested": [
+        "C-009",
+        "C-025"
+      ],
+      "configuration": {
+        "provider": "siflow",
+        "model": "qwen3.6-35ba3b",
+        "credentials_sent": false,
+        "private_prompt_data": false
+      },
+      "expected_discriminating_events": [
+        "message_start",
+        "tool_use",
+        "message_stop"
+      ],
+      "forbidden_events": [],
+      "result": {
+        "outcome": "passed_protocol_subset",
+        "http_status": 200,
+        "forced_tool": "echo",
+        "tool_input": {
+          "text": "hello"
+        },
+        "evidence_ids": [
+          "X-002"
+        ]
+      },
+      "notes": "Endpoint compatibility does not prove harness compatibility."
+    },
+    {
+      "id": "X-SCENARIO-008",
+      "title": "v2.1.88 paper corpus fingerprint",
+      "mode": "scripted",
+      "status": "completed",
+      "claims_tested": [
+        "C-026"
+      ],
+      "configuration": {
+        "benchmark": "https://arxiv.org/html/2604.14228v2",
+        "paper_version": "Claude Code v2.1.88",
+        "local_commit": "16a676ffa36eadbfb28eec39007dff73941346b1"
+      },
+      "expected_discriminating_events": [
+        "typescript_count.match",
+        "named_symbol.match",
+        "feature_gate.match"
+      ],
+      "forbidden_events": [
+        "claim.exact_tree_identity_without_hash"
+      ],
+      "result": {
+        "outcome": "strong_fingerprint_match",
+        "typescript_files": 1884,
+        "javascript_files": 18,
+        "exact_tree_equality": "unproven",
+        "evidence_ids": [
+          "X-003"
+        ]
+      },
+      "notes": "The benchmark narrows release identity but does not replace a package manifest or tree hash."
+    },
+    {
+      "id": "X-SCENARIO-003",
+      "title": "Scripted text-only query",
+      "mode": "scripted",
+      "status": "blocked",
+      "claims_tested": [
+        "C-003",
+        "C-004"
+      ],
+      "configuration": {
+        "entrypoint": "query deps.callModel"
+      },
+      "result": {
+        "outcome": "not_executed",
+        "reason": "snapshot is not self-contained"
+      }
+    },
+    {
+      "id": "X-SCENARIO-004",
+      "title": "Permission denial prevents shell side effect",
+      "mode": "scripted",
+      "status": "blocked",
+      "claims_tested": [
+        "C-012",
+        "C-013",
+        "C-014"
+      ],
+      "configuration": {
+        "permission_mode": "default",
+        "workspace": "disposable"
+      },
+      "result": {
+        "outcome": "not_executed",
+        "reason": "snapshot is not self-contained"
+      }
+    },
+    {
+      "id": "X-SCENARIO-005",
+      "title": "Context overflow and compaction survivors",
+      "mode": "fault",
+      "status": "blocked",
+      "claims_tested": [
+        "C-006",
+        "C-007"
+      ],
+      "configuration": {
+        "model": "scripted",
+        "workspace": "disposable"
+      },
+      "result": {
+        "outcome": "not_executed",
+        "reason": "snapshot is not self-contained"
+      }
+    },
+    {
+      "id": "X-SCENARIO-006",
+      "title": "Session resume and fork",
+      "mode": "scripted",
+      "status": "blocked",
+      "claims_tested": [
+        "C-015",
+        "C-016"
+      ],
+      "configuration": {
+        "entrypoint": "print",
+        "workspace": "disposable"
+      },
+      "result": {
+        "outcome": "not_executed",
+        "reason": "snapshot is not self-contained"
+      }
+    },
+    {
+      "id": "X-SCENARIO-007",
+      "title": "Subagent context/workspace/cancellation matrix",
+      "mode": "scripted",
+      "status": "blocked",
+      "claims_tested": [
+        "C-017",
+        "C-018",
+        "C-019",
+        "C-020"
+      ],
+      "configuration": {
+        "modes": [
+          "sync",
+          "async",
+          "worktree",
+          "in-process teammate"
+        ]
+      },
+      "result": {
+        "outcome": "not_executed",
+        "reason": "snapshot is not self-contained"
+      }
+    }
+  ]
+}

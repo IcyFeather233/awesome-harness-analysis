@@ -1,0 +1,469 @@
+{
+  "schema_version": "1.0",
+  "modules": {
+    "interfaces": {
+      "status": "partial",
+      "directories": [
+        "src",
+        "src/entrypoints",
+        "src/screens"
+      ],
+      "files": [
+        "src/entrypoints/cli.tsx",
+        "src/main.tsx",
+        "src/screens/REPL.tsx",
+        "src/QueryEngine.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-008",
+        "X-SCENARIO-003"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "core_loop": {
+      "status": "partial",
+      "directories": [
+        "src",
+        "src/query"
+      ],
+      "files": [
+        "src/query.ts",
+        "src/query/config.ts",
+        "src/query/deps.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-008",
+        "X-SCENARIO-003"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "context_assembly": {
+      "status": "partial",
+      "directories": [
+        "src",
+        "src/constants",
+        "src/utils"
+      ],
+      "files": [
+        "src/context.ts",
+        "src/constants/prompts.ts",
+        "src/utils/claudemd.ts",
+        "src/utils/attachments.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-005",
+        "X-SCENARIO-006",
+        "X-SCENARIO-007"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "compaction": {
+      "status": "partial",
+      "directories": [
+        "src",
+        "src/services/compact"
+      ],
+      "files": [
+        "src/query.ts",
+        "src/services/compact/autoCompact.ts",
+        "src/services/compact/compact.ts",
+        "src/services/compact/microCompact.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-008",
+        "X-SCENARIO-005"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "model_abstraction": {
+      "status": "partial",
+      "directories": [
+        "src/services/api",
+        "src/utils/model"
+      ],
+      "files": [
+        "src/services/api/client.ts",
+        "src/services/api/claude.ts",
+        "src/services/api/withRetry.ts",
+        "src/utils/model/providers.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "tools_extensions": {
+      "status": "partial",
+      "directories": [
+        "src",
+        "src/services/tools"
+      ],
+      "files": [
+        "src/Tool.ts",
+        "src/tools.ts",
+        "src/services/tools/toolExecution.ts",
+        "src/services/tools/toolOrchestration.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-004"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "permissions_safety": {
+      "status": "partial",
+      "directories": [
+        "src/hooks",
+        "src/types",
+        "src/utils/permissions"
+      ],
+      "files": [
+        "src/types/permissions.ts",
+        "src/utils/permissions/permissions.ts",
+        "src/hooks/useCanUseTool.tsx"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-008",
+        "X-SCENARIO-004"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "sandbox_execution": {
+      "status": "partial",
+      "directories": [
+        "src/tools/BashTool",
+        "src/utils",
+        "src/utils/sandbox"
+      ],
+      "files": [
+        "src/tools/BashTool/BashTool.tsx",
+        "src/tools/BashTool/shouldUseSandbox.ts",
+        "src/utils/sandbox/sandbox-adapter.ts",
+        "src/utils/Shell.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-004"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "workspace": {
+      "status": "partial",
+      "directories": [
+        "src/tools/AgentTool",
+        "src/utils"
+      ],
+      "files": [
+        "src/utils/cwd.ts",
+        "src/utils/worktree.ts",
+        "src/tools/AgentTool/AgentTool.tsx"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-004",
+        "X-SCENARIO-006",
+        "X-SCENARIO-007"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "sessions_persistence": {
+      "status": "partial",
+      "directories": [
+        "src/utils"
+      ],
+      "files": [
+        "src/utils/sessionStorage.ts",
+        "src/utils/sessionRestore.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-006",
+        "X-SCENARIO-007"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "subagents": {
+      "status": "partial",
+      "directories": [
+        "src/tools/AgentTool",
+        "src/utils/swarm"
+      ],
+      "files": [
+        "src/tools/AgentTool/AgentTool.tsx",
+        "src/tools/AgentTool/runAgent.ts",
+        "src/utils/swarm/spawnInProcess.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-007"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "orchestration": {
+      "status": "partial",
+      "directories": [
+        "src",
+        "src/coordinator",
+        "src/services/tools"
+      ],
+      "files": [
+        "src/query.ts",
+        "src/services/tools/toolOrchestration.ts",
+        "src/coordinator/coordinatorMode.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-003",
+        "X-SCENARIO-007"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "observability": {
+      "status": "partial",
+      "directories": [
+        "src/services/analytics",
+        "src/utils/telemetry"
+      ],
+      "files": [
+        "src/services/analytics/index.ts",
+        "src/utils/telemetry/sessionTracing.ts",
+        "src/utils/telemetry/perfettoTracing.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    },
+    "recovery": {
+      "status": "partial",
+      "directories": [
+        "src/services/api",
+        "src/services/compact",
+        "src/utils"
+      ],
+      "files": [
+        "src/services/api/withRetry.ts",
+        "src/utils/gracefulShutdown.ts",
+        "src/services/compact/compact.ts"
+      ],
+      "symbols": [],
+      "configurations": [
+        "source-visible external/default candidate"
+      ],
+      "scenarios": [
+        "X-SCENARIO-001",
+        "X-SCENARIO-002",
+        "X-SCENARIO-003",
+        "X-SCENARIO-005",
+        "X-SCENARIO-006",
+        "X-SCENARIO-007"
+      ],
+      "excluded_surfaces": [
+        "compiled feature set",
+        "official package manifests"
+      ],
+      "unresolved": [
+        "No target runtime trace at this commit."
+      ],
+      "notes": "Static source coverage is focused and evidence-backed; runtime coverage is absent."
+    }
+  },
+  "global": {
+    "entrypoints_examined": [
+      "src/entrypoints/cli.tsx",
+      "src/main.tsx",
+      "src/screens/REPL.tsx",
+      "src/QueryEngine.ts"
+    ],
+    "configurations_tested": [
+      "source snapshot integrity",
+      "SiFlow protocol subset",
+      "v2.1.88 paper corpus fingerprint",
+      "first-party documentary pass"
+    ],
+    "platforms_tested": [
+      "Linux host for analysis scripts only"
+    ],
+    "providers_tested": [
+      "SiFlow qwen3.6-35ba3b protocol probe"
+    ],
+    "search_limits": {
+      "max_files": 20000,
+      "max_file_size": 1000000,
+      "max_hits_per_category": 120
+    },
+    "inaccessible_surfaces": [
+      "original package.json and lockfile",
+      "original bun:bundle feature manifest",
+      "657 unresolved relative imports",
+      "official build/release metadata"
+    ],
+    "unresolved_high_value_questions": [
+      "Which feature() branches are in the external production bundle?",
+      "Does every side-effecting path pass a common process-level policy boundary?",
+      "What exactly is shared across sync, async, teammate and pane-based children at runtime?",
+      "What survives compaction and resume under observed long-context workloads?"
+    ]
+  }
+}

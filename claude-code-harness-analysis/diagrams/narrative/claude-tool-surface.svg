@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="860" viewBox="0 0 1600 860" role="img">
+<title>Registration, visibility and execution are different layers</title>
+<desc>Plugins may contribute MCP, skills or hooks; only the current visible tool pool becomes model schemas.</desc>
+<defs>
+<marker id="arrow-observed" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#166534"/></marker>
+<marker id="arrow-experimental" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#166534"/></marker>
+<marker id="arrow-static" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+<marker id="arrow-inferred" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B45309"/></marker>
+<marker id="arrow-conflicted" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B91C1C"/></marker>
+<marker id="arrow-unknown" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+</defs>
+<style>
+text { font-family: Inter, Arial, sans-serif; letter-spacing: 0; }
+.figure-kicker { font-size: 12px; font-weight: 700; fill: #C2410C; }
+.figure-title { font-size: 28px; font-weight: 800; fill: #172033; }
+.figure-description { font-size: 14px; fill: #475569; }
+.group-label { font-size: 13px; font-weight: 700; fill: #475569; }
+.node-label { font-size: 17px; font-weight: 700; }
+.node-subtitle { font-size: 12px; }
+.edge-label { font-size: 12px; font-weight: 600; fill: #334155; }
+.badge { font-size: 11px; font-weight: 700; fill: #FFFFFF; }
+.footer { font-size: 11px; fill: #64748B; }
+</style>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="40" y="30" class="figure-kicker">ARCHITECTURE VIEW</text>
+<text x="40" y="63" class="figure-title">Registration, visibility and execution are different layers</text>
+<text x="40" y="88" class="figure-description">Plugins may contribute MCP, skills or hooks; only the current visible tool pool becomes model schemas.</text>
+<g class="story-edge" data-id="d1" data-evidence="S-019" data-claims="">
+<title>d1: S-019</title>
+<polyline points="200,129 330,289" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="d2" data-evidence="S-020" data-claims="">
+<title>d2: S-020</title>
+<polyline points="200,289 330,289" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="d3" data-evidence="S-003,S-020" data-claims="">
+<title>d3: S-003,S-020</title>
+<polyline points="110,410 110,328" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="d4" data-evidence="S-020,S-021" data-claims="">
+<title>d4: S-020,S-021</title>
+<polyline points="510,289 600,289" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="d5" data-evidence="S-022" data-claims="">
+<title>d5: S-022</title>
+<polyline points="780,289 870,289" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="d6" data-evidence="S-022,S-024" data-claims="">
+<title>d6: S-022,S-024</title>
+<polyline points="1050,289 1140,289" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="d7" data-evidence="S-024,S-025" data-claims="">
+<title>d7: S-024,S-025</title>
+<polyline points="1320,289 1390,289" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="d8" data-evidence="S-013,S-033" data-claims="">
+<title>d8: S-013,S-033</title>
+<polyline points="200,609 600,289" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+<rect x="366.5" y="261.0" width="67.0" height="23" rx="5" fill="#FFFFFF" fill-opacity="0.94"/><text x="400" y="277" class="edge-label" text-anchor="middle">context</text>
+</g>
+<g class="story-node" data-id="builtin" data-hir="N-BuiltinTools" data-evidence="S-019" data-claims="C-010">
+<title>builtin: HIR N-BuiltinTools; evidence S-019</title>
+<rect x="20.0" y="90.0" width="180.0" height="78.0" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="3"/>
+<text x="38.0" y="121.0" class="node-label" fill="#172554">Built-in Tools</text>
+</g>
+<g class="story-node" data-id="mcp" data-hir="N-MCP" data-evidence="S-020" data-claims="C-010">
+<title>mcp: HIR N-MCP; evidence S-020</title>
+<rect x="20.0" y="250.0" width="180.0" height="78.0" rx="10" fill="#E0F2FE" stroke="#0369A1" stroke-width="3"/>
+<text x="38.0" y="281.0" class="node-label" fill="#0C4A6E">MCP Servers</text>
+</g>
+<g class="story-node" data-id="plugin" data-hir="N-Plugins" data-evidence="S-003,S-020" data-claims="C-010">
+<title>plugin: HIR N-Plugins; evidence S-003,S-020</title>
+<rect x="20.0" y="410.0" width="180.0" height="78.0" rx="10" fill="#FDE7DC" stroke="#C65D35" stroke-width="3"/>
+<text x="38.0" y="441.0" class="node-label" fill="#431407">Plugins</text>
+</g>
+<g class="story-node" data-id="skills" data-hir="N-Skills" data-evidence="S-013,S-033" data-claims="C-006,C-010">
+<title>skills: HIR N-Skills; evidence S-013,S-033</title>
+<rect x="20.0" y="570.0" width="180.0" height="78.0" rx="10" fill="#DCFCE7" stroke="#15803D" stroke-width="3"/>
+<text x="38.0" y="601.0" class="node-label" fill="#14532D">Skills</text>
+</g>
+<g class="story-node" data-id="pool" data-hir="N-ToolRegistry" data-evidence="S-019,S-020" data-claims="C-010">
+<title>pool: HIR N-ToolRegistry; evidence S-019,S-020</title>
+<rect x="330.0" y="250.0" width="180.0" height="78.0" rx="10" fill="#FFF0E6" stroke="#C2410C" stroke-width="3"/>
+<text x="348.0" y="281.0" class="node-label" fill="#431407">Tool Pool</text>
+</g>
+<g class="story-node" data-id="schemas" data-hir="N-ToolRegistry,N-ModelCall" data-evidence="S-020,S-021" data-claims="C-010">
+<title>schemas: HIR N-ToolRegistry,N-ModelCall; evidence S-020,S-021</title>
+<rect x="600.0" y="250.0" width="180.0" height="78.0" rx="10" fill="#E0F2FE" stroke="#0369A1" stroke-width="3"/>
+<text x="618.0" y="281.0" class="node-label" fill="#0C4A6E">Visible Schemas</text>
+</g>
+<g class="story-node" data-id="router" data-hir="N-ToolRouter,N-Hooks" data-evidence="S-022" data-claims="C-011">
+<title>router: HIR N-ToolRouter,N-Hooks; evidence S-022</title>
+<rect x="870.0" y="250.0" width="180.0" height="78.0" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="3"/>
+<text x="888.0" y="281.0" class="node-label" fill="#172554">Tool Router</text>
+</g>
+<g class="story-node" data-id="gate" data-hir="N-Permission" data-evidence="S-024" data-claims="C-012">
+<title>gate: HIR N-Permission; evidence S-024</title>
+<rect x="1140.0" y="250.0" width="180.0" height="78.0" rx="10" fill="#FEF3C7" stroke="#B45309" stroke-width="3"/>
+<text x="1158.0" y="281.0" class="node-label" fill="#451A03">Permission Gate</text>
+</g>
+<g class="story-node" data-id="result" data-hir="N-Shell,N-Attachments" data-evidence="S-009,S-025" data-claims="C-005,C-013">
+<title>result: HIR N-Shell,N-Attachments; evidence S-009,S-025</title>
+<rect x="1390.0" y="250.0" width="170.0" height="78.0" rx="10" fill="#F3F4F6" stroke="#52525B" stroke-width="3"/>
+<text x="1408.0" y="281.0" class="node-label" fill="#18181B">Execution -&gt;</text>
+<text x="1408.0" y="304.0" class="node-label" fill="#18181B">Tool Result</text>
+</g>
+<text x="40" y="836" class="footer">All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise.</text>
+</svg>

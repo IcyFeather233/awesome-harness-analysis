@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "selection_rule": "Prioritize architectural importance, uncertainty, counterexample value and testability.",
+  "queue": [
+    {
+      "id": "Q-001",
+      "question": "What exact build feature set produced the public external package?",
+      "priority": "critical",
+      "status": "blocked"
+    },
+    {
+      "id": "Q-002",
+      "question": "Do hooks and non-tool subsystems share an equivalent policy boundary?",
+      "priority": "critical",
+      "status": "open"
+    },
+    {
+      "id": "Q-003",
+      "question": "What is the observed inheritance matrix for each child mechanism?",
+      "priority": "high",
+      "status": "blocked"
+    },
+    {
+      "id": "Q-004",
+      "question": "What survives long-context compaction and subsequent resume?",
+      "priority": "high",
+      "status": "blocked"
+    }
+  ]
+}

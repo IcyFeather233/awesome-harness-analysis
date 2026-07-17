@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1810" height="694" viewBox="0 0 1810 694" role="img">
+<title>Subagent Topology</title>
+<desc>Delegation, inheritance, isolation, and result aggregation.</desc>
+<defs>
+<marker id="arrow-runtime_verified" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#2E7D32"/></marker>
+<marker id="arrow-experimental_verified" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#2E7D32"/></marker>
+<marker id="arrow-static_only" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+<marker id="arrow-inferred" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B45309"/></marker>
+<marker id="arrow-conflicted" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B91C1C"/></marker>
+<marker id="arrow-unknown" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+</defs>
+<style>
+text { font-family: Inter, Arial, sans-serif; letter-spacing: 0; }
+.diagram-title { font-size: 24px; font-weight: 700; fill: #111827; }
+.diagram-subtitle { font-size: 13px; fill: #475569; }
+.group-title { font-size: 13px; font-weight: 700; fill: #334155; }
+.node-name { font-size: 13px; font-weight: 700; }
+.node-type { font-size: 11px; }
+.edge-label { font-size: 10px; fill: #334155; paint-order: stroke; stroke: #FFFFFF; stroke-width: 4px; stroke-linejoin: round; }
+.legend-title { font-size: 11px; font-weight: 700; fill: #334155; }
+.legend-label { font-size: 10px; fill: #475569; }
+</style>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="36" y="39" class="diagram-title">Subagent Topology</text>
+<text x="36" y="64" class="diagram-subtitle">Delegation, inheritance, isolation, and result aggregation.</text>
+<g class="group"><rect x="36.0" y="96.0" width="240.0" height="140.0" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="58.0" y="118.0" class="group-title">Primary</text></g>
+<g class="group"><rect x="36.0" y="278.0" width="1738.0" height="140.0" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="58.0" y="300.0" class="group-title">Ungrouped</text></g>
+<g class="group"><rect x="36.0" y="460.0" width="454.0" height="140.0" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="58.0" y="482.0" class="group-title">worker</text></g>
+<g class="edge" data-id="E-031" data-evidence="S-008"><title>E-031: S-008</title><path d="M 370.0 396.0 C 370.0 507.6, 156.0 36.4, 156.0 148.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="263.0" y="267.0" class="edge-label" text-anchor="middle">follow-up</text></g>
+<g class="edge" data-id="E-047" data-evidence="S-037"><title>E-047: S-037</title><path d="M 1440.0 396.0 C 1440.0 448.2, 370.0 459.8, 370.0 512.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="905.0" y="449.0" class="edge-label" text-anchor="middle">unread attachment</text></g>
+<g class="edge" data-id="E-033" data-evidence="S-008,S-018"><title>E-033: S-008,S-018</title><path d="M 156.0 214.0 C 156.0 266.2, 1654.0 277.8, 1654.0 330.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="905.0" y="267.0" class="edge-label" text-anchor="middle">calls</text></g>
+<g class="edge" data-id="E-006" data-evidence="S-004,S-005,S-006"><title>E-006: S-004,S-005,S-006</title><path d="M 1226.0 396.0 C 1226.0 507.6, 156.0 36.4, 156.0 148.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="691.0" y="267.0" class="edge-label" text-anchor="middle">calls</text></g>
+<g class="edge" data-id="E-045" data-evidence="S-034,S-036"><title>E-045: S-034,S-036</title><path d="M 1226.0 396.0 C 1226.0 448.2, 370.0 459.8, 370.0 512.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="798.0" y="449.0" class="edge-label" text-anchor="middle">delegates</text></g>
+<g class="edge" data-id="E-039" data-evidence="S-033"><title>E-039: S-033</title><path d="M 156.0 578.0 C 156.0 771.5, 156.0 -45.5, 156.0 148.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="156.0" y="358.0" class="edge-label" text-anchor="middle">recursive query</text></g>
+<g class="edge" data-id="E-040" data-evidence="S-033"><title>E-040: S-033</title><path d="M 156.0 578.0 C 156.0 771.5, 156.0 -45.5, 156.0 148.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="156.0" y="358.0" class="edge-label" text-anchor="middle">isolates_context_from</text></g>
+<g class="edge" data-id="E-044" data-evidence="S-032,S-033"><title>E-044: S-032,S-033</title><path d="M 156.0 578.0 C 156.0 771.5, 156.0 -45.5, 156.0 148.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="156.0" y="358.0" class="edge-label" text-anchor="middle">result/notification</text></g>
+<g class="edge" data-id="E-041" data-evidence="S-032"><title>E-041: S-032</title><path d="M 156.0 578.0 C 156.0 689.6, 1012.0 218.4, 1012.0 330.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="584.0" y="449.0" class="edge-label" text-anchor="middle">default</text></g>
+<g class="edge" data-id="E-043" data-evidence="S-032,S-035"><title>E-043: S-032,S-035</title><path d="M 156.0 578.0 C 156.0 689.6, 798.0 218.4, 798.0 330.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="477.0" y="449.0" class="edge-label" text-anchor="middle">writes</text></g>
+<g class="edge" data-id="E-046" data-evidence="S-037"><title>E-046: S-037</title><path d="M 370.0 578.0 C 370.0 689.6, 1440.0 218.4, 1440.0 330.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="905.0" y="449.0" class="edge-label" text-anchor="middle">writes</text></g>
+<g class="edge" data-id="E-023" data-evidence="S-022,S-024"><title>E-023: S-022,S-024</title><path d="M 156.0 396.0 C 156.0 430.0, 584.0 296.0, 584.0 330.0" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-static_only)"/><text x="370.0" y="358.0" class="edge-label" text-anchor="middle">calls</text></g>
+<g class="node" data-id="N-QueryLoop" data-evidence="S-006,S-007,S-008"><title>N-QueryLoop: S-006,S-007,S-008</title><rect x="58.0" y="148.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="72.0" y="175.0" class="node-name" fill="#1E293B">Shared query loop</text><text x="72.0" y="197.0" class="node-type" fill="#1E293B">AgentLoop</text></g>
+<g class="node" data-id="N-Mailbox" data-evidence="S-037"><title>N-Mailbox: S-037</title><rect x="1342.0" y="330.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="1356.0" y="357.0" class="node-name" fill="#1E293B">Team mailbox</text><text x="1356.0" y="379.0" class="node-type" fill="#1E293B">Artifact</text></g>
+<g class="node" data-id="N-ContextBuilder" data-evidence="S-010,S-011,S-013"><title>N-ContextBuilder: S-010,S-011,S-013</title><rect x="272.0" y="330.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="286.0" y="357.0" class="node-name" fill="#1E293B">Context assembly</text><text x="286.0" y="379.0" class="node-type" fill="#1E293B">ContextBuilder</text></g>
+<g class="node" data-id="N-Permission" data-evidence="S-023,S-024"><title>N-Permission: S-023,S-024</title><rect x="486.0" y="330.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="500.0" y="357.0" class="node-name" fill="#1E293B">Permission gate</text><text x="500.0" y="379.0" class="node-type" fill="#1E293B">PermissionGate</text></g>
+<g class="node" data-id="N-Recovery" data-evidence="S-008,S-018,S-041"><title>N-Recovery: S-008,S-018,S-041</title><rect x="1556.0" y="330.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="1570.0" y="357.0" class="node-name" fill="#1E293B">Retry and recovery</text><text x="1570.0" y="379.0" class="node-type" fill="#1E293B">RecoveryPolicy</text></g>
+<g class="node" data-id="N-ToolRouter" data-evidence="S-022"><title>N-ToolRouter: S-022</title><rect x="58.0" y="330.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="72.0" y="357.0" class="node-name" fill="#1E293B">Tool execution router</text><text x="72.0" y="379.0" class="node-type" fill="#1E293B">Router</text></g>
+<g class="node" data-id="N-Session" data-evidence="S-003,S-029"><title>N-Session: S-003,S-029</title><rect x="1128.0" y="330.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="1142.0" y="357.0" class="node-name" fill="#1E293B">Live session</text><text x="1142.0" y="379.0" class="node-type" fill="#1E293B">Session</text></g>
+<g class="node" data-id="N-Subagent" data-evidence="S-032,S-033"><title>N-Subagent: S-032,S-033</title><rect x="58.0" y="512.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="72.0" y="539.0" class="node-name" fill="#1E293B">Agent child</text><text x="72.0" y="561.0" class="node-type" fill="#1E293B">Subagent</text></g>
+<g class="node" data-id="N-Team" data-evidence="S-034,S-036"><title>N-Team: S-034,S-036</title><rect x="272.0" y="512.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="286.0" y="539.0" class="node-name" fill="#1E293B">Swarm teammate</text><text x="286.0" y="561.0" class="node-type" fill="#1E293B">Subagent</text></g>
+<g class="node" data-id="N-Worktree" data-evidence="S-032,S-035"><title>N-Worktree: S-032,S-035</title><rect x="700.0" y="330.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="714.0" y="357.0" class="node-name" fill="#1E293B">Agent worktree</text><text x="714.0" y="379.0" class="node-type" fill="#1E293B">Workspace</text></g>
+<g class="node" data-id="N-Workspace" data-evidence="S-025,S-032,S-035"><title>N-Workspace: S-025,S-032,S-035</title><rect x="914.0" y="330.0" width="196" height="66" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/><text x="928.0" y="357.0" class="node-name" fill="#1E293B">Current workspace</text><text x="928.0" y="379.0" class="node-type" fill="#1E293B">Workspace</text></g>
+<text x="36" y="636.0" class="legend-title">Evidence state</text>
+<line x1="36.0" y1="656.0" x2="64.0" y2="656.0" stroke="#2E7D32" stroke-width="2"/><text x="72.0" y="660.0" class="legend-label">Observed</text>
+<line x1="196.0" y1="656.0" x2="224.0" y2="656.0" stroke="#64748B" stroke-width="2" stroke-dasharray="7 5"/><text x="232.0" y="660.0" class="legend-label">Static only</text>
+<line x1="356.0" y1="656.0" x2="384.0" y2="656.0" stroke="#B45309" stroke-width="2" stroke-dasharray="2 5"/><text x="392.0" y="660.0" class="legend-label">Inferred</text>
+<line x1="516.0" y1="656.0" x2="544.0" y2="656.0" stroke="#B91C1C" stroke-width="2"/><text x="552.0" y="660.0" class="legend-label">Conflicted</text>
+<line x1="676.0" y1="656.0" x2="704.0" y2="656.0" stroke="#64748B" stroke-width="2" stroke-dasharray="3 5"/><text x="712.0" y="660.0" class="legend-label">Unknown</text>
+</svg>

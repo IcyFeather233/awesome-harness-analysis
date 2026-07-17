@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "X-SCENARIO-002",
+  "executed_at": "2026-07-16",
+  "endpoint_family": "siflow",
+  "base_url_redacted": "https://siflow-changliu.siflow.cn/.../v1/8000",
+  "model": "qwen3.6-35ba3b",
+  "credentials_sent": false,
+  "prompt_contains_private_data": false,
+  "results": {
+    "openai_models": {
+      "http_status": 200,
+      "model_present": true,
+      "reported_max_model_len": 262144
+    },
+    "anthropic_messages_non_streaming": {
+      "http_status": 200,
+      "message_type": "message",
+      "content_type": "thinking"
+    },
+    "anthropic_messages_streaming": {
+      "http_status": 200,
+      "events_observed": [
+        "message_start",
+        "content_block_start",
+        "content_block_delta",
+        "content_block_stop",
+        "message_delta",
+        "message_stop"
+      ]
+    },
+    "anthropic_forced_tool_use": {
+      "http_status": 200,
+      "tool_name": "echo",
+      "tool_input": {
+        "text": "hello"
+      },
+      "stop_reason": "end_turn",
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      }
+    }
+  },
+  "interpretation": "The endpoint supports the Anthropic Messages and tool-use subset needed by Claude Code. This does not establish full harness compatibility because the mirrored source snapshot cannot be built as provided."
+}

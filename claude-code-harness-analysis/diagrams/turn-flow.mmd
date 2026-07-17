@@ -1,0 +1,107 @@
+flowchart LR
+  %% Runtime Turn Flow
+  classDef observed fill:#E8F5E9,stroke:#2E7D32,color:#14261A,stroke-width:2px;
+  classDef staticOnly fill:#F8FAFC,stroke:#64748B,color:#1E293B,stroke-width:1.5px;
+  classDef inferred fill:#FFF7ED,stroke:#B45309,color:#431407,stroke-width:1.5px;
+  classDef conflicted fill:#FEF2F2,stroke:#B91C1C,color:#450A0A,stroke-width:2.5px;
+  classDef unknown fill:#F8FAFC,stroke:#94A3B8,color:#475569,stroke-width:1.5px;
+  subgraph g_1386ac0a1a7b["AgentLoop"]
+    direction LR
+    n_a0434817a984["Shared query loop<br/>AgentLoop"]
+  end
+  subgraph g_76bb063f9109["Compactor"]
+    direction LR
+    n_2fb97928aabe["Compaction pipeline<br/>Compactor"]
+  end
+  subgraph g_8d9a906a7606["ContextBuilder"]
+    direction LR
+    n_bd9215348ff0["Context assembly<br/>ContextBuilder"]
+  end
+  subgraph g_3dd878e8eef6["Entrypoint"]
+    direction LR
+    n_4c2f5cbf902d["CLI bootstrap<br/>Entrypoint"]
+  end
+  subgraph g_c71622423bee["ExecutionBackend"]
+    direction LR
+    n_81a313ce89fa["Shell/process backend<br/>ExecutionBackend"]
+  end
+  subgraph g_f17b46032a6a["ExitCondition"]
+    direction LR
+    n_9021d26f0f99["Turn/session exit<br/>ExitCondition"]
+  end
+  subgraph g_aaea4aaa0b02["Interface"]
+    direction LR
+    n_d82b55feeebb["CLI surfaces<br/>Interface"]
+    n_6362d0c51a53["Interactive REPL<br/>Interface"]
+    n_d9cf81ae0317["Print / SDK<br/>Interface"]
+  end
+  subgraph g_875bbb6ce75a["ModelCall"]
+    direction LR
+    n_6327a3e9cdd9["Messages stream<br/>ModelCall"]
+  end
+  subgraph g_33365285514f["PermissionGate"]
+    direction LR
+    n_c3d9dc875a4e["Permission gate<br/>PermissionGate"]
+  end
+  subgraph g_134aeb3c6799["RecoveryPolicy"]
+    direction LR
+    n_8caa797d111a["Retry and recovery<br/>RecoveryPolicy"]
+  end
+  subgraph g_0c9b71ca0b61["Router"]
+    direction LR
+    n_11dec12887d9["Tool execution router<br/>Router"]
+  end
+  subgraph g_3d2df7742c7e["Session"]
+    direction LR
+    n_6fad310cfe27["Live session<br/>Session"]
+  end
+  subgraph g_06fc21210458["Tool"]
+    direction LR
+    n_2e2b09fcdb36["AgentTool<br/>Tool"]
+    n_86fc78b36f0b["Built-in tools<br/>Tool"]
+  end
+  class n_a0434817a984,n_2fb97928aabe,n_bd9215348ff0,n_4c2f5cbf902d,n_81a313ce89fa,n_9021d26f0f99,n_d82b55feeebb,n_6362d0c51a53,n_d9cf81ae0317,n_6327a3e9cdd9,n_c3d9dc875a4e,n_8caa797d111a,n_11dec12887d9,n_6fad310cfe27,n_2e2b09fcdb36,n_86fc78b36f0b staticOnly;
+  n_86fc78b36f0b -.->|"tool_result"| n_bd9215348ff0
+  n_86fc78b36f0b -.->|"executes"| n_81a313ce89fa
+  n_d82b55feeebb -.->|"enters"| n_4c2f5cbf902d
+  n_4c2f5cbf902d -.->|"--print / SDK"| n_d9cf81ae0317
+  n_4c2f5cbf902d -.->|"default"| n_6362d0c51a53
+  n_2fb97928aabe -.->|"compacts"| n_bd9215348ff0
+  n_bd9215348ff0 -.->|"calls"| n_2fb97928aabe
+  n_bd9215348ff0 -.->|"calls"| n_6327a3e9cdd9
+  n_bd9215348ff0 -.->|"follow-up"| n_a0434817a984
+  n_d9cf81ae0317 -.->|"enters"| n_6fad310cfe27
+  n_6362d0c51a53 -.->|"enters"| n_6fad310cfe27
+  n_6327a3e9cdd9 -.->|"tool_use"| n_11dec12887d9
+  n_c3d9dc875a4e -.->|"authorizes"| n_86fc78b36f0b
+  n_c3d9dc875a4e -.->|"model-facing denial"| n_9021d26f0f99
+  n_a0434817a984 -.->|"calls"| n_2e2b09fcdb36
+  n_a0434817a984 -.->|"assembles"| n_bd9215348ff0
+  n_a0434817a984 -.->|"exits_to"| n_9021d26f0f99
+  n_a0434817a984 -.->|"calls"| n_8caa797d111a
+  n_8caa797d111a -.->|"falls_back_to"| n_2fb97928aabe
+  n_8caa797d111a -.->|"retries"| n_6327a3e9cdd9
+  n_6fad310cfe27 -.->|"calls"| n_a0434817a984
+  n_11dec12887d9 -.->|"calls"| n_c3d9dc875a4e
+  linkStyle 0 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 1 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 2 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 3 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 4 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 5 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 6 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 7 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 8 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 9 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 10 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 11 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 12 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 13 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 14 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 15 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 16 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 17 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 18 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 19 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 20 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 21 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;

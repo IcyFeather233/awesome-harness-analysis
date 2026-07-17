@@ -1,0 +1,309 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-16",
+  "generator": {
+    "tool": "imagegen bundled CLI",
+    "model": "gpt-image-2",
+    "api_mode": "user-authorized custom OpenAI-compatible endpoint",
+    "sdk": "openai 2.45.0 (isolated /tmp target)",
+    "quality": "high",
+    "output_format": "png",
+    "requested_size": "2048x1152"
+  },
+  "prompt_sources": [
+    "prompts/prompts.jsonl",
+    "prompts/04-tools-extensions-retry.jsonl",
+    "prompts/09-11-paper-gap-prompts.jsonl"
+  ],
+  "review": {
+    "method": "manual semantic and visual inspection of all eight assets",
+    "checks": [
+      "component labels",
+      "arrow direction and branching",
+      "conditional-path wording",
+      "invented terminology",
+      "document-width readability"
+    ],
+    "tools_extensions_generation_attempts": 5,
+    "tools_extensions_reviewed_versions": 4,
+    "notes": "The tool/extension figure was regenerated until Skills -> Model Context and Hooks -> Tool Router were both correct and every component appeared exactly once."
+  },
+  "figures": [
+    {
+      "file": "assets/01-system-overview.png",
+      "actual_size": "1693x929",
+      "output_sha256": "43dcb081d83a0e828063b5b915f8b5257e7290b30b0c275f0e6ff49afa3a8476",
+      "prompt_file": "prompts/prompts.jsonl",
+      "prompt_sha256": "a1190f2b51e4d07983c7f6efa18e61e527ec8509f79610956bc7323b3922f1db",
+      "deterministic_counterpart": "../system-overview.svg",
+      "semantic_review": "passed",
+      "reviewed_dimensions": "1693x929",
+      "question": "What is the canonical runtime path and which services branch from it?",
+      "caption": "gpt-image-2 reader illustration for commit 16a676f; static-only; Claude Code: product boundary and canonical path. Structured counterpart is authoritative.",
+      "evidence_ids": [
+        "S-002",
+        "S-003",
+        "S-004",
+        "S-005",
+        "S-006",
+        "S-007",
+        "S-008",
+        "S-010",
+        "S-011",
+        "S-012",
+        "S-013",
+        "S-016",
+        "S-017",
+        "S-019",
+        "S-020",
+        "S-022",
+        "S-023",
+        "S-024",
+        "S-025",
+        "S-026",
+        "S-027",
+        "S-029",
+        "S-030",
+        "S-032",
+        "S-033",
+        "S-034"
+      ],
+      "exclusions": [
+        "Compiled feature reachability",
+        "Production frequency"
+      ],
+      "glossary": {
+        "CLI / REPL": "Command-line and interactive terminal surfaces",
+        "Transcript JSONL": "Append-oriented session event log",
+        "Anthropic Messages": "Provider request/response boundary"
+      }
+    },
+    {
+      "file": "assets/02-turn-flow.png",
+      "actual_size": "1774x887",
+      "output_sha256": "c9ce01face0b6b64c4df43401d9283f459c0ad8d4f818ba3138aaae5cef612e2",
+      "prompt_file": "prompts/prompts.jsonl",
+      "prompt_sha256": "a1190f2b51e4d07983c7f6efa18e61e527ec8509f79610956bc7323b3922f1db",
+      "deterministic_counterpart": "../turn-flow.svg",
+      "semantic_review": "passed",
+      "reviewed_dimensions": "1774x887",
+      "question": "How does one user query iterate across multiple model requests and tool calls?",
+      "caption": "gpt-image-2 reader illustration for commit 16a676f; static-only; One query: model, tool and recovery loop. Structured counterpart is authoritative.",
+      "evidence_ids": [
+        "S-004",
+        "S-005",
+        "S-007",
+        "S-008",
+        "S-009",
+        "S-010",
+        "S-014",
+        "S-017",
+        "S-018",
+        "S-022",
+        "S-024",
+        "S-025"
+      ],
+      "exclusions": [
+        "Exact runtime timing",
+        "Feature-disabled recovery paths"
+      ],
+      "glossary": {
+        "Model Stream": "One streamed API request",
+        "Tool Call?": "Decision based on tool_use blocks",
+        "Retry / Compact": "Separate provider and context-pressure recovery paths"
+      }
+    },
+    {
+      "file": "assets/03-context-lifecycle.png",
+      "actual_size": "1774x887",
+      "output_sha256": "dee9e5201c9d640c6dc2383868009edcc9fb25b5a6be5c780ed4167c719cc1fc",
+      "prompt_file": "prompts/prompts.jsonl",
+      "prompt_sha256": "a1190f2b51e4d07983c7f6efa18e61e527ec8509f79610956bc7323b3922f1db",
+      "deterministic_counterpart": "../context-lifecycle.svg",
+      "semantic_review": "passed",
+      "reviewed_dimensions": "1774x887",
+      "question": "What reaches the model, when, and through which transformations?",
+      "caption": "gpt-image-2 reader illustration for commit 16a676f; static-only; Context is a lifecycle, not one prompt. Structured counterpart is authoritative.",
+      "evidence_ids": [
+        "S-007",
+        "S-009",
+        "S-010",
+        "S-011",
+        "S-012",
+        "S-013",
+        "S-014",
+        "S-015",
+        "S-017",
+        "S-022",
+        "S-029"
+      ],
+      "exclusions": [
+        "Production token thresholds",
+        "Semantic quality after compaction"
+      ],
+      "glossary": {
+        "CLAUDE.md": "Hierarchical project/user instruction files",
+        "History JSONL": "Durable transcript used to rebuild the live view",
+        "Runtime Attachments": "Per-turn context deltas"
+      }
+    },
+    {
+      "file": "assets/04-tools-extensions.png",
+      "actual_size": "1774x887",
+      "output_sha256": "cdde7802340481215d6752c919ca46784173a64a861fb87e2d670050a70c8c75",
+      "prompt_file": "prompts/04-tools-extensions-retry.jsonl",
+      "prompt_sha256": "dfc0990cdf9c97f372f2cb8a195ea995008fca57113709e5480f5b9b4fe373eb",
+      "deterministic_counterpart": "../tool-extension-surface.svg",
+      "semantic_review": "passed",
+      "reviewed_dimensions": "1774x887",
+      "question": "How do capabilities become visible model schemas and then executable actions?",
+      "caption": "gpt-image-2 reader illustration for commit 16a676f; static-only; Registration, visibility and execution are different layers. Structured counterpart is authoritative.",
+      "evidence_ids": [
+        "S-003",
+        "S-009",
+        "S-013",
+        "S-019",
+        "S-020",
+        "S-021",
+        "S-022",
+        "S-024",
+        "S-025",
+        "S-033"
+      ],
+      "exclusions": [
+        "All conditional tools",
+        "Runtime-enabled plugin inventory"
+      ],
+      "glossary": {
+        "MCP Servers": "External Model Context Protocol capability providers",
+        "Visible Schemas": "Tool definitions included in the current model request",
+        "Tool Router": "Validation, hooks, permission and dispatch path"
+      }
+    },
+    {
+      "file": "assets/05-permission-pipeline.png",
+      "actual_size": "1693x929",
+      "output_sha256": "2d503f3e56fc761532630e1580983d00ca9cdb4891a170e0891c9157ed2614b5",
+      "prompt_file": "prompts/prompts.jsonl",
+      "prompt_sha256": "a1190f2b51e4d07983c7f6efa18e61e527ec8509f79610956bc7323b3922f1db",
+      "deterministic_counterpart": "../permission-pipeline.svg",
+      "semantic_review": "passed",
+      "reviewed_dimensions": "1693x929",
+      "question": "Which checks occur before a tool creates a side effect?",
+      "caption": "gpt-image-2 reader illustration for commit 16a676f; static-only; Permission is a decision pipeline; sandbox is conditional. Structured counterpart is authoritative.",
+      "evidence_ids": [
+        "I-001",
+        "S-003",
+        "S-004",
+        "S-017",
+        "S-022",
+        "S-023",
+        "S-024",
+        "S-025",
+        "S-026",
+        "S-027",
+        "S-028"
+      ],
+      "exclusions": [
+        "Unproven process-wide bypass reachability",
+        "Platform-specific sandbox implementation"
+      ],
+      "glossary": {
+        "Permission Rules": "Allow, ask and deny policy plus mode constraints",
+        "Sandbox?": "Optional OS-backed execution isolation",
+        "Model-facing Denial": "A denial returned to the loop as context"
+      }
+    },
+    {
+      "file": "assets/06-subagent-topology.png",
+      "actual_size": "1536x1024",
+      "output_sha256": "1d960938e12a56b2808c8be25abf02db203af44d2e161b37d170ccad5d16db6a",
+      "prompt_file": "prompts/prompts.jsonl",
+      "prompt_sha256": "a1190f2b51e4d07983c7f6efa18e61e527ec8509f79610956bc7323b3922f1db",
+      "deterministic_counterpart": "../subagent-topology.svg",
+      "semantic_review": "passed",
+      "reviewed_dimensions": "1536x1024",
+      "question": "Which child mechanisms exist and what do they isolate or share?",
+      "caption": "gpt-image-2 reader illustration for commit 16a676f; static-only; Claude Code has several child mechanisms, not one. Structured counterpart is authoritative.",
+      "evidence_ids": [
+        "S-006",
+        "S-013",
+        "S-029",
+        "S-032",
+        "S-033",
+        "S-034",
+        "S-035",
+        "S-036",
+        "S-037"
+      ],
+      "exclusions": [
+        "Observed process IDs",
+        "Runtime permission prompt propagation"
+      ],
+      "glossary": {
+        "AgentTool": "Model-callable delegation entry",
+        "Sidechain JSONL": "Child-specific durable transcript",
+        "Swarm Teammate": "Team worker with in-process or terminal-pane backend",
+        "Team Mailbox": "File-locked durable inbox"
+      }
+    },
+    {
+      "file": "assets/07-persistence-lifecycle.png",
+      "actual_size": "1693x929",
+      "output_sha256": "edbfe57137b138678a4ca55d6b7a6184d4fdd2d6114662fd0d85774a0316f8ce",
+      "prompt_file": "prompts/prompts.jsonl",
+      "prompt_sha256": "a1190f2b51e4d07983c7f6efa18e61e527ec8509f79610956bc7323b3922f1db",
+      "deterministic_counterpart": "../persistence-lifecycle.svg",
+      "semantic_review": "passed",
+      "reviewed_dimensions": "1693x929",
+      "question": "What becomes durable, and what do resume and fork restore?",
+      "caption": "gpt-image-2 reader illustration for commit 16a676f; static-only; Resume restores conversation state, not the filesystem. Structured counterpart is authoritative.",
+      "evidence_ids": [
+        "I-003",
+        "S-015",
+        "S-029",
+        "S-030",
+        "S-031",
+        "S-035"
+      ],
+      "exclusions": [
+        "Corrupted JSONL behavior",
+        "Abrupt SIGKILL durability"
+      ],
+      "glossary": {
+        "Resume: Same ID": "Continue an existing session identity",
+        "Fork: New ID": "Copy recoverable history into a new session identity",
+        "NO ROLLBACK": "Workspace files are external to conversational restore"
+      }
+    },
+    {
+      "file": "assets/08-observability-recovery.png",
+      "actual_size": "1774x887",
+      "output_sha256": "8d34004d84891bf67a07b87bd618f9c4d3b87611fb9cc66cdd21fff7ea493ebd",
+      "prompt_file": "prompts/prompts.jsonl",
+      "prompt_sha256": "a1190f2b51e4d07983c7f6efa18e61e527ec8509f79610956bc7323b3922f1db",
+      "deterministic_counterpart": "../layered-architecture.svg",
+      "semantic_review": "passed",
+      "reviewed_dimensions": "1774x887",
+      "question": "How are model/tool activity, retry and process shutdown observed?",
+      "caption": "gpt-image-2 reader illustration for commit 16a676f; static-only; Observation and recovery are layered. Structured counterpart is authoritative.",
+      "evidence_ids": [
+        "S-018",
+        "S-038",
+        "S-039",
+        "S-040",
+        "S-041"
+      ],
+      "exclusions": [
+        "Tracing enabled by default",
+        "Production latency and cost distributions"
+      ],
+      "glossary": {
+        "OTel": "OpenTelemetry spans and exporters",
+        "Perfetto Trace": "Optional timing and agent-hierarchy trace",
+        "Failsafe Timer": "Bounded final-exit safeguard"
+      }
+    }
+  ],
+  "rejected": []
+}

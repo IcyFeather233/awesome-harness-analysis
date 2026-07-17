@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="860" viewBox="0 0 1600 860" role="img">
+<title>Context is a lifecycle, not one prompt</title>
+<desc>Startup instructions, durable history and per-turn deltas converge before token-pressure transforms.</desc>
+<defs>
+<marker id="arrow-observed" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#166534"/></marker>
+<marker id="arrow-experimental" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#166534"/></marker>
+<marker id="arrow-static" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+<marker id="arrow-inferred" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B45309"/></marker>
+<marker id="arrow-conflicted" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B91C1C"/></marker>
+<marker id="arrow-unknown" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+</defs>
+<style>
+text { font-family: Inter, Arial, sans-serif; letter-spacing: 0; }
+.figure-kicker { font-size: 12px; font-weight: 700; fill: #C2410C; }
+.figure-title { font-size: 28px; font-weight: 800; fill: #172033; }
+.figure-description { font-size: 14px; fill: #475569; }
+.group-label { font-size: 13px; font-weight: 700; fill: #475569; }
+.node-label { font-size: 17px; font-weight: 700; }
+.node-subtitle { font-size: 12px; }
+.edge-label { font-size: 12px; font-weight: 600; fill: #334155; }
+.badge { font-size: 11px; font-weight: 700; fill: #FFFFFF; }
+.footer { font-size: 11px; fill: #64748B; }
+</style>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="40" y="30" class="figure-kicker">ARCHITECTURE VIEW</text>
+<text x="40" y="63" class="figure-title">Context is a lifecycle, not one prompt</text>
+<text x="40" y="88" class="figure-description">Startup instructions, durable history and per-turn deltas converge before token-pressure transforms.</text>
+<g class="story-edge" data-id="c1" data-evidence="S-011" data-claims="">
+<title>c1: S-011</title>
+<polyline points="210,119 360,349" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="c2" data-evidence="S-012" data-claims="">
+<title>c2: S-012</title>
+<polyline points="210,279 360,349" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="c3" data-evidence="S-029" data-claims="">
+<title>c3: S-029</title>
+<polyline points="210,439 360,349" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="c4" data-evidence="S-013" data-claims="">
+<title>c4: S-013</title>
+<polyline points="210,599 360,349" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="c5" data-evidence="S-014" data-claims="">
+<title>c5: S-014</title>
+<polyline points="570,349 700,349" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="c6" data-evidence="S-014,S-015" data-claims="">
+<title>c6: S-014,S-015</title>
+<polyline points="880,349 1030,349" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="c7" data-evidence="S-007,S-009" data-claims="">
+<title>c7: S-007,S-009</title>
+<polyline points="1210,349 1320,539" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="c8" data-evidence="S-009,S-029" data-claims="">
+<title>c8: S-009,S-029</title>
+<polyline points="1410,500 120,478" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-node" data-id="system" data-hir="N-SystemPrompt" data-evidence="S-011" data-claims="C-006">
+<title>system: HIR N-SystemPrompt; evidence S-011</title>
+<rect x="30.0" y="80.0" width="180.0" height="78.0" rx="10" fill="#FDE7DC" stroke="#C65D35" stroke-width="3"/>
+<text x="48.0" y="111.0" class="node-label" fill="#431407">System Prompt</text>
+<rect x="133.0" y="92.0" width="65" height="24" rx="12" fill="#C65D35"/><text x="165.5" y="109.0" class="badge" text-anchor="middle">STARTUP</text>
+</g>
+<g class="story-node" data-id="claudemd" data-hir="N-ClaudeMd" data-evidence="S-012" data-claims="C-006">
+<title>claudemd: HIR N-ClaudeMd; evidence S-012</title>
+<rect x="30.0" y="240.0" width="180.0" height="78.0" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="3"/>
+<text x="48.0" y="271.0" class="node-label" fill="#172554">CLAUDE.md</text>
+<text x="48.0" y="294.0" class="node-label" fill="#172554">+ Rules</text>
+<rect x="154.0" y="252.0" width="44" height="24" rx="12" fill="#2563EB"/><text x="176.0" y="269.0" class="badge" text-anchor="middle">LAZY</text>
+</g>
+<g class="story-node" data-id="history" data-hir="N-SessionStore" data-evidence="S-029" data-claims="C-015">
+<title>history: HIR N-SessionStore; evidence S-029</title>
+<rect x="30.0" y="400.0" width="180.0" height="78.0" rx="10" fill="#DCFCE7" stroke="#15803D" stroke-width="3"/>
+<text x="48.0" y="431.0" class="node-label" fill="#14532D">History JSONL</text>
+<rect x="133.0" y="412.0" width="65" height="24" rx="12" fill="#15803D"/><text x="165.5" y="429.0" class="badge" text-anchor="middle">DURABLE</text>
+</g>
+<g class="story-node" data-id="delta" data-hir="N-Attachments" data-evidence="S-013" data-claims="C-006">
+<title>delta: HIR N-Attachments; evidence S-013</title>
+<rect x="30.0" y="560.0" width="180.0" height="78.0" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="3"/>
+<text x="48.0" y="591.0" class="node-label" fill="#172554">Runtime</text>
+<text x="48.0" y="614.0" class="node-label" fill="#172554">Attachments</text>
+<rect x="126.0" y="572.0" width="72" height="24" rx="12" fill="#2563EB"/><text x="162.0" y="589.0" class="badge" text-anchor="middle">PER TURN</text>
+</g>
+<g class="story-node" data-id="builder" data-hir="N-ContextBuilder" data-evidence="S-010,S-013" data-claims="C-006">
+<title>builder: HIR N-ContextBuilder; evidence S-010,S-013</title>
+<rect x="360.0" y="310.0" width="210.0" height="78.0" rx="10" fill="#FFF0E6" stroke="#C2410C" stroke-width="3"/>
+<text x="378.0" y="341.0" class="node-label" fill="#431407">Context Builder</text>
+</g>
+<g class="story-node" data-id="compact" data-hir="N-Compactor" data-evidence="S-014,S-015" data-claims="C-007">
+<title>compact: HIR N-Compactor; evidence S-014,S-015</title>
+<rect x="700.0" y="310.0" width="180.0" height="78.0" rx="10" fill="#FEF3C7" stroke="#B45309" stroke-width="3"/>
+<text x="718.0" y="341.0" class="node-label" fill="#451A03">Compact?</text>
+</g>
+<g class="story-node" data-id="request" data-hir="N-ModelCall" data-evidence="S-007,S-017" data-claims="C-004,C-008">
+<title>request: HIR N-ModelCall; evidence S-007,S-017</title>
+<rect x="1030.0" y="310.0" width="180.0" height="78.0" rx="10" fill="#E0F2FE" stroke="#0369A1" stroke-width="3"/>
+<text x="1048.0" y="341.0" class="node-label" fill="#0C4A6E">Model Request</text>
+</g>
+<g class="story-node" data-id="result" data-hir="N-BuiltinTools,N-Attachments" data-evidence="S-009,S-022" data-claims="C-005">
+<title>result: HIR N-BuiltinTools,N-Attachments; evidence S-009,S-022</title>
+<rect x="1320.0" y="500.0" width="180.0" height="78.0" rx="10" fill="#F3F4F6" stroke="#52525B" stroke-width="3"/>
+<text x="1338.0" y="531.0" class="node-label" fill="#18181B">Tool Result</text>
+</g>
+<text x="40" y="836" class="footer">All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise.</text>
+</svg>

@@ -28,6 +28,7 @@
 |---|---|---|---|
 | [earendil-works/pi](https://github.com/earendil-works/pi) | `v0.80.7` / `818d674` | [Pi Agent Harness 架构恢复报告](pi-harness-analysis/report/index.md) | 薄核心、强扩展、外部隔离；当前 `AgentSession` 与新 `AgentHarness` 构成一条尚未完成的迁移线 |
 | [openai/codex](https://github.com/openai/codex) | `rust-v0.144.5` / `87db9bc` | [Codex Harness 架构恢复报告](codex-harness-analysis/report/index.md) | 以 thread/session 为耐久边界、turn 为调度边界、policy+sandbox 为副作用边界；工具 exposure、world-state diff 和条件 multi-agent 是主要复杂度来源 |
+| Claude Code source snapshot | commit `16a676f`（无 tag） | [Claude Code Harness 架构恢复报告](claude-code-harness-analysis/report/index.md) | 共享 `query()` 驱动交互与 headless；source-only 快照缺失构建清单和 657 个相对 import，报告明确标为静态恢复 |
 
 Pi 分析同时提供：
 
@@ -52,6 +53,19 @@ Codex 分析同时提供：
 
 Codex 的真实 SiFlow 场景保留为兼容性负证据：该 endpoint 支持基础 Responses SSE，但当前不能直接接受 Codex 0.144.5 的 `developer` role 与 V1 `namespace` tool schema。核心 loop、tool feedback、deny、subagent 和 resume 路径因此使用受控 Responses fixture 验证，报告没有把 scripted model 伪装成真实模型成功运行。
 
+Claude Code 分析同时提供：
+
+- [接口与生命周期术语](claude-code-harness-analysis/report/02-interfaces-lifecycle.md)
+- [Context 与 compaction](claude-code-harness-analysis/report/04-context-memory-compaction.md)
+- [模型、工具与扩展](claude-code-harness-analysis/report/05-models-tools-extensions.md)
+- [权限、sandbox 与 workspace](claude-code-harness-analysis/report/06-permissions-sandbox-workspace.md)
+- [Subagent、teammate 与 mailbox](claude-code-harness-analysis/report/07-subagents-delegation.md)
+- [Session、resume/fork 与恢复](claude-code-harness-analysis/report/08-sessions-persistence-recovery.md)
+- [Harness IR](claude-code-harness-analysis/hir.json)
+- [Claims 与证据](claude-code-harness-analysis/evidence/claims.jsonl)
+
+该快照本身不能构建运行，因此没有把源码路径标成 runtime verified。用户提供的 SiFlow qwen3.6-35ba3b endpoint 已通过 Anthropic Messages、SSE 与强制 tool-use 协议探针；这证明 provider 子集可用，不代表完整 Claude Code 已成功启动。
+
 ## 后续计划
 
 后续会继续使用同一套 `harness-analysis-skill`、证据模型和可视化规范，加入更多 coding agent、通用 agent runtime、多 agent framework 和 controller/harness 项目的独立分析，也会继续加入 Pi 生态中的其他 harness 分析。
@@ -71,13 +85,21 @@ awesome-harness-analysis/
 │   ├── traces/
 │   ├── diagrams/
 │   └── report/
-└── codex-harness-analysis/
+├── codex-harness-analysis/
+│   ├── manifest.json
+│   ├── hir.json
+│   ├── evidence/
+│   ├── scenarios/
+│   ├── traces/
+│   ├── diagrams/
+│   └── report/
+└── claude-code-harness-analysis/
     ├── manifest.json
     ├── hir.json
     ├── evidence/
     ├── scenarios/
-    ├── traces/
     ├── diagrams/
+    ├── experiments/
     └── report/
 ```
 

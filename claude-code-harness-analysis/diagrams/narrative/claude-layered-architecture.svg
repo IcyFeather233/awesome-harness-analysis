@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="860" viewBox="0 0 1600 860" role="img">
+<title>Five responsibility layers around one shared loop</title>
+<desc>Interfaces and state surround a small reactive core; safety/action mediates capabilities before backend effects.</desc>
+<defs>
+<marker id="arrow-observed" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#166534"/></marker>
+<marker id="arrow-experimental" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#166534"/></marker>
+<marker id="arrow-static" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+<marker id="arrow-inferred" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B45309"/></marker>
+<marker id="arrow-conflicted" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#B91C1C"/></marker>
+<marker id="arrow-unknown" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M 0 0 L 10 4 L 0 8 z" fill="#64748B"/></marker>
+</defs>
+<style>
+text { font-family: Inter, Arial, sans-serif; letter-spacing: 0; }
+.figure-kicker { font-size: 12px; font-weight: 700; fill: #C2410C; }
+.figure-title { font-size: 28px; font-weight: 800; fill: #172033; }
+.figure-description { font-size: 14px; fill: #475569; }
+.group-label { font-size: 13px; font-weight: 700; fill: #475569; }
+.node-label { font-size: 17px; font-weight: 700; }
+.node-subtitle { font-size: 12px; }
+.edge-label { font-size: 12px; font-weight: 600; fill: #334155; }
+.badge { font-size: 11px; font-weight: 700; fill: #FFFFFF; }
+.footer { font-size: 11px; fill: #64748B; }
+</style>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="40" y="30" class="figure-kicker">ARCHITECTURE VIEW</text>
+<text x="40" y="63" class="figure-title">Five responsibility layers around one shared loop</text>
+<text x="40" y="88" class="figure-description">Interfaces and state surround a small reactive core; safety/action mediates capabilities before backend effects.</text>
+<g class="story-edge" data-id="l1" data-evidence="S-004,S-005,S-006" data-claims="">
+<title>l1: S-004,S-005,S-006</title>
+<polyline points="360,139 400,139" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="l2" data-evidence="S-014" data-claims="">
+<title>l2: S-014</title>
+<polyline points="660,139 700,139" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="l3" data-evidence="S-007,S-019,S-020" data-claims="">
+<title>l3: S-007,S-019,S-020</title>
+<polyline points="530,178 190,340" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="l4" data-evidence="S-022,S-024" data-claims="">
+<title>l4: S-022,S-024</title>
+<polyline points="320,379 360,379" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="l5" data-evidence="S-024,S-025,S-027" data-claims="">
+<title>l5: S-024,S-025,S-027</title>
+<polyline points="640,379 1040,379" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="l6" data-evidence="S-032,S-033" data-claims="">
+<title>l6: S-032,S-033</title>
+<polyline points="320,379 680,379" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="l7" data-evidence="S-010,S-013" data-claims="">
+<title>l7: S-010,S-013</title>
+<polyline points="340,609 400,139" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="l8" data-evidence="S-029" data-claims="">
+<title>l8: S-029</title>
+<polyline points="530,178 510,570" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-edge" data-id="l9" data-evidence="S-016,S-020,S-039" data-claims="">
+<title>l9: S-016,S-020,S-039</title>
+<polyline points="1310,379 1360,379" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 6" marker-end="url(#arrow-static)"/>
+</g>
+<g class="story-node" data-id="surface" data-hir="N-CLI,N-Interactive,N-Headless" data-evidence="S-002,S-003,S-004,S-005" data-claims="C-002,C-003">
+<title>surface: HIR N-CLI,N-Interactive,N-Headless; evidence S-002,S-003,S-004,S-005</title>
+<rect x="60.0" y="100.0" width="300.0" height="78.0" rx="10" fill="#FDE7DC" stroke="#C65D35" stroke-width="3"/>
+<text x="78.0" y="131.0" class="node-label" fill="#431407">Surface</text>
+<text x="78.0" y="162.0" class="node-subtitle" fill="#431407">CLI, REPL, headless, SDK</text>
+</g>
+<g class="story-node" data-id="loop" data-hir="N-QueryLoop,N-ModelCall" data-evidence="S-006,S-007,S-008" data-claims="C-003,C-004">
+<title>loop: HIR N-QueryLoop,N-ModelCall; evidence S-006,S-007,S-008</title>
+<rect x="400.0" y="100.0" width="260.0" height="78.0" rx="10" fill="#FFF0E6" stroke="#C2410C" stroke-width="3"/>
+<text x="418.0" y="131.0" class="node-label" fill="#431407">Shared Query Loop</text>
+</g>
+<g class="story-node" data-id="compact" data-hir="N-Compactor" data-evidence="S-014,S-015" data-claims="C-007">
+<title>compact: HIR N-Compactor; evidence S-014,S-015</title>
+<rect x="700.0" y="100.0" width="260.0" height="78.0" rx="10" fill="#FFF0E6" stroke="#C2410C" stroke-width="3"/>
+<text x="718.0" y="131.0" class="node-label" fill="#431407">Compaction Pipeline</text>
+<text x="718.0" y="162.0" class="node-subtitle" fill="#431407">five ordered shapers</text>
+</g>
+<g class="story-node" data-id="capability" data-hir="N-ToolRegistry,N-BuiltinTools,N-MCP,N-Skills,N-Plugins" data-evidence="S-019,S-020,S-046" data-claims="C-010,C-028">
+<title>capability: HIR N-ToolRegistry,N-BuiltinTools,N-MCP,N-Skills,N-Plugins; evidence S-019,S-020,S-046</title>
+<rect x="60.0" y="340.0" width="260.0" height="78.0" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="3"/>
+<text x="78.0" y="371.0" class="node-label" fill="#172554">Capabilities</text>
+<text x="78.0" y="402.0" class="node-subtitle" fill="#172554">tools and extensions</text>
+</g>
+<g class="story-node" data-id="governance" data-hir="N-Permission,N-Policy,N-Hooks,N-Sandbox" data-evidence="S-023,S-024,S-026,S-028" data-claims="C-012,C-013,C-014">
+<title>governance: HIR N-Permission,N-Policy,N-Hooks,N-Sandbox; evidence S-023,S-024,S-026,S-028</title>
+<rect x="360.0" y="340.0" width="280.0" height="78.0" rx="10" fill="#FEF3C7" stroke="#B45309" stroke-width="3"/>
+<text x="378.0" y="371.0" class="node-label" fill="#451A03">Safety / Action</text>
+<text x="378.0" y="402.0" class="node-subtitle" fill="#451A03">rules, hooks, sandbox</text>
+</g>
+<g class="story-node" data-id="children" data-hir="N-AgentTool,N-Subagent,N-Team" data-evidence="S-032,S-033,S-034" data-claims="C-017,C-018">
+<title>children: HIR N-AgentTool,N-Subagent,N-Team; evidence S-032,S-033,S-034</title>
+<rect x="680.0" y="340.0" width="240.0" height="78.0" rx="10" fill="#E0F2FE" stroke="#0369A1" stroke-width="3"/>
+<text x="698.0" y="371.0" class="node-label" fill="#0C4A6E">Subagents</text>
+<text x="698.0" y="402.0" class="node-subtitle" fill="#0C4A6E">recursive workers</text>
+</g>
+<g class="story-node" data-id="context" data-hir="N-ContextBuilder,N-SystemPrompt,N-ClaudeMd,N-Attachments" data-evidence="S-010,S-011,S-012,S-013" data-claims="C-006">
+<title>context: HIR N-ContextBuilder,N-SystemPrompt,N-ClaudeMd,N-Attachments; evidence S-010,S-011,S-012,S-013</title>
+<rect x="60.0" y="570.0" width="280.0" height="78.0" rx="10" fill="#DCFCE7" stroke="#15803D" stroke-width="3"/>
+<text x="78.0" y="601.0" class="node-label" fill="#14532D">Context Assembly</text>
+</g>
+<g class="story-node" data-id="durable" data-hir="N-SessionStore,N-Mailbox" data-evidence="S-029,S-037" data-claims="C-015,C-020">
+<title>durable: HIR N-SessionStore,N-Mailbox; evidence S-029,S-037</title>
+<rect x="380.0" y="570.0" width="260.0" height="78.0" rx="10" fill="#DCFCE7" stroke="#15803D" stroke-width="3"/>
+<text x="398.0" y="601.0" class="node-label" fill="#14532D">Durable State</text>
+<text x="398.0" y="632.0" class="node-subtitle" fill="#14532D">transcript and inbox</text>
+</g>
+<g class="story-node" data-id="backend" data-hir="N-Shell,N-Workspace,N-Worktree" data-evidence="S-025,S-027,S-035" data-claims="C-013,C-019">
+<title>backend: HIR N-Shell,N-Workspace,N-Worktree; evidence S-025,S-027,S-035</title>
+<rect x="1040.0" y="340.0" width="270.0" height="78.0" rx="10" fill="#F3F4F6" stroke="#52525B" stroke-width="3"/>
+<text x="1058.0" y="371.0" class="node-label" fill="#18181B">Execution Backend</text>
+<text x="1058.0" y="402.0" class="node-subtitle" fill="#18181B">host, worktree, remote</text>
+</g>
+<g class="story-node" data-id="external" data-hir="N-MCP,N-Telemetry" data-evidence="S-016,S-020,S-039" data-claims="C-008,C-021">
+<title>external: HIR N-MCP,N-Telemetry; evidence S-016,S-020,S-039</title>
+<rect x="1360.0" y="340.0" width="190.0" height="78.0" rx="10" fill="#EDE9FE" stroke="#7C3AED" stroke-width="3"/>
+<text x="1378.0" y="371.0" class="node-label" fill="#3B0764">External Resources</text>
+</g>
+<text x="40" y="836" class="footer">All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise.</text>
+</svg>

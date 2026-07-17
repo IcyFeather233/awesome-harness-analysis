@@ -1,0 +1,5159 @@
+{
+  "schema_version": "1.0",
+  "figures": [
+    {
+      "id": "claude-system-overview",
+      "title": "Claude Code: product boundary and canonical path",
+      "description": "The shared query loop connects interfaces, model calls, governed tools, context and durable state.",
+      "question": "What is the canonical runtime path and which services branch from it?",
+      "exact_text": [
+        "CLI / REPL",
+        "Live Session",
+        "Query Loop",
+        "Anthropic Messages",
+        "Tool Router",
+        "Permission Gate",
+        "Sandbox / Shell",
+        "Workspace",
+        "Context Builder",
+        "Transcript JSONL",
+        "Subagents"
+      ],
+      "exactly_once": [
+        "CLI / REPL",
+        "Live Session",
+        "Query Loop",
+        "Anthropic Messages",
+        "Tool Router",
+        "Permission Gate",
+        "Sandbox / Shell",
+        "Workspace",
+        "Context Builder",
+        "Transcript JSONL",
+        "Subagents"
+      ],
+      "glossary": {
+        "CLI / REPL": "Command-line and interactive terminal surfaces",
+        "Transcript JSONL": "Append-oriented session event log",
+        "Anthropic Messages": "Provider request/response boundary"
+      },
+      "exclusions": [
+        "Compiled feature reachability",
+        "Production frequency"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "surface",
+          "kind": "hir",
+          "hir_ids": [
+            "N-CLI",
+            "N-Interactive",
+            "N-Headless"
+          ],
+          "claim_ids": [
+            "C-002",
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-002",
+            "S-003",
+            "S-004",
+            "S-005"
+          ],
+          "label": "CLI / REPL",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 30,
+          "y": 330,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "session",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Session"
+          ],
+          "claim_ids": [
+            "C-003",
+            "C-015"
+          ],
+          "evidence_ids": [
+            "S-004",
+            "S-005",
+            "S-029"
+          ],
+          "label": "Live Session",
+          "subtitle": "",
+          "tone": "state",
+          "x": 245,
+          "y": 330,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "loop",
+          "kind": "hir",
+          "hir_ids": [
+            "N-QueryLoop"
+          ],
+          "claim_ids": [
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-006",
+            "S-007",
+            "S-008"
+          ],
+          "label": "Query Loop",
+          "subtitle": "",
+          "tone": "core",
+          "x": 460,
+          "y": 330,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "model",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ModelAdapter",
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-016",
+            "S-017"
+          ],
+          "label": "Anthropic\nMessages",
+          "subtitle": "",
+          "tone": "model",
+          "x": 675,
+          "y": 330,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "tools",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRegistry",
+            "N-ToolRouter"
+          ],
+          "claim_ids": [
+            "C-010",
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-019",
+            "S-020",
+            "S-022"
+          ],
+          "label": "Tool Router",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 890,
+          "y": 330,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "policy",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Permission",
+            "N-Policy"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-023",
+            "S-024"
+          ],
+          "label": "Permission Gate",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 1105,
+          "y": 330,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "exec",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Sandbox",
+            "N-Shell"
+          ],
+          "claim_ids": [
+            "C-013"
+          ],
+          "evidence_ids": [
+            "S-025",
+            "S-026",
+            "S-027"
+          ],
+          "label": "Sandbox / Shell",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1320,
+          "y": 330,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "workspace",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-013",
+            "C-016"
+          ],
+          "evidence_ids": [
+            "S-025",
+            "S-030"
+          ],
+          "label": "Workspace",
+          "subtitle": "",
+          "tone": "state",
+          "x": 1320,
+          "y": 520,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "context",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ContextBuilder",
+            "N-SystemPrompt",
+            "N-ClaudeMd",
+            "N-Attachments"
+          ],
+          "claim_ids": [
+            "C-006"
+          ],
+          "evidence_ids": [
+            "S-010",
+            "S-011",
+            "S-012",
+            "S-013"
+          ],
+          "label": "Context Builder",
+          "subtitle": "",
+          "tone": "state",
+          "x": 460,
+          "y": 110,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "store",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SessionStore"
+          ],
+          "claim_ids": [
+            "C-015"
+          ],
+          "evidence_ids": [
+            "S-029"
+          ],
+          "label": "Transcript JSONL",
+          "subtitle": "",
+          "tone": "state",
+          "x": 245,
+          "y": 600,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "children",
+          "kind": "hir",
+          "hir_ids": [
+            "N-AgentTool",
+            "N-Subagent",
+            "N-Team"
+          ],
+          "claim_ids": [
+            "C-017"
+          ],
+          "evidence_ids": [
+            "S-032",
+            "S-033",
+            "S-034"
+          ],
+          "label": "Subagents",
+          "subtitle": "",
+          "tone": "muted",
+          "x": 675,
+          "y": 600,
+          "width": 180,
+          "height": 78
+        }
+      ],
+      "edges": [
+        {
+          "id": "a1",
+          "source": "surface",
+          "target": "session",
+          "points": [
+            [
+              210,
+              369
+            ],
+            [
+              245,
+              369
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-004",
+            "S-005"
+          ]
+        },
+        {
+          "id": "a2",
+          "source": "session",
+          "target": "loop",
+          "points": [
+            [
+              425,
+              369
+            ],
+            [
+              460,
+              369
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-006"
+          ]
+        },
+        {
+          "id": "a3",
+          "source": "loop",
+          "target": "model",
+          "points": [
+            [
+              640,
+              369
+            ],
+            [
+              675,
+              369
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-007",
+            "S-017"
+          ]
+        },
+        {
+          "id": "a4",
+          "source": "model",
+          "target": "tools",
+          "points": [
+            [
+              855,
+              369
+            ],
+            [
+              890,
+              369
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-007",
+            "S-022"
+          ]
+        },
+        {
+          "id": "a5",
+          "source": "tools",
+          "target": "policy",
+          "points": [
+            [
+              1070,
+              369
+            ],
+            [
+              1105,
+              369
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-022",
+            "S-024"
+          ]
+        },
+        {
+          "id": "a6",
+          "source": "policy",
+          "target": "exec",
+          "points": [
+            [
+              1285,
+              369
+            ],
+            [
+              1320,
+              369
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-024",
+            "S-025"
+          ]
+        },
+        {
+          "id": "a7",
+          "source": "context",
+          "target": "loop",
+          "points": [
+            [
+              550,
+              188
+            ],
+            [
+              550,
+              330
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-006",
+            "S-010"
+          ]
+        },
+        {
+          "id": "a8",
+          "source": "session",
+          "target": "store",
+          "points": [
+            [
+              335,
+              408
+            ],
+            [
+              335,
+              600
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-029"
+          ]
+        },
+        {
+          "id": "a10",
+          "source": "exec",
+          "target": "workspace",
+          "points": [
+            [
+              1410,
+              408
+            ],
+            [
+              1410,
+              520
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-025",
+            "S-027"
+          ]
+        },
+        {
+          "id": "a9",
+          "source": "loop",
+          "target": "children",
+          "points": [
+            [
+              640,
+              369
+            ],
+            [
+              675,
+              639
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-032",
+            "S-033"
+          ]
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-turn-flow",
+      "title": "One query: model, tool and recovery loop",
+      "description": "A query may contain multiple model calls; a UI turn is therefore not the same as one API request.",
+      "question": "How does one user query iterate across multiple model requests and tool calls?",
+      "exact_text": [
+        "User Input",
+        "Build Context",
+        "Model Stream",
+        "Tool Call?",
+        "Validate",
+        "Permission",
+        "Execute Tool",
+        "Append Result",
+        "Stop",
+        "Retry / Compact"
+      ],
+      "exactly_once": [
+        "User Input",
+        "Build Context",
+        "Model Stream",
+        "Tool Call?",
+        "Validate",
+        "Permission",
+        "Execute Tool",
+        "Append Result",
+        "Stop",
+        "Retry / Compact"
+      ],
+      "glossary": {
+        "Model Stream": "One streamed API request",
+        "Tool Call?": "Decision based on tool_use blocks",
+        "Retry / Compact": "Separate provider and context-pressure recovery paths"
+      },
+      "exclusions": [
+        "Exact runtime timing",
+        "Feature-disabled recovery paths"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "input",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Interactive",
+            "N-Headless"
+          ],
+          "claim_ids": [
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-004",
+            "S-005"
+          ],
+          "label": "User Input",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 20,
+          "y": 340,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "context",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ContextBuilder",
+            "N-Compactor"
+          ],
+          "claim_ids": [
+            "C-006",
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-010",
+            "S-014"
+          ],
+          "label": "Build Context",
+          "subtitle": "",
+          "tone": "state",
+          "x": 220,
+          "y": 340,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "stream",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-004",
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-007",
+            "S-017"
+          ],
+          "label": "Model Stream",
+          "subtitle": "",
+          "tone": "model",
+          "x": 420,
+          "y": 340,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "route",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRouter"
+          ],
+          "claim_ids": [
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-007",
+            "S-008"
+          ],
+          "label": "Tool Call?",
+          "subtitle": "",
+          "tone": "core",
+          "x": 620,
+          "y": 340,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "validate",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRouter"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-022"
+          ],
+          "label": "Validate",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 820,
+          "y": 340,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "permission",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Permission"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-024"
+          ],
+          "label": "Permission",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 1020,
+          "y": 340,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "execute",
+          "kind": "hir",
+          "hir_ids": [
+            "N-BuiltinTools",
+            "N-Shell"
+          ],
+          "claim_ids": [
+            "C-011",
+            "C-013"
+          ],
+          "evidence_ids": [
+            "S-022",
+            "S-025"
+          ],
+          "label": "Execute Tool",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1220,
+          "y": 340,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "append",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Attachments",
+            "N-ContextBuilder"
+          ],
+          "claim_ids": [
+            "C-005"
+          ],
+          "evidence_ids": [
+            "S-009",
+            "S-022"
+          ],
+          "label": "Append Result",
+          "subtitle": "",
+          "tone": "state",
+          "x": 1420,
+          "y": 340,
+          "width": 150,
+          "height": 78
+        },
+        {
+          "id": "stop",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Exit"
+          ],
+          "claim_ids": [
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-008"
+          ],
+          "label": "Stop",
+          "subtitle": "",
+          "tone": "neutral",
+          "x": 650,
+          "y": 610,
+          "width": 120,
+          "height": 78
+        },
+        {
+          "id": "recover",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Recovery",
+            "N-Compactor"
+          ],
+          "claim_ids": [
+            "C-007",
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-014",
+            "S-018"
+          ],
+          "label": "Retry / Compact",
+          "subtitle": "",
+          "tone": "risk",
+          "x": 420,
+          "y": 100,
+          "width": 180,
+          "height": 78
+        }
+      ],
+      "edges": [
+        {
+          "id": "b1",
+          "source": "input",
+          "target": "context",
+          "points": [
+            [
+              200,
+              379
+            ],
+            [
+              220,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-004",
+            "S-005"
+          ]
+        },
+        {
+          "id": "b2",
+          "source": "context",
+          "target": "stream",
+          "points": [
+            [
+              400,
+              379
+            ],
+            [
+              420,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-007",
+            "S-010"
+          ]
+        },
+        {
+          "id": "b3",
+          "source": "stream",
+          "target": "route",
+          "points": [
+            [
+              600,
+              379
+            ],
+            [
+              620,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-007"
+          ]
+        },
+        {
+          "id": "b4",
+          "source": "route",
+          "target": "validate",
+          "points": [
+            [
+              800,
+              379
+            ],
+            [
+              820,
+              379
+            ]
+          ],
+          "label": "yes",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-022"
+          ],
+          "label_x": 810,
+          "label_y": 367
+        },
+        {
+          "id": "b5",
+          "source": "validate",
+          "target": "permission",
+          "points": [
+            [
+              1000,
+              379
+            ],
+            [
+              1020,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-022",
+            "S-024"
+          ]
+        },
+        {
+          "id": "b6",
+          "source": "permission",
+          "target": "execute",
+          "points": [
+            [
+              1200,
+              379
+            ],
+            [
+              1220,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-024",
+            "S-025"
+          ]
+        },
+        {
+          "id": "b7",
+          "source": "execute",
+          "target": "append",
+          "points": [
+            [
+              1400,
+              379
+            ],
+            [
+              1420,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-009",
+            "S-022"
+          ]
+        },
+        {
+          "id": "b8",
+          "source": "append",
+          "target": "context",
+          "points": [
+            [
+              1495,
+              418
+            ],
+            [
+              1495,
+              468
+            ],
+            [
+              310,
+              468
+            ],
+            [
+              310,
+              418
+            ]
+          ],
+          "label": "continue",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-008",
+            "S-009"
+          ],
+          "label_x": 902,
+          "label_y": 406
+        },
+        {
+          "id": "b9",
+          "source": "route",
+          "target": "stop",
+          "points": [
+            [
+              710,
+              418
+            ],
+            [
+              710,
+              610
+            ]
+          ],
+          "label": "no",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-008"
+          ],
+          "label_x": 710,
+          "label_y": 406
+        },
+        {
+          "id": "b10",
+          "source": "stream",
+          "target": "recover",
+          "points": [
+            [
+              510,
+              340
+            ],
+            [
+              510,
+              178
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-014",
+            "S-018"
+          ]
+        },
+        {
+          "id": "b11",
+          "source": "recover",
+          "target": "stream",
+          "points": [
+            [
+              510,
+              178
+            ],
+            [
+              510,
+              340
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-018"
+          ]
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-context-lifecycle",
+      "title": "Context is a lifecycle, not one prompt",
+      "description": "Startup instructions, durable history and per-turn deltas converge before token-pressure transforms.",
+      "question": "What reaches the model, when, and through which transformations?",
+      "exact_text": [
+        "System Prompt",
+        "CLAUDE.md + Rules",
+        "History JSONL",
+        "Runtime Attachments",
+        "Context Builder",
+        "Compact?",
+        "Model Request",
+        "Tool Result"
+      ],
+      "exactly_once": [
+        "System Prompt",
+        "CLAUDE.md + Rules",
+        "History JSONL",
+        "Runtime Attachments",
+        "Context Builder",
+        "Compact?",
+        "Model Request",
+        "Tool Result"
+      ],
+      "glossary": {
+        "CLAUDE.md": "Hierarchical project/user instruction files",
+        "History JSONL": "Durable transcript used to rebuild the live view",
+        "Runtime Attachments": "Per-turn context deltas"
+      },
+      "exclusions": [
+        "Production token thresholds",
+        "Semantic quality after compaction"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "system",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SystemPrompt"
+          ],
+          "claim_ids": [
+            "C-006"
+          ],
+          "evidence_ids": [
+            "S-011"
+          ],
+          "label": "System Prompt",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 30,
+          "y": 80,
+          "width": 180,
+          "height": 78,
+          "badge": "STARTUP"
+        },
+        {
+          "id": "claudemd",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ClaudeMd"
+          ],
+          "claim_ids": [
+            "C-006"
+          ],
+          "evidence_ids": [
+            "S-012"
+          ],
+          "label": "CLAUDE.md\n+ Rules",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 30,
+          "y": 240,
+          "width": 180,
+          "height": 78,
+          "badge": "LAZY"
+        },
+        {
+          "id": "history",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SessionStore"
+          ],
+          "claim_ids": [
+            "C-015"
+          ],
+          "evidence_ids": [
+            "S-029"
+          ],
+          "label": "History JSONL",
+          "subtitle": "",
+          "tone": "state",
+          "x": 30,
+          "y": 400,
+          "width": 180,
+          "height": 78,
+          "badge": "DURABLE"
+        },
+        {
+          "id": "delta",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Attachments"
+          ],
+          "claim_ids": [
+            "C-006"
+          ],
+          "evidence_ids": [
+            "S-013"
+          ],
+          "label": "Runtime\nAttachments",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 30,
+          "y": 560,
+          "width": 180,
+          "height": 78,
+          "badge": "PER TURN"
+        },
+        {
+          "id": "builder",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ContextBuilder"
+          ],
+          "claim_ids": [
+            "C-006"
+          ],
+          "evidence_ids": [
+            "S-010",
+            "S-013"
+          ],
+          "label": "Context Builder",
+          "subtitle": "",
+          "tone": "core",
+          "x": 360,
+          "y": 310,
+          "width": 210,
+          "height": 78
+        },
+        {
+          "id": "compact",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Compactor"
+          ],
+          "claim_ids": [
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-014",
+            "S-015"
+          ],
+          "label": "Compact?",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 700,
+          "y": 310,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "request",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-004",
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-007",
+            "S-017"
+          ],
+          "label": "Model Request",
+          "subtitle": "",
+          "tone": "model",
+          "x": 1030,
+          "y": 310,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "result",
+          "kind": "hir",
+          "hir_ids": [
+            "N-BuiltinTools",
+            "N-Attachments"
+          ],
+          "claim_ids": [
+            "C-005"
+          ],
+          "evidence_ids": [
+            "S-009",
+            "S-022"
+          ],
+          "label": "Tool Result",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1320,
+          "y": 500,
+          "width": 180,
+          "height": 78
+        }
+      ],
+      "edges": [
+        {
+          "id": "c1",
+          "source": "system",
+          "target": "builder",
+          "points": [
+            [
+              210,
+              119
+            ],
+            [
+              360,
+              349
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-011"
+          ]
+        },
+        {
+          "id": "c2",
+          "source": "claudemd",
+          "target": "builder",
+          "points": [
+            [
+              210,
+              279
+            ],
+            [
+              360,
+              349
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-012"
+          ]
+        },
+        {
+          "id": "c3",
+          "source": "history",
+          "target": "builder",
+          "points": [
+            [
+              210,
+              439
+            ],
+            [
+              360,
+              349
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-029"
+          ]
+        },
+        {
+          "id": "c4",
+          "source": "delta",
+          "target": "builder",
+          "points": [
+            [
+              210,
+              599
+            ],
+            [
+              360,
+              349
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-013"
+          ]
+        },
+        {
+          "id": "c5",
+          "source": "builder",
+          "target": "compact",
+          "points": [
+            [
+              570,
+              349
+            ],
+            [
+              700,
+              349
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-014"
+          ]
+        },
+        {
+          "id": "c6",
+          "source": "compact",
+          "target": "request",
+          "points": [
+            [
+              880,
+              349
+            ],
+            [
+              1030,
+              349
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-014",
+            "S-015"
+          ]
+        },
+        {
+          "id": "c7",
+          "source": "request",
+          "target": "result",
+          "points": [
+            [
+              1210,
+              349
+            ],
+            [
+              1320,
+              539
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-007",
+            "S-009"
+          ]
+        },
+        {
+          "id": "c8",
+          "source": "result",
+          "target": "history",
+          "points": [
+            [
+              1410,
+              500
+            ],
+            [
+              120,
+              478
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-009",
+            "S-029"
+          ]
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-tool-surface",
+      "title": "Registration, visibility and execution are different layers",
+      "description": "Plugins may contribute MCP, skills or hooks; only the current visible tool pool becomes model schemas.",
+      "question": "How do capabilities become visible model schemas and then executable actions?",
+      "exact_text": [
+        "Built-in Tools",
+        "MCP Servers",
+        "Plugins",
+        "Skills",
+        "Tool Pool",
+        "Visible Schemas",
+        "Tool Router",
+        "Permission Gate",
+        "Execution -> Tool Result"
+      ],
+      "exactly_once": [
+        "Built-in Tools",
+        "MCP Servers",
+        "Plugins",
+        "Skills",
+        "Tool Pool",
+        "Visible Schemas",
+        "Tool Router",
+        "Permission Gate",
+        "Execution -> Tool Result"
+      ],
+      "glossary": {
+        "MCP Servers": "External Model Context Protocol capability providers",
+        "Visible Schemas": "Tool definitions included in the current model request",
+        "Tool Router": "Validation, hooks, permission and dispatch path"
+      },
+      "exclusions": [
+        "All conditional tools",
+        "Runtime-enabled plugin inventory"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "builtin",
+          "kind": "hir",
+          "hir_ids": [
+            "N-BuiltinTools"
+          ],
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-019"
+          ],
+          "label": "Built-in Tools",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 20,
+          "y": 90,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "mcp",
+          "kind": "hir",
+          "hir_ids": [
+            "N-MCP"
+          ],
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-020"
+          ],
+          "label": "MCP Servers",
+          "subtitle": "",
+          "tone": "model",
+          "x": 20,
+          "y": 250,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "plugin",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Plugins"
+          ],
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-003",
+            "S-020"
+          ],
+          "label": "Plugins",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 20,
+          "y": 410,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "skills",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Skills"
+          ],
+          "claim_ids": [
+            "C-006",
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-013",
+            "S-033"
+          ],
+          "label": "Skills",
+          "subtitle": "",
+          "tone": "state",
+          "x": 20,
+          "y": 570,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "pool",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRegistry"
+          ],
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-019",
+            "S-020"
+          ],
+          "label": "Tool Pool",
+          "subtitle": "",
+          "tone": "core",
+          "x": 330,
+          "y": 250,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "schemas",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRegistry",
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-010"
+          ],
+          "evidence_ids": [
+            "S-020",
+            "S-021"
+          ],
+          "label": "Visible Schemas",
+          "subtitle": "",
+          "tone": "model",
+          "x": 600,
+          "y": 250,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "router",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRouter",
+            "N-Hooks"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-022"
+          ],
+          "label": "Tool Router",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 870,
+          "y": 250,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "gate",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Permission"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-024"
+          ],
+          "label": "Permission Gate",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 1140,
+          "y": 250,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "result",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Shell",
+            "N-Attachments"
+          ],
+          "claim_ids": [
+            "C-005",
+            "C-013"
+          ],
+          "evidence_ids": [
+            "S-009",
+            "S-025"
+          ],
+          "label": "Execution ->\nTool Result",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1390,
+          "y": 250,
+          "width": 170,
+          "height": 78
+        }
+      ],
+      "edges": [
+        {
+          "id": "d1",
+          "source": "builtin",
+          "target": "pool",
+          "points": [
+            [
+              200,
+              129
+            ],
+            [
+              330,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-019"
+          ]
+        },
+        {
+          "id": "d2",
+          "source": "mcp",
+          "target": "pool",
+          "points": [
+            [
+              200,
+              289
+            ],
+            [
+              330,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-020"
+          ]
+        },
+        {
+          "id": "d3",
+          "source": "plugin",
+          "target": "mcp",
+          "points": [
+            [
+              110,
+              410
+            ],
+            [
+              110,
+              328
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-003",
+            "S-020"
+          ]
+        },
+        {
+          "id": "d4",
+          "source": "pool",
+          "target": "schemas",
+          "points": [
+            [
+              510,
+              289
+            ],
+            [
+              600,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-020",
+            "S-021"
+          ]
+        },
+        {
+          "id": "d5",
+          "source": "schemas",
+          "target": "router",
+          "points": [
+            [
+              780,
+              289
+            ],
+            [
+              870,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-022"
+          ]
+        },
+        {
+          "id": "d6",
+          "source": "router",
+          "target": "gate",
+          "points": [
+            [
+              1050,
+              289
+            ],
+            [
+              1140,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-022",
+            "S-024"
+          ]
+        },
+        {
+          "id": "d7",
+          "source": "gate",
+          "target": "result",
+          "points": [
+            [
+              1320,
+              289
+            ],
+            [
+              1390,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-024",
+            "S-025"
+          ]
+        },
+        {
+          "id": "d8",
+          "source": "skills",
+          "target": "schemas",
+          "points": [
+            [
+              200,
+              609
+            ],
+            [
+              600,
+              289
+            ]
+          ],
+          "label": "context",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-013",
+            "S-033"
+          ],
+          "label_x": 400,
+          "label_y": 277
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-permission-pipeline",
+      "title": "Permission is a decision pipeline; sandbox is conditional",
+      "description": "The canonical tool path is source-grounded. Other side-effect surfaces remain a separate audit question.",
+      "question": "Which checks occur before a tool creates a side effect?",
+      "exact_text": [
+        "Model Tool Call",
+        "Schema Validation",
+        "Permission Rules",
+        "Ask User",
+        "Model-facing Denial",
+        "Sandbox?",
+        "Execution",
+        "Workspace / Network Effect",
+        "Hooks + Other Subsystems"
+      ],
+      "exactly_once": [
+        "Model Tool Call",
+        "Schema Validation",
+        "Permission Rules",
+        "Ask User",
+        "Model-facing Denial",
+        "Sandbox?",
+        "Execution",
+        "Workspace / Network Effect",
+        "Hooks + Other Subsystems"
+      ],
+      "glossary": {
+        "Permission Rules": "Allow, ask and deny policy plus mode constraints",
+        "Sandbox?": "Optional OS-backed execution isolation",
+        "Model-facing Denial": "A denial returned to the loop as context"
+      },
+      "exclusions": [
+        "Unproven process-wide bypass reachability",
+        "Platform-specific sandbox implementation"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "call",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-017",
+            "S-022"
+          ],
+          "label": "Model Tool Call",
+          "subtitle": "",
+          "tone": "model",
+          "x": 20,
+          "y": 320,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "validate",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRouter"
+          ],
+          "claim_ids": [
+            "C-011"
+          ],
+          "evidence_ids": [
+            "S-022"
+          ],
+          "label": "Schema\nValidation",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 230,
+          "y": 320,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "rules",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Policy",
+            "N-Permission"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-023",
+            "S-024"
+          ],
+          "label": "Permission Rules",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 440,
+          "y": 320,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "ask",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Permission",
+            "N-Interactive"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-004",
+            "S-024"
+          ],
+          "label": "Ask User",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 690,
+          "y": 100,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "deny",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Exit",
+            "N-Attachments"
+          ],
+          "claim_ids": [
+            "C-012"
+          ],
+          "evidence_ids": [
+            "S-022",
+            "S-024"
+          ],
+          "label": "Model-facing\nDenial",
+          "subtitle": "",
+          "tone": "risk",
+          "x": 690,
+          "y": 560,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "sandbox",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Sandbox"
+          ],
+          "claim_ids": [
+            "C-013"
+          ],
+          "evidence_ids": [
+            "S-026",
+            "S-027"
+          ],
+          "label": "Sandbox?",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 730,
+          "y": 320,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "exec",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Shell"
+          ],
+          "claim_ids": [
+            "C-013"
+          ],
+          "evidence_ids": [
+            "S-025",
+            "S-027"
+          ],
+          "label": "Execution",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1010,
+          "y": 320,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "effect",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-013"
+          ],
+          "evidence_ids": [
+            "S-025",
+            "S-027"
+          ],
+          "label": "Workspace /\nNetwork Effect",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1280,
+          "y": 320,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "other",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Hooks",
+            "N-CLIEntry"
+          ],
+          "claim_ids": [
+            "C-014"
+          ],
+          "evidence_ids": [
+            "S-003",
+            "S-028",
+            "I-001"
+          ],
+          "label": "Hooks + Other\nSubsystems",
+          "subtitle": "",
+          "tone": "muted",
+          "x": 1010,
+          "y": 610,
+          "width": 180,
+          "height": 78,
+          "badge": "AUDIT"
+        }
+      ],
+      "edges": [
+        {
+          "id": "p1",
+          "source": "call",
+          "target": "validate",
+          "points": [
+            [
+              200,
+              359
+            ],
+            [
+              230,
+              359
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-022"
+          ]
+        },
+        {
+          "id": "p2",
+          "source": "validate",
+          "target": "rules",
+          "points": [
+            [
+              410,
+              359
+            ],
+            [
+              440,
+              359
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-022",
+            "S-024"
+          ]
+        },
+        {
+          "id": "p3",
+          "source": "rules",
+          "target": "sandbox",
+          "points": [
+            [
+              620,
+              359
+            ],
+            [
+              730,
+              359
+            ]
+          ],
+          "label": "allow",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-024",
+            "S-026"
+          ],
+          "label_x": 675,
+          "label_y": 347
+        },
+        {
+          "id": "p4",
+          "source": "rules",
+          "target": "ask",
+          "points": [
+            [
+              620,
+              359
+            ],
+            [
+              690,
+              139
+            ]
+          ],
+          "label": "ask",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-024"
+          ],
+          "label_x": 655,
+          "label_y": 127
+        },
+        {
+          "id": "p5",
+          "source": "rules",
+          "target": "deny",
+          "points": [
+            [
+              620,
+              359
+            ],
+            [
+              690,
+              599
+            ]
+          ],
+          "label": "deny",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-024"
+          ],
+          "label_x": 655,
+          "label_y": 347
+        },
+        {
+          "id": "p6",
+          "source": "ask",
+          "target": "sandbox",
+          "points": [
+            [
+              780,
+              178
+            ],
+            [
+              820,
+              320
+            ]
+          ],
+          "label": "approved",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-024"
+          ],
+          "label_x": 800,
+          "label_y": 166
+        },
+        {
+          "id": "p7",
+          "source": "sandbox",
+          "target": "exec",
+          "points": [
+            [
+              910,
+              359
+            ],
+            [
+              1010,
+              359
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-026",
+            "S-027"
+          ]
+        },
+        {
+          "id": "p8",
+          "source": "exec",
+          "target": "effect",
+          "points": [
+            [
+              1190,
+              359
+            ],
+            [
+              1280,
+              359
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-025",
+            "S-027"
+          ]
+        },
+        {
+          "id": "p9",
+          "source": "other",
+          "target": "exec",
+          "points": [
+            [
+              1100,
+              610
+            ],
+            [
+              1100,
+              398
+            ]
+          ],
+          "label": "separate path",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-028",
+            "I-001"
+          ],
+          "label_x": 1100,
+          "label_y": 386
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-subagent-topology",
+      "title": "Claude Code has several child mechanisms, not one",
+      "description": "Agent child and swarm teammate differ in context, process backend, workspace and result channel.",
+      "question": "Which child mechanisms exist and what do they isolate or share?",
+      "exact_text": [
+        "Parent Query",
+        "AgentTool",
+        "Agent Child",
+        "Shared Workspace",
+        "Worktree Isolation",
+        "Sidechain JSONL",
+        "Swarm Teammate",
+        "Team Mailbox",
+        "Return to Parent"
+      ],
+      "exactly_once": [
+        "Parent Query",
+        "AgentTool",
+        "Agent Child",
+        "Shared Workspace",
+        "Worktree Isolation",
+        "Sidechain JSONL",
+        "Swarm Teammate",
+        "Team Mailbox",
+        "Return to Parent"
+      ],
+      "glossary": {
+        "AgentTool": "Model-callable delegation entry",
+        "Sidechain JSONL": "Child-specific durable transcript",
+        "Swarm Teammate": "Team worker with in-process or terminal-pane backend",
+        "Team Mailbox": "File-locked durable inbox"
+      },
+      "exclusions": [
+        "Observed process IDs",
+        "Runtime permission prompt propagation"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "parent",
+          "kind": "hir",
+          "hir_ids": [
+            "N-QueryLoop"
+          ],
+          "claim_ids": [
+            "C-017"
+          ],
+          "evidence_ids": [
+            "S-006",
+            "S-032"
+          ],
+          "label": "Parent Query",
+          "subtitle": "",
+          "tone": "core",
+          "x": 690,
+          "y": 40,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "agenttool",
+          "kind": "hir",
+          "hir_ids": [
+            "N-AgentTool"
+          ],
+          "claim_ids": [
+            "C-017"
+          ],
+          "evidence_ids": [
+            "S-032"
+          ],
+          "label": "AgentTool",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 690,
+          "y": 180,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "child",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Subagent"
+          ],
+          "claim_ids": [
+            "C-018"
+          ],
+          "evidence_ids": [
+            "S-032",
+            "S-033"
+          ],
+          "label": "Agent Child",
+          "subtitle": "own context + tools",
+          "tone": "model",
+          "x": 300,
+          "y": 380,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "shared",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "S-032"
+          ],
+          "label": "Shared Workspace",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 110,
+          "y": 580,
+          "width": 180,
+          "height": 78,
+          "badge": "DEFAULT"
+        },
+        {
+          "id": "worktree",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Worktree"
+          ],
+          "claim_ids": [
+            "C-019"
+          ],
+          "evidence_ids": [
+            "S-032",
+            "S-035"
+          ],
+          "label": "Worktree\nIsolation",
+          "subtitle": "",
+          "tone": "state",
+          "x": 500,
+          "y": 580,
+          "width": 180,
+          "height": 78,
+          "badge": "OPTIONAL"
+        },
+        {
+          "id": "sidechain",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SessionStore"
+          ],
+          "claim_ids": [
+            "C-015",
+            "C-018"
+          ],
+          "evidence_ids": [
+            "S-029",
+            "S-033"
+          ],
+          "label": "Sidechain JSONL",
+          "subtitle": "",
+          "tone": "state",
+          "x": 300,
+          "y": 700,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "team",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Team"
+          ],
+          "claim_ids": [
+            "C-020"
+          ],
+          "evidence_ids": [
+            "S-034",
+            "S-036"
+          ],
+          "label": "Swarm Teammate",
+          "subtitle": "in-process or pane",
+          "tone": "interface",
+          "x": 1080,
+          "y": 380,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "mailbox",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Mailbox"
+          ],
+          "claim_ids": [
+            "C-020"
+          ],
+          "evidence_ids": [
+            "S-037"
+          ],
+          "label": "Team Mailbox",
+          "subtitle": "",
+          "tone": "state",
+          "x": 1080,
+          "y": 600,
+          "width": 180,
+          "height": 78,
+          "badge": "DURABLE"
+        },
+        {
+          "id": "result",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Attachments"
+          ],
+          "claim_ids": [
+            "C-017",
+            "C-018"
+          ],
+          "evidence_ids": [
+            "S-013",
+            "S-032"
+          ],
+          "label": "Return to Parent",
+          "subtitle": "",
+          "tone": "neutral",
+          "x": 690,
+          "y": 700,
+          "width": 180,
+          "height": 78
+        }
+      ],
+      "edges": [
+        {
+          "id": "s1",
+          "source": "parent",
+          "target": "agenttool",
+          "points": [
+            [
+              780,
+              118
+            ],
+            [
+              780,
+              180
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-032"
+          ]
+        },
+        {
+          "id": "s2",
+          "source": "agenttool",
+          "target": "child",
+          "points": [
+            [
+              780,
+              258
+            ],
+            [
+              390,
+              380
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-032",
+            "S-033"
+          ]
+        },
+        {
+          "id": "s3",
+          "source": "agenttool",
+          "target": "team",
+          "points": [
+            [
+              870,
+              219
+            ],
+            [
+              1080,
+              419
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-034",
+            "S-036"
+          ]
+        },
+        {
+          "id": "s4",
+          "source": "child",
+          "target": "shared",
+          "points": [
+            [
+              390,
+              458
+            ],
+            [
+              200,
+              580
+            ]
+          ],
+          "label": "default",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-032"
+          ],
+          "label_x": 295,
+          "label_y": 446
+        },
+        {
+          "id": "s5",
+          "source": "child",
+          "target": "worktree",
+          "points": [
+            [
+              480,
+              419
+            ],
+            [
+              500,
+              619
+            ]
+          ],
+          "label": "optional",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-032",
+            "S-035"
+          ],
+          "label_x": 490,
+          "label_y": 407
+        },
+        {
+          "id": "s6",
+          "source": "child",
+          "target": "sidechain",
+          "points": [
+            [
+              390,
+              458
+            ],
+            [
+              390,
+              700
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-029",
+            "S-033"
+          ]
+        },
+        {
+          "id": "s7",
+          "source": "team",
+          "target": "mailbox",
+          "points": [
+            [
+              1170,
+              458
+            ],
+            [
+              1170,
+              600
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-037"
+          ]
+        },
+        {
+          "id": "s9",
+          "source": "child",
+          "target": "result",
+          "points": [
+            [
+              480,
+              419
+            ],
+            [
+              690,
+              739
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-032",
+            "S-033"
+          ]
+        },
+        {
+          "id": "s10",
+          "source": "team",
+          "target": "result",
+          "points": [
+            [
+              1170,
+              458
+            ],
+            [
+              780,
+              700
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-034",
+            "S-037"
+          ]
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-persistence-lifecycle",
+      "title": "Resume restores conversation state, not the filesystem",
+      "description": "JSONL history, session identity and optional worktree metadata have different persistence semantics.",
+      "question": "What becomes durable, and what do resume and fork restore?",
+      "exact_text": [
+        "Live Session",
+        "Append Messages",
+        "Transcript JSONL",
+        "Resume: Same ID",
+        "Fork: New ID",
+        "Rebuild Context",
+        "Workspace Files",
+        "Compaction Boundary",
+        "Worktree Path"
+      ],
+      "exactly_once": [
+        "Live Session",
+        "Append Messages",
+        "Transcript JSONL",
+        "Resume: Same ID",
+        "Fork: New ID",
+        "Rebuild Context",
+        "Workspace Files",
+        "Compaction Boundary",
+        "Worktree Path"
+      ],
+      "glossary": {
+        "Resume: Same ID": "Continue an existing session identity",
+        "Fork: New ID": "Copy recoverable history into a new session identity",
+        "NO ROLLBACK": "Workspace files are external to conversational restore"
+      },
+      "exclusions": [
+        "Corrupted JSONL behavior",
+        "Abrupt SIGKILL durability"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "live",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Session"
+          ],
+          "claim_ids": [
+            "C-015"
+          ],
+          "evidence_ids": [
+            "S-029"
+          ],
+          "label": "Live Session",
+          "subtitle": "",
+          "tone": "core",
+          "x": 30,
+          "y": 250,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "append",
+          "kind": "hir",
+          "hir_ids": [
+            "N-QueryLoop"
+          ],
+          "claim_ids": [
+            "C-015"
+          ],
+          "evidence_ids": [
+            "S-029"
+          ],
+          "label": "Append Messages",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 270,
+          "y": 250,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "jsonl",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SessionStore"
+          ],
+          "claim_ids": [
+            "C-015"
+          ],
+          "evidence_ids": [
+            "S-029"
+          ],
+          "label": "Transcript JSONL",
+          "subtitle": "",
+          "tone": "state",
+          "x": 510,
+          "y": 250,
+          "width": 180,
+          "height": 78,
+          "badge": "DURABLE"
+        },
+        {
+          "id": "resume",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Session"
+          ],
+          "claim_ids": [
+            "C-016"
+          ],
+          "evidence_ids": [
+            "S-030",
+            "S-031"
+          ],
+          "label": "Resume: Same ID",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 780,
+          "y": 100,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "fork",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Session"
+          ],
+          "claim_ids": [
+            "C-016"
+          ],
+          "evidence_ids": [
+            "S-030",
+            "S-031"
+          ],
+          "label": "Fork: New ID",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 780,
+          "y": 400,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "rebuild",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ContextBuilder"
+          ],
+          "claim_ids": [
+            "C-016"
+          ],
+          "evidence_ids": [
+            "S-030"
+          ],
+          "label": "Rebuild Context",
+          "subtitle": "",
+          "tone": "core",
+          "x": 1080,
+          "y": 250,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "workspace",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Workspace"
+          ],
+          "claim_ids": [
+            "C-016"
+          ],
+          "evidence_ids": [
+            "S-030",
+            "I-003"
+          ],
+          "label": "Workspace Files",
+          "subtitle": "",
+          "tone": "execution",
+          "x": 1080,
+          "y": 600,
+          "width": 180,
+          "height": 78,
+          "badge": "NO ROLLBACK"
+        },
+        {
+          "id": "compact",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Compactor"
+          ],
+          "claim_ids": [
+            "C-007",
+            "C-015"
+          ],
+          "evidence_ids": [
+            "S-015",
+            "S-029"
+          ],
+          "label": "Compaction Boundary",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 510,
+          "y": 40,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "worktree",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Worktree"
+          ],
+          "claim_ids": [
+            "C-016",
+            "C-019"
+          ],
+          "evidence_ids": [
+            "S-030",
+            "S-035"
+          ],
+          "label": "Worktree Path",
+          "subtitle": "",
+          "tone": "state",
+          "x": 1350,
+          "y": 600,
+          "width": 180,
+          "height": 78,
+          "badge": "OPTIONAL"
+        }
+      ],
+      "edges": [
+        {
+          "id": "r1",
+          "source": "live",
+          "target": "append",
+          "points": [
+            [
+              210,
+              289
+            ],
+            [
+              270,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-029"
+          ]
+        },
+        {
+          "id": "r2",
+          "source": "append",
+          "target": "jsonl",
+          "points": [
+            [
+              450,
+              289
+            ],
+            [
+              510,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-029"
+          ]
+        },
+        {
+          "id": "r3",
+          "source": "compact",
+          "target": "jsonl",
+          "points": [
+            [
+              600,
+              118
+            ],
+            [
+              600,
+              250
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-015",
+            "S-029"
+          ]
+        },
+        {
+          "id": "r4",
+          "source": "jsonl",
+          "target": "resume",
+          "points": [
+            [
+              690,
+              289
+            ],
+            [
+              780,
+              139
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-030",
+            "S-031"
+          ]
+        },
+        {
+          "id": "r5",
+          "source": "jsonl",
+          "target": "fork",
+          "points": [
+            [
+              690,
+              289
+            ],
+            [
+              780,
+              439
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-030",
+            "S-031"
+          ]
+        },
+        {
+          "id": "r6",
+          "source": "resume",
+          "target": "rebuild",
+          "points": [
+            [
+              960,
+              139
+            ],
+            [
+              1080,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-030"
+          ]
+        },
+        {
+          "id": "r7",
+          "source": "fork",
+          "target": "rebuild",
+          "points": [
+            [
+              960,
+              439
+            ],
+            [
+              1080,
+              289
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-030"
+          ]
+        },
+        {
+          "id": "r8",
+          "source": "rebuild",
+          "target": "workspace",
+          "points": [
+            [
+              1170,
+              328
+            ],
+            [
+              1170,
+              600
+            ]
+          ],
+          "label": "external state",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-030",
+            "I-003"
+          ],
+          "label_x": 1170,
+          "label_y": 316
+        },
+        {
+          "id": "r9",
+          "source": "workspace",
+          "target": "worktree",
+          "points": [
+            [
+              1260,
+              639
+            ],
+            [
+              1350,
+              639
+            ]
+          ],
+          "label": "optional",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-030",
+            "S-035"
+          ],
+          "label_x": 1305,
+          "label_y": 627
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-observability-recovery",
+      "title": "Observation and recovery are layered",
+      "description": "Tracing is optional; retry and shutdown use separate policies and time budgets.",
+      "question": "How are model/tool activity, retry and process shutdown observed?",
+      "exact_text": [
+        "Interaction Span",
+        "LLM Span",
+        "Tool Span",
+        "Events + OTel",
+        "Perfetto Trace",
+        "Model Error",
+        "Retry Policy",
+        "Retry / Fallback / Error",
+        "SIGINT / SIGTERM",
+        "Graceful Shutdown",
+        "Cleanup -> Hooks -> Exit",
+        "Failsafe Timer"
+      ],
+      "exactly_once": [
+        "Interaction Span",
+        "LLM Span",
+        "Tool Span",
+        "Events + OTel",
+        "Perfetto Trace",
+        "Model Error",
+        "Retry Policy",
+        "Retry / Fallback / Error",
+        "SIGINT / SIGTERM",
+        "Graceful Shutdown",
+        "Cleanup -> Hooks -> Exit",
+        "Failsafe Timer"
+      ],
+      "glossary": {
+        "OTel": "OpenTelemetry spans and exporters",
+        "Perfetto Trace": "Optional timing and agent-hierarchy trace",
+        "Failsafe Timer": "Bounded final-exit safeguard"
+      },
+      "exclusions": [
+        "Tracing enabled by default",
+        "Production latency and cost distributions"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "interaction",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Telemetry"
+          ],
+          "claim_ids": [
+            "C-021"
+          ],
+          "evidence_ids": [
+            "S-039"
+          ],
+          "label": "Interaction Span",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 40,
+          "y": 90,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "llm",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Telemetry",
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-021"
+          ],
+          "evidence_ids": [
+            "S-039"
+          ],
+          "label": "LLM Span",
+          "subtitle": "",
+          "tone": "model",
+          "x": 320,
+          "y": 90,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "tool",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Telemetry",
+            "N-ToolRouter"
+          ],
+          "claim_ids": [
+            "C-021"
+          ],
+          "evidence_ids": [
+            "S-039"
+          ],
+          "label": "Tool Span",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 600,
+          "y": 90,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "sinks",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Telemetry"
+          ],
+          "claim_ids": [
+            "C-021"
+          ],
+          "evidence_ids": [
+            "S-038",
+            "S-039"
+          ],
+          "label": "Events + OTel",
+          "subtitle": "",
+          "tone": "observability",
+          "x": 900,
+          "y": 90,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "perfetto",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Telemetry"
+          ],
+          "claim_ids": [
+            "C-021"
+          ],
+          "evidence_ids": [
+            "S-040"
+          ],
+          "label": "Perfetto Trace",
+          "subtitle": "",
+          "tone": "muted",
+          "x": 1200,
+          "y": 90,
+          "width": 180,
+          "height": 78,
+          "badge": "OPTIONAL"
+        },
+        {
+          "id": "error",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Recovery"
+          ],
+          "claim_ids": [
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-018"
+          ],
+          "label": "Model Error",
+          "subtitle": "",
+          "tone": "risk",
+          "x": 40,
+          "y": 350,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "retry",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Recovery"
+          ],
+          "claim_ids": [
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-018"
+          ],
+          "label": "Retry Policy",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 320,
+          "y": 350,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "outcome",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Recovery",
+            "N-Exit"
+          ],
+          "claim_ids": [
+            "C-008"
+          ],
+          "evidence_ids": [
+            "S-018"
+          ],
+          "label": "Retry / Fallback / Error",
+          "subtitle": "",
+          "tone": "core",
+          "x": 620,
+          "y": 350,
+          "width": 220,
+          "height": 78
+        },
+        {
+          "id": "signal",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Exit"
+          ],
+          "claim_ids": [
+            "C-022"
+          ],
+          "evidence_ids": [
+            "S-041"
+          ],
+          "label": "SIGINT / SIGTERM",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 40,
+          "y": 620,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "shutdown",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Recovery"
+          ],
+          "claim_ids": [
+            "C-022"
+          ],
+          "evidence_ids": [
+            "S-041"
+          ],
+          "label": "Graceful Shutdown",
+          "subtitle": "",
+          "tone": "core",
+          "x": 340,
+          "y": 620,
+          "width": 180,
+          "height": 78
+        },
+        {
+          "id": "cleanup",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SessionStore",
+            "N-Hooks",
+            "N-Telemetry",
+            "N-Exit"
+          ],
+          "claim_ids": [
+            "C-022"
+          ],
+          "evidence_ids": [
+            "S-041"
+          ],
+          "label": "Cleanup -> Hooks -> Exit",
+          "subtitle": "",
+          "tone": "state",
+          "x": 700,
+          "y": 620,
+          "width": 260,
+          "height": 78
+        },
+        {
+          "id": "failsafe",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Recovery"
+          ],
+          "claim_ids": [
+            "C-022"
+          ],
+          "evidence_ids": [
+            "S-041"
+          ],
+          "label": "Failsafe Timer",
+          "subtitle": "",
+          "tone": "risk",
+          "x": 1080,
+          "y": 620,
+          "width": 180,
+          "height": 78
+        }
+      ],
+      "edges": [
+        {
+          "id": "o1",
+          "source": "interaction",
+          "target": "llm",
+          "points": [
+            [
+              220,
+              129
+            ],
+            [
+              320,
+              129
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-039"
+          ]
+        },
+        {
+          "id": "o2",
+          "source": "llm",
+          "target": "tool",
+          "points": [
+            [
+              500,
+              129
+            ],
+            [
+              600,
+              129
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-039"
+          ]
+        },
+        {
+          "id": "o3",
+          "source": "tool",
+          "target": "sinks",
+          "points": [
+            [
+              780,
+              129
+            ],
+            [
+              900,
+              129
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-038",
+            "S-039"
+          ]
+        },
+        {
+          "id": "o4",
+          "source": "sinks",
+          "target": "perfetto",
+          "points": [
+            [
+              1080,
+              129
+            ],
+            [
+              1200,
+              129
+            ]
+          ],
+          "label": "optional",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-040"
+          ],
+          "label_x": 1140,
+          "label_y": 117
+        },
+        {
+          "id": "o5",
+          "source": "error",
+          "target": "retry",
+          "points": [
+            [
+              220,
+              389
+            ],
+            [
+              320,
+              389
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-018"
+          ]
+        },
+        {
+          "id": "o6",
+          "source": "retry",
+          "target": "outcome",
+          "points": [
+            [
+              500,
+              389
+            ],
+            [
+              620,
+              389
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-018"
+          ]
+        },
+        {
+          "id": "o7",
+          "source": "signal",
+          "target": "shutdown",
+          "points": [
+            [
+              220,
+              659
+            ],
+            [
+              340,
+              659
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-041"
+          ]
+        },
+        {
+          "id": "o8",
+          "source": "shutdown",
+          "target": "cleanup",
+          "points": [
+            [
+              520,
+              659
+            ],
+            [
+              700,
+              659
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-041"
+          ]
+        },
+        {
+          "id": "o9",
+          "source": "cleanup",
+          "target": "failsafe",
+          "points": [
+            [
+              960,
+              659
+            ],
+            [
+              1080,
+              659
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-041"
+          ]
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-layered-architecture",
+      "title": "Five responsibility layers around one shared loop",
+      "description": "Interfaces and state surround a small reactive core; safety/action mediates capabilities before backend effects.",
+      "question": "How do surface, core, safety/action, state and backend responsibilities depend on one another?",
+      "exact_text": [
+        "Surface",
+        "Shared Query Loop",
+        "Compaction Pipeline",
+        "Capabilities",
+        "Safety / Action",
+        "Subagents",
+        "Context Assembly",
+        "Durable State",
+        "Execution Backend",
+        "External Resources"
+      ],
+      "exactly_once": [
+        "Surface",
+        "Shared Query Loop",
+        "Compaction Pipeline",
+        "Capabilities",
+        "Safety / Action",
+        "Subagents",
+        "Context Assembly",
+        "Durable State",
+        "Execution Backend",
+        "External Resources"
+      ],
+      "glossary": {
+        "Surface": "Entrypoints and rendering",
+        "Core": "Shared query loop and context pressure management",
+        "Safety / Action": "Capabilities, policy and execution mediation",
+        "State": "Context, runtime and durable records",
+        "Backend": "Host, remote and external resources"
+      },
+      "exclusions": [
+        "Strict acyclic layering",
+        "Compiled feature reachability"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "surface",
+          "kind": "hir",
+          "hir_ids": [
+            "N-CLI",
+            "N-Interactive",
+            "N-Headless"
+          ],
+          "claim_ids": [
+            "C-002",
+            "C-003"
+          ],
+          "evidence_ids": [
+            "S-002",
+            "S-003",
+            "S-004",
+            "S-005"
+          ],
+          "label": "Surface",
+          "subtitle": "CLI, REPL, headless, SDK",
+          "tone": "interface",
+          "x": 60,
+          "y": 100,
+          "width": 300,
+          "height": 78
+        },
+        {
+          "id": "loop",
+          "kind": "hir",
+          "hir_ids": [
+            "N-QueryLoop",
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-003",
+            "C-004"
+          ],
+          "evidence_ids": [
+            "S-006",
+            "S-007",
+            "S-008"
+          ],
+          "label": "Shared Query Loop",
+          "subtitle": "",
+          "tone": "core",
+          "x": 400,
+          "y": 100,
+          "width": 260,
+          "height": 78
+        },
+        {
+          "id": "compact",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Compactor"
+          ],
+          "claim_ids": [
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-014",
+            "S-015"
+          ],
+          "label": "Compaction Pipeline",
+          "subtitle": "five ordered shapers",
+          "tone": "core",
+          "x": 700,
+          "y": 100,
+          "width": 260,
+          "height": 78
+        },
+        {
+          "id": "capability",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRegistry",
+            "N-BuiltinTools",
+            "N-MCP",
+            "N-Skills",
+            "N-Plugins"
+          ],
+          "claim_ids": [
+            "C-010",
+            "C-028"
+          ],
+          "evidence_ids": [
+            "S-019",
+            "S-020",
+            "S-046"
+          ],
+          "label": "Capabilities",
+          "subtitle": "tools and extensions",
+          "tone": "capability",
+          "x": 60,
+          "y": 340,
+          "width": 260,
+          "height": 78
+        },
+        {
+          "id": "governance",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Permission",
+            "N-Policy",
+            "N-Hooks",
+            "N-Sandbox"
+          ],
+          "claim_ids": [
+            "C-012",
+            "C-013",
+            "C-014"
+          ],
+          "evidence_ids": [
+            "S-023",
+            "S-024",
+            "S-026",
+            "S-028"
+          ],
+          "label": "Safety / Action",
+          "subtitle": "rules, hooks, sandbox",
+          "tone": "policy",
+          "x": 360,
+          "y": 340,
+          "width": 280,
+          "height": 78
+        },
+        {
+          "id": "children",
+          "kind": "hir",
+          "hir_ids": [
+            "N-AgentTool",
+            "N-Subagent",
+            "N-Team"
+          ],
+          "claim_ids": [
+            "C-017",
+            "C-018"
+          ],
+          "evidence_ids": [
+            "S-032",
+            "S-033",
+            "S-034"
+          ],
+          "label": "Subagents",
+          "subtitle": "recursive workers",
+          "tone": "model",
+          "x": 680,
+          "y": 340,
+          "width": 240,
+          "height": 78
+        },
+        {
+          "id": "context",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ContextBuilder",
+            "N-SystemPrompt",
+            "N-ClaudeMd",
+            "N-Attachments"
+          ],
+          "claim_ids": [
+            "C-006"
+          ],
+          "evidence_ids": [
+            "S-010",
+            "S-011",
+            "S-012",
+            "S-013"
+          ],
+          "label": "Context Assembly",
+          "subtitle": "",
+          "tone": "state",
+          "x": 60,
+          "y": 570,
+          "width": 280,
+          "height": 78
+        },
+        {
+          "id": "durable",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SessionStore",
+            "N-Mailbox"
+          ],
+          "claim_ids": [
+            "C-015",
+            "C-020"
+          ],
+          "evidence_ids": [
+            "S-029",
+            "S-037"
+          ],
+          "label": "Durable State",
+          "subtitle": "transcript and inbox",
+          "tone": "state",
+          "x": 380,
+          "y": 570,
+          "width": 260,
+          "height": 78
+        },
+        {
+          "id": "backend",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Shell",
+            "N-Workspace",
+            "N-Worktree"
+          ],
+          "claim_ids": [
+            "C-013",
+            "C-019"
+          ],
+          "evidence_ids": [
+            "S-025",
+            "S-027",
+            "S-035"
+          ],
+          "label": "Execution Backend",
+          "subtitle": "host, worktree, remote",
+          "tone": "execution",
+          "x": 1040,
+          "y": 340,
+          "width": 270,
+          "height": 78
+        },
+        {
+          "id": "external",
+          "kind": "hir",
+          "hir_ids": [
+            "N-MCP",
+            "N-Telemetry"
+          ],
+          "claim_ids": [
+            "C-008",
+            "C-021"
+          ],
+          "evidence_ids": [
+            "S-016",
+            "S-020",
+            "S-039"
+          ],
+          "label": "External Resources",
+          "subtitle": "",
+          "tone": "observability",
+          "x": 1360,
+          "y": 340,
+          "width": 190,
+          "height": 78
+        }
+      ],
+      "edges": [
+        {
+          "id": "l1",
+          "source": "surface",
+          "target": "loop",
+          "points": [
+            [
+              360,
+              139
+            ],
+            [
+              400,
+              139
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-004",
+            "S-005",
+            "S-006"
+          ]
+        },
+        {
+          "id": "l2",
+          "source": "loop",
+          "target": "compact",
+          "points": [
+            [
+              660,
+              139
+            ],
+            [
+              700,
+              139
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-014"
+          ]
+        },
+        {
+          "id": "l3",
+          "source": "loop",
+          "target": "capability",
+          "points": [
+            [
+              530,
+              178
+            ],
+            [
+              190,
+              340
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-007",
+            "S-019",
+            "S-020"
+          ]
+        },
+        {
+          "id": "l4",
+          "source": "capability",
+          "target": "governance",
+          "points": [
+            [
+              320,
+              379
+            ],
+            [
+              360,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-022",
+            "S-024"
+          ]
+        },
+        {
+          "id": "l5",
+          "source": "governance",
+          "target": "backend",
+          "points": [
+            [
+              640,
+              379
+            ],
+            [
+              1040,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-024",
+            "S-025",
+            "S-027"
+          ]
+        },
+        {
+          "id": "l6",
+          "source": "capability",
+          "target": "children",
+          "points": [
+            [
+              320,
+              379
+            ],
+            [
+              680,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-032",
+            "S-033"
+          ]
+        },
+        {
+          "id": "l7",
+          "source": "context",
+          "target": "loop",
+          "points": [
+            [
+              340,
+              609
+            ],
+            [
+              400,
+              139
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-010",
+            "S-013"
+          ]
+        },
+        {
+          "id": "l8",
+          "source": "loop",
+          "target": "durable",
+          "points": [
+            [
+              530,
+              178
+            ],
+            [
+              510,
+              570
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-029"
+          ]
+        },
+        {
+          "id": "l9",
+          "source": "backend",
+          "target": "external",
+          "points": [
+            [
+              1310,
+              379
+            ],
+            [
+              1360,
+              379
+            ]
+          ],
+          "label": "",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-016",
+            "S-020",
+            "S-039"
+          ]
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-extension-injection",
+      "title": "Four extension mechanisms, three runtime injection points",
+      "description": "Plugins package components; skills shape context, MCP expands callable tools, and hooks intercept lifecycle boundaries.",
+      "question": "Where does each extension mechanism enter the loop?",
+      "exact_text": [
+        "ASSEMBLE",
+        "MODEL SURFACE",
+        "AUTHORIZE / EXECUTE",
+        "Plugins",
+        "Skills",
+        "MCP Servers",
+        "Hooks"
+      ],
+      "exactly_once": [
+        "ASSEMBLE",
+        "MODEL SURFACE",
+        "AUTHORIZE / EXECUTE",
+        "Plugins",
+        "Skills",
+        "MCP Servers",
+        "Hooks"
+      ],
+      "glossary": {
+        "ASSEMBLE": "What the model sees",
+        "MODEL SURFACE": "What actions the model can request",
+        "AUTHORIZE / EXECUTE": "Whether and how an action runs",
+        "Context Cost": "Prompt-window footprint when active"
+      },
+      "exclusions": [
+        "Installed plugin inventory",
+        "Exact production context cost"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "assemble",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ContextBuilder"
+          ],
+          "claim_ids": [
+            "C-006",
+            "C-028"
+          ],
+          "evidence_ids": [
+            "S-010",
+            "S-013"
+          ],
+          "label": "ASSEMBLE",
+          "subtitle": "what the model sees",
+          "tone": "state",
+          "x": 460,
+          "y": 110,
+          "width": 240,
+          "height": 78
+        },
+        {
+          "id": "model",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRegistry",
+            "N-ModelCall"
+          ],
+          "claim_ids": [
+            "C-010",
+            "C-028"
+          ],
+          "evidence_ids": [
+            "S-019",
+            "S-020",
+            "S-021"
+          ],
+          "label": "MODEL SURFACE",
+          "subtitle": "what it can call",
+          "tone": "model",
+          "x": 460,
+          "y": 350,
+          "width": 240,
+          "height": 78
+        },
+        {
+          "id": "execute",
+          "kind": "hir",
+          "hir_ids": [
+            "N-ToolRouter",
+            "N-Permission",
+            "N-Shell"
+          ],
+          "claim_ids": [
+            "C-011",
+            "C-012",
+            "C-028"
+          ],
+          "evidence_ids": [
+            "S-022",
+            "S-024",
+            "S-025"
+          ],
+          "label": "AUTHORIZE / EXECUTE",
+          "subtitle": "whether and how it runs",
+          "tone": "policy",
+          "x": 460,
+          "y": 590,
+          "width": 280,
+          "height": 78
+        },
+        {
+          "id": "plugins",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Plugins"
+          ],
+          "claim_ids": [
+            "C-028"
+          ],
+          "evidence_ids": [
+            "S-046"
+          ],
+          "label": "Plugins",
+          "subtitle": "packaging",
+          "tone": "interface",
+          "x": 40,
+          "y": 350,
+          "width": 200,
+          "height": 78
+        },
+        {
+          "id": "skills",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Skills"
+          ],
+          "claim_ids": [
+            "C-028"
+          ],
+          "evidence_ids": [
+            "S-013"
+          ],
+          "label": "Skills",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 1020,
+          "y": 110,
+          "width": 220,
+          "height": 78,
+          "badge": "LOW CONTEXT"
+        },
+        {
+          "id": "mcp",
+          "kind": "hir",
+          "hir_ids": [
+            "N-MCP"
+          ],
+          "claim_ids": [
+            "C-028"
+          ],
+          "evidence_ids": [
+            "S-020"
+          ],
+          "label": "MCP Servers",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 1020,
+          "y": 350,
+          "width": 220,
+          "height": 78,
+          "badge": "SCHEMA COST"
+        },
+        {
+          "id": "hooks",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Hooks"
+          ],
+          "claim_ids": [
+            "C-028"
+          ],
+          "evidence_ids": [
+            "S-028",
+            "S-043"
+          ],
+          "label": "Hooks",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 1020,
+          "y": 590,
+          "width": 220,
+          "height": 78,
+          "badge": "EVENT DRIVEN"
+        }
+      ],
+      "edges": [
+        {
+          "id": "x1",
+          "source": "skills",
+          "target": "assemble",
+          "points": [
+            [
+              1130,
+              188
+            ],
+            [
+              1130,
+              238
+            ],
+            [
+              580,
+              238
+            ],
+            [
+              580,
+              188
+            ]
+          ],
+          "label": "instructions",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-013"
+          ],
+          "label_x": 855,
+          "label_y": 176
+        },
+        {
+          "id": "x2",
+          "source": "mcp",
+          "target": "model",
+          "points": [
+            [
+              1130,
+              428
+            ],
+            [
+              1130,
+              478
+            ],
+            [
+              580,
+              478
+            ],
+            [
+              580,
+              428
+            ]
+          ],
+          "label": "tools",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-020"
+          ],
+          "label_x": 855,
+          "label_y": 416
+        },
+        {
+          "id": "x3",
+          "source": "hooks",
+          "target": "execute",
+          "points": [
+            [
+              1130,
+              668
+            ],
+            [
+              1130,
+              718
+            ],
+            [
+              600,
+              718
+            ],
+            [
+              600,
+              668
+            ]
+          ],
+          "label": "pre / post",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-022",
+            "S-028",
+            "S-043"
+          ],
+          "label_x": 865,
+          "label_y": 656
+        },
+        {
+          "id": "x4",
+          "source": "hooks",
+          "target": "assemble",
+          "points": [
+            [
+              1130,
+              590
+            ],
+            [
+              580,
+              188
+            ]
+          ],
+          "label": "context",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-028",
+            "S-043"
+          ],
+          "label_x": 855,
+          "label_y": 176
+        },
+        {
+          "id": "x5",
+          "source": "plugins",
+          "target": "skills",
+          "points": [
+            [
+              240,
+              389
+            ],
+            [
+              1020,
+              149
+            ]
+          ],
+          "label": "packages",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-046"
+          ],
+          "label_x": 630,
+          "label_y": 137
+        },
+        {
+          "id": "x6",
+          "source": "plugins",
+          "target": "mcp",
+          "points": [
+            [
+              240,
+              389
+            ],
+            [
+              1020,
+              389
+            ]
+          ],
+          "label": "packages",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-046"
+          ],
+          "label_x": 630,
+          "label_y": 377
+        },
+        {
+          "id": "x7",
+          "source": "plugins",
+          "target": "hooks",
+          "points": [
+            [
+              240,
+              389
+            ],
+            [
+              1020,
+              629
+            ]
+          ],
+          "label": "packages",
+          "status": "static",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-043",
+            "S-046"
+          ],
+          "label_x": 630,
+          "label_y": 377
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    },
+    {
+      "id": "claude-values-mechanisms",
+      "title": "Documented product stances, analyst principles, source mechanisms",
+      "description": "The middle column is synthesis, not an official Anthropic taxonomy; source mechanisms remain independently verifiable.",
+      "question": "How do first-party product stances map through analyst principles to implementation mechanisms?",
+      "exact_text": [
+        "Human Authority",
+        "Safety & Privacy",
+        "Reliable Execution",
+        "Capability Amplification",
+        "Context Adaptability",
+        "Deny-first & Graduated Trust",
+        "Defense in Depth",
+        "Progressive Context",
+        "Composable Extensions",
+        "Append-only & Isolated Work",
+        "Rules + Re-approval",
+        "Permission + Sandbox",
+        "Five-stage Compaction",
+        "MCP + Plugins + Skills + Hooks",
+        "JSONL + Sidechains + Worktrees"
+      ],
+      "exactly_once": [
+        "Human Authority",
+        "Safety & Privacy",
+        "Reliable Execution",
+        "Capability Amplification",
+        "Context Adaptability",
+        "Deny-first & Graduated Trust",
+        "Defense in Depth",
+        "Progressive Context",
+        "Composable Extensions",
+        "Append-only & Isolated Work",
+        "Rules + Re-approval",
+        "Permission + Sandbox",
+        "Five-stage Compaction",
+        "MCP + Plugins + Skills + Hooks",
+        "JSONL + Sidechains + Worktrees"
+      ],
+      "glossary": {
+        "Product Stance": "First-party documented objective or constraint",
+        "Analyst Principle": "Normalized interpretation, not official taxonomy",
+        "Mechanism": "Source-grounded implementation choice"
+      },
+      "exclusions": [
+        "Causal proof of author motivation",
+        "Cross-project universality"
+      ],
+      "width": 1600,
+      "height": 860,
+      "nodes": [
+        {
+          "id": "v1",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024"
+          ],
+          "evidence_ids": [
+            "D-001",
+            "D-008"
+          ],
+          "label": "Human Authority",
+          "subtitle": "",
+          "tone": "interface",
+          "x": 30,
+          "y": 90,
+          "width": 210,
+          "height": 78
+        },
+        {
+          "id": "v2",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024"
+          ],
+          "evidence_ids": [
+            "D-001",
+            "D-003",
+            "D-004"
+          ],
+          "label": "Safety & Privacy",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 30,
+          "y": 230,
+          "width": 210,
+          "height": 78
+        },
+        {
+          "id": "v3",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024"
+          ],
+          "evidence_ids": [
+            "D-002",
+            "D-005"
+          ],
+          "label": "Reliable Execution",
+          "subtitle": "",
+          "tone": "core",
+          "x": 30,
+          "y": 370,
+          "width": 210,
+          "height": 78
+        },
+        {
+          "id": "v4",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024"
+          ],
+          "evidence_ids": [
+            "D-002",
+            "D-005"
+          ],
+          "label": "Capability Amplification",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 30,
+          "y": 510,
+          "width": 210,
+          "height": 78
+        },
+        {
+          "id": "v5",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024"
+          ],
+          "evidence_ids": [
+            "D-005",
+            "D-006",
+            "D-007"
+          ],
+          "label": "Context Adaptability",
+          "subtitle": "",
+          "tone": "state",
+          "x": 30,
+          "y": 650,
+          "width": 210,
+          "height": 78
+        },
+        {
+          "id": "p1",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024",
+            "C-027"
+          ],
+          "evidence_ids": [
+            "D-001",
+            "D-003",
+            "I-003",
+            "I-005"
+          ],
+          "label": "Deny-first &\nGraduated Trust",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 500,
+          "y": 90,
+          "width": 240,
+          "height": 78,
+          "badge": "ANALYST"
+        },
+        {
+          "id": "p2",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024",
+            "C-027"
+          ],
+          "evidence_ids": [
+            "D-003",
+            "D-004",
+            "I-003",
+            "I-005"
+          ],
+          "label": "Defense in Depth",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 500,
+          "y": 230,
+          "width": 240,
+          "height": 78,
+          "badge": "ANALYST"
+        },
+        {
+          "id": "p3",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024",
+            "C-027"
+          ],
+          "evidence_ids": [
+            "D-005",
+            "I-003",
+            "I-005"
+          ],
+          "label": "Progressive Context",
+          "subtitle": "",
+          "tone": "core",
+          "x": 500,
+          "y": 370,
+          "width": 240,
+          "height": 78,
+          "badge": "ANALYST"
+        },
+        {
+          "id": "p4",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024",
+            "C-027",
+            "C-028"
+          ],
+          "evidence_ids": [
+            "D-005",
+            "D-006",
+            "I-003",
+            "I-005"
+          ],
+          "label": "Composable Extensions",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 500,
+          "y": 510,
+          "width": 240,
+          "height": 78,
+          "badge": "ANALYST"
+        },
+        {
+          "id": "p5",
+          "kind": "concept",
+          "hir_ids": [],
+          "claim_ids": [
+            "C-024",
+            "C-027"
+          ],
+          "evidence_ids": [
+            "D-005",
+            "D-007",
+            "I-003",
+            "I-005"
+          ],
+          "label": "Append-only &\nIsolated Work",
+          "subtitle": "",
+          "tone": "state",
+          "x": 500,
+          "y": 650,
+          "width": 240,
+          "height": 78,
+          "badge": "ANALYST"
+        },
+        {
+          "id": "m1",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Policy",
+            "N-Permission"
+          ],
+          "claim_ids": [
+            "C-012",
+            "C-029"
+          ],
+          "evidence_ids": [
+            "S-023",
+            "S-024",
+            "S-044"
+          ],
+          "label": "Rules + Re-approval",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 1060,
+          "y": 90,
+          "width": 260,
+          "height": 78
+        },
+        {
+          "id": "m2",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Permission",
+            "N-Sandbox",
+            "N-Hooks"
+          ],
+          "claim_ids": [
+            "C-012",
+            "C-013"
+          ],
+          "evidence_ids": [
+            "S-024",
+            "S-026",
+            "S-043"
+          ],
+          "label": "Permission + Sandbox",
+          "subtitle": "",
+          "tone": "policy",
+          "x": 1060,
+          "y": 230,
+          "width": 260,
+          "height": 78
+        },
+        {
+          "id": "m3",
+          "kind": "hir",
+          "hir_ids": [
+            "N-Compactor",
+            "N-ContextBuilder"
+          ],
+          "claim_ids": [
+            "C-006",
+            "C-007"
+          ],
+          "evidence_ids": [
+            "S-014",
+            "S-015"
+          ],
+          "label": "Five-stage Compaction",
+          "subtitle": "",
+          "tone": "core",
+          "x": 1060,
+          "y": 370,
+          "width": 260,
+          "height": 78
+        },
+        {
+          "id": "m4",
+          "kind": "hir",
+          "hir_ids": [
+            "N-MCP",
+            "N-Plugins",
+            "N-Skills",
+            "N-Hooks"
+          ],
+          "claim_ids": [
+            "C-028"
+          ],
+          "evidence_ids": [
+            "S-020",
+            "S-043",
+            "S-046"
+          ],
+          "label": "MCP + Plugins +\nSkills + Hooks",
+          "subtitle": "",
+          "tone": "capability",
+          "x": 1060,
+          "y": 510,
+          "width": 260,
+          "height": 78
+        },
+        {
+          "id": "m5",
+          "kind": "hir",
+          "hir_ids": [
+            "N-SessionStore",
+            "N-Subagent",
+            "N-Worktree"
+          ],
+          "claim_ids": [
+            "C-015",
+            "C-018",
+            "C-019"
+          ],
+          "evidence_ids": [
+            "S-029",
+            "S-033",
+            "S-035"
+          ],
+          "label": "JSONL + Sidechains +\nWorktrees",
+          "subtitle": "",
+          "tone": "state",
+          "x": 1060,
+          "y": 650,
+          "width": 260,
+          "height": 78
+        }
+      ],
+      "edges": [
+        {
+          "id": "v1p1",
+          "source": "v1",
+          "target": "p1",
+          "points": [
+            [
+              240,
+              129
+            ],
+            [
+              500,
+              129
+            ]
+          ],
+          "label": "supports",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "D-001",
+            "D-008",
+            "I-003"
+          ],
+          "label_x": 370,
+          "label_y": 117
+        },
+        {
+          "id": "p1m1",
+          "source": "p1",
+          "target": "m1",
+          "points": [
+            [
+              740,
+              129
+            ],
+            [
+              1060,
+              129
+            ]
+          ],
+          "label": "implemented as",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-023",
+            "S-024",
+            "S-044",
+            "I-005"
+          ],
+          "label_x": 900,
+          "label_y": 117
+        },
+        {
+          "id": "v2p2",
+          "source": "v2",
+          "target": "p2",
+          "points": [
+            [
+              240,
+              269
+            ],
+            [
+              500,
+              269
+            ]
+          ],
+          "label": "supports",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "D-003",
+            "D-004",
+            "I-003"
+          ],
+          "label_x": 370,
+          "label_y": 257
+        },
+        {
+          "id": "p2m2",
+          "source": "p2",
+          "target": "m2",
+          "points": [
+            [
+              740,
+              269
+            ],
+            [
+              1060,
+              269
+            ]
+          ],
+          "label": "implemented as",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-024",
+            "S-026",
+            "S-043",
+            "I-005"
+          ],
+          "label_x": 900,
+          "label_y": 257
+        },
+        {
+          "id": "v3p3",
+          "source": "v3",
+          "target": "p3",
+          "points": [
+            [
+              240,
+              409
+            ],
+            [
+              500,
+              409
+            ]
+          ],
+          "label": "supports",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "D-002",
+            "D-005",
+            "I-003"
+          ],
+          "label_x": 370,
+          "label_y": 397
+        },
+        {
+          "id": "p3m3",
+          "source": "p3",
+          "target": "m3",
+          "points": [
+            [
+              740,
+              409
+            ],
+            [
+              1060,
+              409
+            ]
+          ],
+          "label": "implemented as",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-014",
+            "S-015",
+            "I-005"
+          ],
+          "label_x": 900,
+          "label_y": 397
+        },
+        {
+          "id": "v4p4",
+          "source": "v4",
+          "target": "p4",
+          "points": [
+            [
+              240,
+              549
+            ],
+            [
+              500,
+              549
+            ]
+          ],
+          "label": "supports",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "D-002",
+            "D-005",
+            "I-003"
+          ],
+          "label_x": 370,
+          "label_y": 537
+        },
+        {
+          "id": "p4m4",
+          "source": "p4",
+          "target": "m4",
+          "points": [
+            [
+              740,
+              549
+            ],
+            [
+              1060,
+              549
+            ]
+          ],
+          "label": "implemented as",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-020",
+            "S-043",
+            "S-046",
+            "I-005"
+          ],
+          "label_x": 900,
+          "label_y": 537
+        },
+        {
+          "id": "v5p5",
+          "source": "v5",
+          "target": "p5",
+          "points": [
+            [
+              240,
+              689
+            ],
+            [
+              500,
+              689
+            ]
+          ],
+          "label": "supports",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "D-005",
+            "D-006",
+            "D-007",
+            "I-003"
+          ],
+          "label_x": 370,
+          "label_y": 677
+        },
+        {
+          "id": "p5m5",
+          "source": "p5",
+          "target": "m5",
+          "points": [
+            [
+              740,
+              689
+            ],
+            [
+              1060,
+              689
+            ]
+          ],
+          "label": "implemented as",
+          "status": "inferred",
+          "claim_ids": [],
+          "evidence_ids": [
+            "S-029",
+            "S-033",
+            "S-035",
+            "I-005"
+          ],
+          "label_x": 900,
+          "label_y": 677
+        }
+      ],
+      "footer": "All architecture edges are static-only at commit 16a676f unless explicitly marked otherwise."
+    }
+  ]
+}
