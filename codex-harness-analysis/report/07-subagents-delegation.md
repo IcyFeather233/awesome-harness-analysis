@@ -30,6 +30,17 @@
 
 默认配置中 V1 `multi_agent` 开启，V2 关闭；默认最大 child threads 为 6，V2 并发 session 为 4，深度为 1。[源码](https://github.com/openai/codex/blob/87db9bc18ba5bc82c1cb4e4381b44f693ee35623/codex-rs/core/src/config/mod.rs#L203) [S: `S-015`] 这些数字是版本/配置条件，不应画成 harness 的普遍常数。
 
+## 继承与隔离矩阵
+
+| 维度 | V1 child 的默认语义 | V2 / 条件差异 | 本轮验证边界 |
+|---|---|---|---|
+| Context/history | Child 创建独立 session、channel、context 与 history；可 full-history fork 或 truncated rebuild。 | V2 还按 `fork_turns`/communication context 选择传播内容。 | V1 请求 digest 与 root 不同；完整 survivor 差分未跑。 |
+| Model/provider | 从 parent effective config 派生，child 可继续使用相同 provider/model。 | Role/config 可以覆盖默认值。 | 只验证测试 fixture 下请求可达，没有跑多 provider matrix。 |
+| Tools/exposure | 重新构造 child tool surface；达到默认 depth 后不再暴露 spawn namespace。 | V1/V2 namespace、并发限制与 usage hints 不同。 | `X-005` 只覆盖 V1 depth=1。 |
+| Approval/sandbox/exec policy | 继承 effective approval、permission/sandbox、cwd；exec policy 只有 config folder/requirement 等价时才可共享 manager。 | V2 可携带额外 communication/policy context。 | 未做 child permission deny 或 escalation experiment。 |
+| Workspace/process | 独立 child session/task，但普通 child 使用相同 cwd/filesystem。 | 外部 remote/worktree 隔离不在该默认路径中。 | 未做并发同文件写入或 process crash。 |
+| Cancellation/result | 共享 AgentControl 管理 interrupt/lifecycle；result 通过 parent-facing event/message 返回。 | V2 completion 先进入 session mailbox，再按 turn phase 当前轮或下一轮消费。 | V1 spawn 已观察；join/cancel/V2 mailbox 未运行。 |
+
 ## 动态观察
 
 `X-SCENARIO-005` 的 root request 暴露一个 `multi_agent_v1` namespace，随后 `spawn_agent` event 返回新的 child thread id。日志出现三个 provider requests：root 首次、root tool-output follow-up、child 首次。child request 有不同 input digest，且不再带 namespace，符合默认 depth limit。[X: `X-005`]

@@ -169,12 +169,14 @@
     "tools_extensions": {
       "status": "analyzed",
       "directories": [
-        "codex-rs/core/src/tools"
+        "codex-rs/core/src/tools",
+        "codex-rs/core/src/tools/handlers"
       ],
       "files": [
         "codex-rs/core/src/tools/spec_plan.rs",
         "codex-rs/core/src/tools/router.rs",
-        "codex-rs/core/src/tools/registry.rs"
+        "codex-rs/core/src/tools/registry.rs",
+        "codex-rs/core/src/tools/handlers/apply_patch.rs"
       ],
       "symbols": [],
       "configurations": [
@@ -195,11 +197,13 @@
       "status": "analyzed",
       "directories": [
         "codex-rs/core/src",
-        "codex-rs/core/src/tools"
+        "codex-rs/core/src/tools",
+        "codex-rs/core/src/tools/handlers"
       ],
       "files": [
         "codex-rs/core/src/exec_policy.rs",
-        "codex-rs/core/src/tools/sandboxing.rs"
+        "codex-rs/core/src/tools/sandboxing.rs",
+        "codex-rs/core/src/tools/handlers/shell.rs"
       ],
       "symbols": [],
       "configurations": [

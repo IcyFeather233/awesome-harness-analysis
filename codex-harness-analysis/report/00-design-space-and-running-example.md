@@ -13,14 +13,14 @@
 
 ## 六个反复出现的设计问题
 
-| 问题 | v0.144.5 的答案 | 可替代方案 | 可观察代价 | 证据 |
+| 问题 | v0.144.5 的当前机制 | 可替代方案 | 部署约束、权衡与边界 | 证据与置信度 |
 |---|---|---|---|---|
-| 谁拥有耐久状态？ | ThreadStore/LiveThread + rollout JSONL | UI 进程内内存 | 可 resume/fork，但写入与 flush 成为 correctness 边界 | `S-018`, `S-019`, `X-006` |
-| 每轮模型看见什么？ | history + world-state diff + per-turn tool exposure | 每轮重建完整 prompt | 减少重复，但缓存/同步语义更复杂 | `S-004`–`S-006`, `I-001` |
-| 能力何时可见？ | registry 与 exposure 分离 | 所有已注册工具始终暴露 | 适配 provider/模式，但静态 registry 不能等同于实际 surface | `S-009`, `X-005` |
-| 副作用如何治理？ | exec policy + approval + platform sandbox | 只审批或只 sandbox | 边界更完整，但跨平台和 mode matrix 更难验证 | `D-002`, `S-012`–`S-014`, `I-002` |
-| 多 agent 如何隔离？ | 独立 child context/history，共享 cwd/policy | 单 context 内角色切换或完全独立 workspace | 控制 context 增长，但共享文件产生竞争 | `S-015`–`S-017`, `X-005` |
-| 失败后从哪恢复？ | turn retry/cancel + rollout flush + thread resume | 整个进程重启或事务 checkpoint | 局部恢复成本低，但没有一个覆盖所有失败的统一机制 | `S-008`, `S-022`, `X-006` |
+| 谁拥有耐久状态？ | `ThreadStore` 定义后端中立接口，`LiveThread` 负责活动 thread 的 append/flush，local backend 用 rollout JSONL 保存 canonical history。 | 只保存在 UI 进程内存，或为每轮建立数据库/文件系统事务 checkpoint。 | 跨进程 resume/fork 清晰，但 flush、尾部损坏和 workspace drift 成为 correctness 边界；本轮只验证正常尾部写入。 | `S-018`, `S-019`, `X-006`；高 |
+| 每轮模型看见什么？ | `ContextManager` 保留 history，`WorldState` 维护 typed snapshot/diff，`StepContext` 冻结本次请求的 model、cwd、policy 与 tool exposure。 | 每轮从一个 canonical store 重建完整 prompt snapshot。 | 减少重复注入并保护并发请求配置，但 baseline、cache prefix 与动态状态同步更难推理；完整 source differential 未跑。 | `S-004`–`S-006`, `I-001`；中 |
+| 能力何时可见？ | ToolSpecPlan 把 registered handler 与本轮 model-visible specs 分开，并按 provider、feature、agent depth、MCP/extension 状态选择 exposure。 | 所有已注册工具始终发送给模型。 | 动态适配能力强，但静态 registry、模型可见、实际 requested、获准执行是四个不同事实。 | `S-009`, `X-005`；高 |
+| 副作用如何治理？ | 真正的进程 exec 先计算 rule/approval requirement，再经 permission profile 选择 platform sandbox；apply_patch 走专用 patch governance。 | 只做用户审批、只做 OS sandbox，或所有 action 统一 capability broker。 | 分层治理能区分“允许”与“可触达范围”，但平台/mode/tool handler 矩阵复杂；一次 Linux deny 不能覆盖 MCP、dynamic tool 或 patch 路径。 | `D-002`, `S-012`–`S-014`, `S-028`, `I-002`；中 |
+| 多 agent 如何隔离？ | Child 拥有独立 thread/channel/context/history，继承 effective model/policy/cwd，并共享 AgentControl 与 workspace；V1/V2 分 gate。 | 单 context 角色切换，或每 child 独立 worktree/container/remote runtime。 | Root context 增长受控，但共享文件会竞争；本轮只运行 V1，V2 mailbox 与多 child 冲突仍是静态边界。 | `S-015`–`S-017`, `S-027`, `X-005`；中 |
+| 失败后从哪恢复？ | Provider stream retry、tool/turn cancellation、rollout flush 和跨进程 thread resume 分别处理不同失败域。 | Fail-fast 整体重启，或统一事务 checkpoint/rollback。 | 局部恢复成本低且 session 可继续，但不存在覆盖 provider、tool、process、durable state 与 workspace 的单一回滚点。 | `S-008`, `S-022`, `X-006`；中 |
 
 ## Running example：一次确定性的 read tool turn
 

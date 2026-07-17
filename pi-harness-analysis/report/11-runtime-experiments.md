@@ -2,6 +2,15 @@
 
 完整命令和结果见 [runtime-tests.md](../runtime-tests.md)，场景机器可读记录见 [catalog.json](../scenarios/catalog.json)。
 
+| 场景组 | 执行对象 | 预声明断言 | 结果 | 主要 artifact | 解释边界 |
+|---|---|---|---|---|---|
+| R-001 | 真实 SiFlow text-only | 1 turn、0 tool、最终 settled | 通过，`PI_TEXT_OK` | `traces/normalized/R-001-text-only.normalized.jsonl` | 仅最短 JSON-mode 路径 |
+| R-002 | 真实 SiFlow + read fixture | 必须先 toolUse，再带 toolResult 二次请求 | 通过，2 turns、1 tool、`314159` | `traces/normalized/R-002-read-tool.normalized.jsonl` | 只读；未覆盖 permission/sandbox |
+| R-003/004 | 两个独立 Pi 进程 | 第二次 prompt 不重发 token仍可恢复 | 通过，`PI_RESUME_2718` | `traces/raw/R-004-session-state.jsonl` + normalized traces | 正常 JSONL 尾部；无 corruption |
+| X-001 | agent-core faux provider | loop、双顺序、hooks、queue、length-stop contract | 39/39 passed | 固定 test files 见 `X-001` | 不评价真实模型行为 |
+| X-002 | 新 `AgentHarness` | snapshot/save point、pending writes、helpers | 61/61 passed | 固定 test files 见 `X-002` | 不代表 Coding Agent 已迁移 |
+| X-003 | Coding Agent recovery | compaction/retry/context rebuild 分层 | 31/31 passed | 固定 test files 见 `X-003` | 未注入 OS crash/真实长上下文 |
+
 ## R-SCENARIO-001：最短文本路径
 
 - 配置：JSON mode、no session、no tools、禁 extensions/skills/templates/context files。

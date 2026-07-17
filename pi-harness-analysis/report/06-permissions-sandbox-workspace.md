@@ -10,6 +10,16 @@
 2. **Tool hook**：可选 application policy。extension 可在 `tool_call` 返回 block；`protected-paths.ts` 是示例，不是默认策略。[C: C-017]
 3. **Sandbox**：OS/container/VM 边界。Pi 默认没有；需要 whole-process Docker/OpenShell，或用 Gondolin extension 路由 built-in tools。[C: C-005]
 
+## 边界对照
+
+| 边界 | 默认启用 | 保护对象 | 不保护/可绕行面 | 合理部署用途 |
+|---|---|---|---|---|
+| Project trust | interactive 有 prompt；headless `ask` 无既有决策时不加载项目资源 | `.pi/settings.json`、project extensions/skills/SYSTEM 等 startup resources | AGENTS/CLAUDE context；之后的 read/write/edit/bash；extension 直接副作用 | 防止打开未知仓库时静默装载可执行扩展和配置 |
+| `tool_call` hook / protected paths extension | 默认关闭；需用户安装并配置 | 经过 tool registry 的命名调用和参数 | extension 直接 fs/process/network；`!` command；未被路由的 custom backend | 交互确认、路径规则、组织策略原型 |
+| Gondolin tool routing example | 默认关闭；需安装并启用该 extension | 被该 extension 覆盖的 built-ins 与 `!` command | 未 delegate 的 arbitrary extension tools；host resource loader/package install | 把选定 tool backend 放入隔离 guest |
+| Whole-process Docker/OpenShell/VM | 否，由部署层提供 | Pi、extensions、shell、language server 等整个进程树 | bind mount 仍可写 host；挂载 agent dir 会暴露 session/settings/auth | unattended/untrusted workload 的主要隔离层 |
+| Host OS user/ACL | 是，取决于启动用户 | 用户权限不允许访问的资源 | 该用户本来可读写的 workspace、credentials、network | 所有模式的最终基础边界 |
+
 ## 默认 side-effect path
 
 内置 bash 在 cwd 启动 shell，默认继承进程环境；timeout 参数可选且无默认值。Unix 使用 detached process group，abort/timeout 会 kill tree。extension 代码、package install、language server 与 shell 子进程都处于同一用户权限边界。[C: C-007]

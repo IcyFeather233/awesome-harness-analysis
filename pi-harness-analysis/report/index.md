@@ -2,7 +2,7 @@
 
 分析对象：`earendil-works/pi` tag `v0.80.7`，commit `818d67457cdd6b60bce6b121d16b23141c252dd8`。
 
-本报告不是文件树摘要。结论来自固定版本源码、官方仓库文档、4 个真实 SiFlow 场景和 3 组 faux-provider 定向测试，并通过 Harness Analysis validator 做了 claims/evidence/HIR 的交叉校验。
+本报告不是文件树摘要。结论来自固定版本源码、官方仓库文档、4 个真实 SiFlow 场景和 3 组 faux-provider 定向测试，并通过 Harness Analysis validator 做了 claims/evidence/HIR 的交叉校验。首次遇到内部类型、事件名或 provider/session 术语时，可查[全局术语表](16-glossary.md)。
 
 ## 一句话结论
 
@@ -32,14 +32,14 @@ Pi 是一个“薄核心、强扩展、外部隔离”的 agent harness：`pi-ai
 
 ## 动态验证结果
 
-| 场景 | 模式 | 结果 | 主要证明 |
-|---|---|---|---|
-| `R-SCENARIO-001` | SiFlow real model, no tools | `PI_TEXT_OK` | 最短 turn 与 settled 路径 |
-| `R-SCENARIO-002` | SiFlow real model, read only | read start/end，两次 turn，`314159` | 真实 model -> tool -> context -> model loop |
-| `R-SCENARIO-003/004` | 两个独立 Pi 进程 | 恢复 `PI_RESUME_2718` | JSONL session 跨进程恢复 |
-| `X-SCENARIO-001` | faux provider | `39/39` | loop、并行/顺序、hooks、queue、终止 |
-| `X-SCENARIO-002` | faux provider | `61/61` | 新 AgentHarness save point、session、compaction helper |
-| `X-SCENARIO-003` | faux provider | `31/31` | Coding Agent compaction、network retry、context rebuild |
+| 场景 | 固定配置 | 区分性断言 | 结果与审计产物 | 能证明 | 不能推出 |
+|---|---|---|---|---|---|
+| `R-SCENARIO-001` | JSON mode；SiFlow；no session/tools/resources | 无工具时一次 provider turn 后是否进入 `agent_settled` | `PI_TEXT_OK`；`R-001-text-only.normalized.jsonl` | 最短真实模型生命周期至少成功一次 | 不证明 tool、session 或 retry 路径 |
+| `R-SCENARIO-002` | JSON mode；只开放 `read`；合成 fixture | toolResult 是否进入第二次 provider request | read start/end、2 turns、`314159`；`R-002-read-tool.normalized.jsonl` | 真实 model -> tool -> context -> model 闭环 | 不证明 write/bash 的权限或隔离 |
+| `R-SCENARIO-003/004` | 相同 session id；两个独立进程；无工具 | 新进程能否只靠 JSONL 恢复未重发 token | 恢复 `PI_RESUME_2718`；raw session copy + normalized events | 正常尾部写入后的跨进程恢复 | 不证明 corruption、半写入或 workspace rollback |
+| `X-SCENARIO-001` | faux provider；agent-core tests | loop、并行/顺序、hooks、queue、length-stop 分支是否满足 contract | `39/39`；测试文件固定在 `X-001` | controller 分支在定向测试中通过 | 不评价真实模型选择工具的质量 |
+| `X-SCENARIO-002` | faux provider；新 `AgentHarness` tests | snapshot/save point、pending writes 和 helper 是否按设计工作 | `61/61`；`X-002` | 迁移中 harness 的现有 contract | 不代表已替代 Coding Agent `AgentSession` |
+| `X-SCENARIO-003` | Coding Agent recovery tests | overflow/threshold compaction、retry、context rebuild 是否分层 | `31/31`；`X-003` | 当前产品路径的定向恢复行为 | 不证明真实 crash、SIGINT 或超长模型场景 |
 
 ## 最高价值未知项
 
@@ -65,6 +65,8 @@ Pi 是一个“薄核心、强扩展、外部隔离”的 agent harness：`pi-ai
 - [失败模式与开放问题](12-failure-modes-open-questions.md)
 - [覆盖与复现](13-coverage-reproducibility.md)
 - [与 2604.14228 的质量对照](quality-comparison-2604.14228.md)
-- [Claim index](claim-index.md)
+- [源码与 Claim 索引](14-source-claim-index.md)
+- [全局术语表](16-glossary.md)
+- [兼容 Claim index](claim-index.md)
 
 结构化真值：[manifest](../manifest.json) · [HIR](../hir.json) · [claims](../evidence/claims.jsonl) · [evidence](../evidence/observations.jsonl) · [coverage](../evidence/coverage.json) · [scenarios](../scenarios/catalog.json)

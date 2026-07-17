@@ -2,16 +2,16 @@
 
 ## 实验矩阵
 
-| 场景 | 模式 | 区分性断言 | 结果 | 副作用 |
-|---|---|---|---|---|
-| R-001 | 真实 SiFlow | stock Codex 最小 Responses 能否直接运行 | 400: Unexpected message role | 无 tool call |
-| R-002 | 真实 SiFlow + V1 | endpoint 是否接受 namespace tool | 400: schema rejects namespace | 无 tool call |
-| X-001 | deterministic SSE | 无 tool 时是否正常停止 | `SCRIPTED_OK`, turn.completed | 无 |
-| X-002 | deterministic SSE | tool output 是否进入第二 request | input types 新增 call/output，返回 `HXA-1445` | 只读 FACTS.txt |
-| X-003 | deterministic SSE | 未知 tool 是否可恢复 | unsupported error 回流，turn completed | 无 |
-| X-004 | deterministic SSE | never 是否前置拒绝 escalation | policy error 回流，turn completed | marker 未创建 |
-| X-005 | deterministic SSE + V1 | child 是否独立 request/depth-limited | child thread + 独立 digest/tool surface | 无 |
-| X-006 | deterministic SSE + persistence | resume 是否恢复同 thread/history | id 相同，input 3→5 | 仅临时 rollout |
+| 场景 | 模式与关键配置 | 区分性断言与实际结果 | OS 可见副作用 | 保留工件 | 不能推出什么 |
+|---|---|---|---|---|---|
+| R-001 | 官方 binary + 真实 SiFlow，最小 Responses。 | Stock request 是否直接可运行；HTTP 400 `Unexpected message role`，在模型输出前失败。 | 无 tool call、无 workspace 写入。 | `traces/raw/real-siflow-minimal.jsonl`。 | 只证明该日期/endpoint 方言不兼容，不证明 Responses 协议整体不可用。 |
+| R-002 | 官方 binary + SiFlow + V1 namespace tool。 | Endpoint 是否接受 Codex namespace schema；HTTP 400 schema reject。 | 无 tool call。 | Normalized namespace trace。 | 不能推出关闭 V1 后的所有 tool schema 都失败。 |
+| X-001 | Local deterministic SSE，无工具。 | 无 tool 时应正常停止；得到 `SCRIPTED_OK` 与 turn.completed。 | 仅临时 home/workspace。 | Normalized trace + raw request log。 | 不覆盖 tool、policy、compaction 或 persistence。 |
+| X-002 | Deterministic SSE，read-only/never，fixture 强制 `exec_command(cat FACTS.txt)`。 | 第二 request 必须包含同 call id 的 output；观察到 function call/output 并返回 `HXA-1445`。 | 只读 `FACTS.txt`。 | `traces/raw/read-tool-requests.jsonl`（未另建 normalized 文件）。 | 不能评价模型自主选 tool 的质量，也不覆盖 write/sandbox。 |
+| X-003 | Deterministic SSE，请求不存在工具。 | Unsupported error 是否回流模型；观察到 model-facing output 与 turn completion。 | 无。 | Normalized unknown-tool trace。 | 不证明所有 handler exception 都可恢复。 |
+| X-004 | Deterministic SSE，`approval_policy=never`，请求 escalation。 | Policy 是否先于 process 拒绝；观察到 error 回流并完成。 | Marker 未创建，目录清单与文件 hash 不变。 | Denial normalized trace + `X-007` side-effect trace。 | 只覆盖该普通 exec escalation；不覆盖 patch/MCP/dynamic tool。 |
+| X-005 | Deterministic SSE + Multi-agent V1，默认 depth=1。 | Child 是否独立 request 且 depth-limited；观察到 child thread、不同 digest、child 无 namespace。 | 共享临时 workspace，无写入。 | `traces/raw/subagent-spawn-requests.jsonl`。 | 不覆盖 join/cancel/crash、并发文件竞争或 V2 mailbox。 |
+| X-006 | Deterministic SSE + local rollout，两个进程。 | Resume 是否保持 thread/history；id 相同，provider input 3→5。 | 只写临时 rollout。 | `traces/raw/resume-requests.jsonl` 与临时 rollout 记录。 | 只验证正常尾部；不覆盖 partial write、corruption、fork 或 workspace drift。 |
 
 <!-- EXPLANATION:experiment-modes -->
 ## 表中模式与结果怎么解释

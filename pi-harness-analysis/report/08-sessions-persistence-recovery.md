@@ -10,6 +10,15 @@
 
 读取时 Pi 流式解析 JSONL，单个 malformed line 会被跳过；非空文件如果最终没有合法 Pi header 则拒绝打开。v1/v2 会迁移到 v3并重写文件。中间 entry 损坏是否造成可接受但错误的 branch 仍是开放风险。
 
+| 状态 | Live owner | Durable 表示 | Resume/fork 行为 | 不随 session 恢复的内容 |
+|---|---|---|---|---|
+| Active conversation branch | `AgentSession` + `SessionManager` current leaf | JSONL entry 的 `id/parentId` tree 与 leaf | resume 选择 active leaf；branch navigation/fork 选择或复制 path | workspace 文件、外部进程、网络服务状态 |
+| Model/thinking choice | session runtime | model/thinking change entries | `buildSessionContext()` 重放到 active path 的有效配置 | provider 端连接/stream |
+| Message/tool transcript | low-level Agent context | message entries，包括 assistant toolUse 与 toolResult | 重建为下一 request 的 carry-forward context | tool 已造成的副作用不会重放或撤销 |
+| Compaction | Coding Agent orchestration | summary、`firstKeptEntryId`、`tokensBefore`、details | active context 用 summary + kept suffix 重建 | 被 summary 丢失的细节不能从有效 context 自动恢复 |
+| Retry/error | `AgentSession` recovery state | provider error 可留 session；live context 可移除 | reopen 可看到 durable entry，但不会恢复中断的 provider stream | backoff timer、in-flight HTTP stream |
+| Workspace | OS/filesystem | Pi session 外部的目录现实状态 | resume/fork 继续看到当前磁盘 | 没有 conversation leaf 对应的自动 snapshot/rollback |
+
 ## Resume 与 fork
 
 - Resume/open：加载 entries、迁移、重建 index/leaf，再 `buildSessionContext()`。

@@ -534,7 +534,62 @@
             "S-021"
           ]
         }
-      ]
+      ],
+      "question": "一次 Codex 请求如何从产品入口穿过 session、模型、工具与副作用治理，并把结果持久化？",
+      "exact_text": [
+        "Surfaces",
+        "Thread / Session",
+        "Turn loop",
+        "Responses API",
+        "Tool runtime",
+        "Exec Policy + Sandbox",
+        "Workspace",
+        "Context + World state",
+        "Rollout JSONL",
+        "Child Session",
+        "Events + OTel"
+      ],
+      "exactly_once": [
+        "Surfaces",
+        "Thread / Session",
+        "Turn loop",
+        "Responses API",
+        "Tool runtime",
+        "Exec Policy + Sandbox",
+        "Workspace",
+        "Context + World state",
+        "Rollout JSONL",
+        "Child Session",
+        "Events + OTel"
+      ],
+      "glossary": {
+        "Thread / Session": "durable conversation identity and its current live runtime",
+        "Turn loop": "one task boundary containing one or more model requests",
+        "Exec Policy": "process-execution allow/prompt/forbid decision",
+        "Rollout": "append-oriented durable session history"
+      },
+      "exclusions": [
+        "不展开 MCP/dynamic handler 的各自安全路径",
+        "不描绘 apply_patch 在普通 exec policy 前被专用 handler 拦截的细节",
+        "不表示生产 feature 使用频率"
+      ],
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "S-003",
+        "S-009",
+        "S-010",
+        "S-012",
+        "S-014",
+        "S-015",
+        "S-018",
+        "S-019",
+        "X-002",
+        "X-004",
+        "X-005",
+        "X-006"
+      ],
+      "caption": "Codex 0.144.5 的主路径收敛到 thread/session 与 turn loop；exec、持久化和 subagent 是带条件的边界，工具结果经 context 触发下一次模型请求。"
     },
     {
       "id": "codex-observed-turn",
@@ -790,7 +845,40 @@
             "X-002"
           ]
         }
-      ]
+      ],
+      "question": "真实 harness 的一次 read-only tool turn 为什么需要两次 Responses 请求？",
+      "exact_text": [
+        "Turn loop",
+        "Context",
+        "Responses",
+        "exec_command",
+        "Updated history",
+        "Final answer"
+      ],
+      "exactly_once": [
+        "Turn loop",
+        "Context",
+        "Responses",
+        "exec_command",
+        "Updated history",
+        "Final answer"
+      ],
+      "glossary": {
+        "Responses": "Codex model-provider request boundary",
+        "function_call_output": "tool result item linked to the original call_id",
+        "Turn complete": "outer task terminal event after no follow-up remains"
+      },
+      "exclusions": [
+        "没有发生审批提示、写入、compaction、subagent 或 resume",
+        "不评价真实模型工具选择质量"
+      ],
+      "evidence_ids": [
+        "S-002",
+        "S-003",
+        "S-010",
+        "X-002"
+      ],
+      "caption": "X-SCENARIO-002 中，第一次请求产生 exec_command，工具结果以 function_call_output 回填 history，fixture 只有在第二次请求看到对应 call_id 后才返回 HXA-1445。"
     },
     {
       "id": "codex-context-lifecycle",
@@ -1133,7 +1221,49 @@
             "X-002"
           ]
         }
-      ]
+      ],
+      "question": "Codex 如何把 history、world state、当前输入和可见工具组合成下一次模型请求？",
+      "exact_text": [
+        "History",
+        "World state",
+        "Tool specs",
+        "Context Manager",
+        "Responses",
+        "Compactor",
+        "Long-term memory",
+        "Tool runtime"
+      ],
+      "exactly_once": [
+        "History",
+        "World state",
+        "Tool specs",
+        "Context Manager",
+        "Responses",
+        "Compactor",
+        "Long-term memory",
+        "Tool runtime"
+      ],
+      "glossary": {
+        "World state": "typed runtime environment snapshot/diff",
+        "StepContext": "request-level model/cwd/policy/tool snapshot",
+        "Compaction": "conditional replacement of model-visible history",
+        "Exposure": "tool schemas visible in the current request"
+      },
+      "exclusions": [
+        "图中两个 History 图标是同一 history 的重复视图",
+        "未运行超长上下文或 memories feature",
+        "不表示 compaction 回滚 rollout 或 workspace"
+      ],
+      "evidence_ids": [
+        "D-007",
+        "S-004",
+        "S-005",
+        "S-006",
+        "S-007",
+        "S-009",
+        "X-002"
+      ],
+      "caption": "ContextManager 分开维护模型可见 history 与可差分 world state；tool output 返回 history，compaction 只在条件满足时替换后续有效上下文。"
     },
     {
       "id": "codex-tool-surface",
@@ -1416,7 +1546,49 @@
             "X-002"
           ]
         }
-      ]
+      ],
+      "question": "工具从能力来源到模型 exposure、router、handler 和结果回填要经过哪些不同阶段？",
+      "exact_text": [
+        "MCP / Dynamic",
+        "Registry",
+        "Responses",
+        "Router",
+        "Hooks",
+        "Runtime",
+        "Context"
+      ],
+      "exactly_once": [
+        "MCP / Dynamic",
+        "Registry",
+        "Responses",
+        "Router",
+        "Hooks",
+        "Runtime",
+        "Context"
+      ],
+      "glossary": {
+        "Registry": "implemented tool handlers known to the process",
+        "Exposure": "request-visible subset of registered capabilities",
+        "Router": "call parser and handler dispatcher",
+        "Exclusive": "handler class serialized with a write lock"
+      },
+      "exclusions": [
+        "不表示已注册工具必然对模型可见",
+        "不把 MCP/dynamic/hosted handler 画成与 exec 相同的安全路径",
+        "不展开 apply_patch 专用治理"
+      ],
+      "evidence_ids": [
+        "S-004",
+        "S-009",
+        "S-010",
+        "S-011",
+        "S-025",
+        "S-026",
+        "X-002",
+        "X-003",
+        "X-005"
+      ],
+      "caption": "ToolSpecPlan 把 registry 与 per-turn exposure 分开；router/registry/hooks 定位 handler，ToolCallRuntime 决定 parallel/exclusive，结果再进入 context。"
     },
     {
       "id": "codex-permission-pipeline",
@@ -1678,7 +1850,45 @@
             "X-004"
           ]
         }
-      ]
+      ],
+      "question": "真正启动进程的 exec 调用如何经过 policy、approval 与 platform sandbox？",
+      "exact_text": [
+        "Tool call",
+        "Exec Policy",
+        "User Approval",
+        "Sandbox",
+        "Process",
+        "Denied"
+      ],
+      "exactly_once": [
+        "Tool call",
+        "Exec Policy",
+        "User Approval",
+        "Sandbox",
+        "Process",
+        "Denied"
+      ],
+      "glossary": {
+        "Approval": "user decision that may be cached for the session",
+        "Exec Policy": "command-segment allow/prompt/forbid layer",
+        "Sandbox": "platform-specific filesystem/network execution transform",
+        "never": "approval mode that cannot prompt for escalation"
+      },
+      "exclusions": [
+        "只描述普通 process exec 主路径",
+        "apply_patch 会在普通 exec requirement 前进入专用 patch governance，未画入主轴",
+        "未动态比较 Linux/macOS/Windows sandbox backend"
+      ],
+      "evidence_ids": [
+        "D-002",
+        "S-012",
+        "S-013",
+        "S-014",
+        "S-028",
+        "X-004",
+        "X-007"
+      ],
+      "caption": "普通进程 exec 先得到 allow/ask/forbid requirement；ask 可经 session approval，允许路径仍进入 filesystem/network profile 和 platform sandbox，never+escalation 在创建进程前拒绝。"
     },
     {
       "id": "codex-subagent-topology",
@@ -1938,7 +2148,43 @@
             "S-027"
           ]
         }
-      ]
+      ],
+      "question": "Codex child session 隔离什么、继承什么，又与 root 共享什么？",
+      "exact_text": [
+        "Root Session",
+        "AgentControl",
+        "Child Session",
+        "Child context",
+        "Shared workspace",
+        "V2 mailbox"
+      ],
+      "exactly_once": [
+        "Root Session",
+        "AgentControl",
+        "Child Session",
+        "Child context",
+        "Shared workspace",
+        "V2 mailbox"
+      ],
+      "glossary": {
+        "AgentControl": "shared control plane for one root agent tree",
+        "Child Session": "independent live Codex runtime for a delegated task",
+        "Mailbox": "V2 session-scoped inter-agent message queue",
+        "Depth limit": "maximum recursive child level"
+      },
+      "exclusions": [
+        "本轮只动态运行 V1",
+        "未验证 child crash、cancel、聚合 final 或共享文件冲突",
+        "默认 limit 是版本/配置条件"
+      ],
+      "evidence_ids": [
+        "S-015",
+        "S-016",
+        "S-017",
+        "S-027",
+        "X-005"
+      ],
+      "caption": "V1 child 有独立 thread/session/context/history，继承有效 model/policy/cwd 并共享 workspace；默认 depth=1 限制继续 spawn，V2 mailbox 仅有静态证据。"
     },
     {
       "id": "codex-persistence-lifecycle",
@@ -2154,7 +2400,43 @@
             "X-006"
           ]
         }
-      ]
+      ],
+      "question": "Codex 的 session items 如何落到 durable rollout，并在新进程恢复为同一 thread？",
+      "exact_text": [
+        "Turn items",
+        "LiveThread",
+        "Rollout JSONL",
+        "New process",
+        "Restored history",
+        "Workspace"
+      ],
+      "exactly_once": [
+        "Turn items",
+        "LiveThread",
+        "Rollout JSONL",
+        "New process",
+        "Restored history",
+        "Workspace"
+      ],
+      "glossary": {
+        "LiveThread": "active durable-thread handle",
+        "Rollout": "append-oriented JSONL session history",
+        "Resume": "load durable history into a new live session",
+        "Workspace": "external filesystem state not checkpointed by rollout"
+      },
+      "exclusions": [
+        "只验证正常尾部写入后的 resume",
+        "未注入中段 corruption、flush failure 或 schema migration",
+        "resume 不表示 workspace rollback"
+      ],
+      "evidence_ids": [
+        "D-004",
+        "S-018",
+        "S-019",
+        "S-022",
+        "X-006"
+      ],
+      "caption": "LiveThread 把 session items append/flush 到 rollout JSONL；X-SCENARIO-006 在第二个进程以同一 thread id 重建 history，但 workspace 保持独立现实状态。"
     },
     {
       "id": "codex-design-space",
@@ -2250,7 +2532,46 @@
           "height": 76
         }
       ],
-      "edges": []
+      "edges": [],
+      "question": "Codex 的关键约束、恢复出的机制和分析者综合 tradeoff 如何对应？",
+      "exact_text": [
+        "Durable thread",
+        "Incremental context",
+        "Conditional tools",
+        "Layered safety"
+      ],
+      "exactly_once": [
+        "Durable thread",
+        "Incremental context",
+        "Conditional tools",
+        "Layered safety"
+      ],
+      "glossary": {
+        "Constraint": "problem the harness must handle",
+        "Recovered mechanism": "source-grounded implementation",
+        "Analyst synthesis": "falsifiable inference rather than documented intent",
+        "Exposure": "per-request visible tool subset"
+      },
+      "exclusions": [
+        "tradeoff 不表示 OpenAI 作者动机",
+        "不声称这些机制在所有配置中启用",
+        "不展开运行实验细节"
+      ],
+      "evidence_ids": [
+        "D-002",
+        "D-004",
+        "D-007",
+        "S-005",
+        "S-006",
+        "S-009",
+        "S-012",
+        "S-014",
+        "S-018",
+        "S-019",
+        "I-001",
+        "I-002"
+      ],
+      "caption": "四行把 durable conversation、增量 context、能力 exposure 和副作用治理的约束映射到固定源码机制；右列是明确标记的分析推断。"
     }
   ]
 }

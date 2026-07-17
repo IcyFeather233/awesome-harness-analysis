@@ -565,7 +565,61 @@
             "D-007"
           ]
         }
-      ]
+      ],
+      "question": "Pi 当前产品请求如何穿过 AgentSession、low-level loop、provider、tool 与 durable session？",
+      "exact_text": [
+        "CLI / JSON / RPC",
+        "AgentSession",
+        "runAgentLoop",
+        "Context",
+        "Provider",
+        "Tools",
+        "Workspace",
+        "AgentHarness v2",
+        "Tool gate",
+        "Session JSONL v3",
+        "Lifecycle events",
+        "Container / VM"
+      ],
+      "exactly_once": [
+        "CLI / JSON / RPC",
+        "AgentSession",
+        "runAgentLoop",
+        "Context",
+        "Provider",
+        "Tools",
+        "Workspace",
+        "AgentHarness v2",
+        "Tool gate",
+        "Session JSONL v3",
+        "Lifecycle events",
+        "Container / VM"
+      ],
+      "glossary": {
+        "AgentSession": "current Coding Agent product orchestrator",
+        "runAgentLoop": "shared low-level model/tool loop",
+        "Provider": "pi-ai model/auth/stream adapter",
+        "JSONL session": "durable parent-linked conversation tree"
+      },
+      "exclusions": [
+        "迁移中的 AgentHarness 不是当前 Coding Agent 默认主轴",
+        "不表示默认存在 MCP、subagent、permission gate 或 sandbox",
+        "不表示 workspace 随 session 恢复"
+      ],
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "S-008",
+        "S-012",
+        "S-013",
+        "S-017",
+        "R-001",
+        "R-002",
+        "R-004",
+        "X-002",
+        "X-003"
+      ],
+      "caption": "Pi v0.80.7 的主路径由 Coding Agent AgentSession 编排并调用共享 runAgentLoop；默认工具在 host 权限下运行，JSONL session 与外部隔离是不同支路。"
     },
     {
       "id": "pi-observed-turn",
@@ -1071,7 +1125,52 @@
             "R-003"
           ]
         }
-      ]
+      ],
+      "question": "真实 Pi read 场景如何把 toolResult 回填后再调用一次模型？",
+      "exact_text": [
+        "User prompt",
+        "AgentSession pipeline",
+        "Context #1",
+        "Model iteration 1",
+        "read fixture.txt",
+        "toolResult",
+        "Context #2",
+        "Model iteration 2",
+        "agent_end",
+        "agent_settled",
+        "Recovery",
+        "Session store"
+      ],
+      "exactly_once": [
+        "User prompt",
+        "AgentSession pipeline",
+        "Context #1",
+        "Model iteration 1",
+        "read fixture.txt",
+        "toolResult",
+        "Context #2",
+        "Model iteration 2",
+        "agent_end",
+        "agent_settled",
+        "Recovery",
+        "Session store"
+      ],
+      "glossary": {
+        "toolResult": "model-visible result corresponding to toolUse",
+        "agent_end": "low-level run terminal event",
+        "agent_settled": "product-level no-pending-work event",
+        "Turn": "one provider response and its tool batch"
+      },
+      "exclusions": [
+        "没有运行 write/edit/bash、extensions、compaction、retry 或 resume",
+        "不评价长期任务正确性或路径频率"
+      ],
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "R-002"
+      ],
+      "caption": "R-SCENARIO-002 的第一次 SiFlow response 请求 read；314159 作为 toolResult 进入 transcript，第二次 request 返回 final，随后依次出现 agent_end 与 agent_settled。"
     },
     {
       "id": "pi-design-space",
@@ -1521,7 +1620,64 @@
             "C-008"
           ]
         }
-      ]
+      ],
+      "question": "Pi 的 documented stance、恢复机制和分析者 tradeoff 如何逐行对应？",
+      "exact_text": [
+        "Thin generic core",
+        "runAgentLoop + orchestration",
+        "Composable, but split ownership",
+        "Extension over built-ins",
+        "Registry + lifecycle hooks",
+        "Flexible, but policy can fragment",
+        "Externalize isolation",
+        "Host process + optional container",
+        "Honest boundary, deployment burden",
+        "Append-oriented durable state",
+        "JSONL tree + compaction entries",
+        "Auditable, not workspace-transactional"
+      ],
+      "exactly_once": [
+        "Thin generic core",
+        "runAgentLoop + orchestration",
+        "Composable, but split ownership",
+        "Extension over built-ins",
+        "Registry + lifecycle hooks",
+        "Flexible, but policy can fragment",
+        "Externalize isolation",
+        "Host process + optional container",
+        "Honest boundary, deployment burden",
+        "Append-oriented durable state",
+        "JSONL tree + compaction entries",
+        "Auditable, not workspace-transactional"
+      ],
+      "glossary": {
+        "Documented stance": "product boundary stated in repository docs",
+        "Recovered mechanism": "fixed-commit implementation",
+        "Analyst synthesis": "falsifiable tradeoff inferred from evidence",
+        "External isolation": "container/VM deployment boundary"
+      },
+      "exclusions": [
+        "analyst synthesis 不表示作者未记录的动机",
+        "不声称 AgentHarness migration 已完成",
+        "不把可选 sandbox 画成默认核心能力"
+      ],
+      "evidence_ids": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-007",
+        "D-008",
+        "S-001",
+        "S-003",
+        "S-007",
+        "S-008",
+        "S-011",
+        "S-017",
+        "R-004",
+        "X-002"
+      ],
+      "caption": "四行分别呈现 minimal loop、extension-first、external isolation 和 JSONL durability；右列点线只表示证据约束下的分析综合。"
     },
     {
       "id": "pi-context-assembly",
@@ -1952,7 +2108,51 @@
             "R-002"
           ]
         }
-      ]
+      ],
+      "question": "Pi 的 startup、carry-forward 和 runtime context 来源如何在每次 provider request 前汇合？",
+      "exact_text": [
+        "System + project context",
+        "Skills",
+        "Active session branch",
+        "toolResult",
+        "Extension context hooks",
+        "Compaction summary",
+        "Context assembly",
+        "Provider request"
+      ],
+      "exactly_once": [
+        "System + project context",
+        "Skills",
+        "Active session branch",
+        "toolResult",
+        "Extension context hooks",
+        "Compaction summary",
+        "Context assembly",
+        "Provider request"
+      ],
+      "glossary": {
+        "Carry-forward": "context rebuilt from the active durable branch",
+        "transformContext": "extension transform before provider conversion",
+        "convertToLlm": "AgentMessage to provider-message conversion",
+        "Compaction summary": "replacement context stored as a session entry"
+      },
+      "exclusions": [
+        "图中 toolResult 不绕过 context transform 直达 model",
+        "真实场景禁用了 project resources/extensions",
+        "未动态比较九类 context source"
+      ],
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "S-004",
+        "S-005",
+        "S-008",
+        "S-009",
+        "R-002",
+        "R-004",
+        "X-003"
+      ],
+      "caption": "资源、active session branch、toolResult、extension hook 与 compaction summary 先进入 context assembly，再按 transformContext -> convertToLlm 的顺序形成 provider request。"
     },
     {
       "id": "pi-extension-injection",
@@ -2442,7 +2642,58 @@
             "D-007"
           ]
         }
-      ]
+      ],
+      "question": "Pi 的 context 注入、tool capability 注册与 action 执行控制为何是三种不同扩展面？",
+      "exact_text": [
+        "Project instructions",
+        "Skills",
+        "Input / context hooks",
+        "Context assembly",
+        "Built-in tools",
+        "Extension tools",
+        "Unified tool registry",
+        "Tool dispatch",
+        "Optional tool_call gate",
+        "Host execution",
+        "External container / VM"
+      ],
+      "exactly_once": [
+        "Project instructions",
+        "Skills",
+        "Input / context hooks",
+        "Context assembly",
+        "Built-in tools",
+        "Extension tools",
+        "Unified tool registry",
+        "Tool dispatch",
+        "Optional tool_call gate",
+        "Host execution",
+        "External container / VM"
+      ],
+      "glossary": {
+        "Context hook": "per-request message transform",
+        "Registry": "merged built-in/custom/extension tool map",
+        "tool_call gate": "optional pre-execute extension hook",
+        "Host execution": "action running with Pi process permissions"
+      },
+      "exclusions": [
+        "extension 不是隔离 plugin VM",
+        "optional tool_call gate 不覆盖 extension 直接主机副作用",
+        "核心默认不内置 MCP 或 subagent"
+      ],
+      "evidence_ids": [
+        "D-002",
+        "D-004",
+        "D-007",
+        "S-001",
+        "S-002",
+        "S-003",
+        "S-007",
+        "S-015",
+        "S-017",
+        "R-002"
+      ],
+      "caption": "Extensions 可分别改变模型所见 context、registry 中的 callable tools 和 execute 前后的 hooks；默认 action 仍在 host，optional gate/container 不是核心强制路径。"
     }
   ]
 }

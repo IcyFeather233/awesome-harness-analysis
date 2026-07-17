@@ -71,14 +71,14 @@ TurnComplete(U1)
 
 ### 4. 一个跨进程的具体例子
 
-| 时间 | 发生的事 | 仍然相同 | 已经变化 |
-|---|---|---|---|
-| 进程 A 启动 | start thread `T`，建立 session `S1` | `thread_id=T` | 新 session |
-| 用户提问 | `S1` 开始 turn `U1`，内含两次 model request 和一次 tool call | `T`, `S1`, `U1` | model request/step 变化 |
-| `U1` 完成 | terminal event 和 history flush，`S1` 继续 idle | `T`, `S1` | `active_turn: U1 -> None` |
-| 进程 A 退出 | `S1` 消失，rollout 保留 | `T` 和 durable history | live session 消失 |
-| 进程 B resume | 加载 `T` 并建立 `S2` | 同一 `thread_id=T` 和旧 history | `S2` 是新 live object |
-| 用户再提问 | `S2` 开始新 turn `U2` | `T` | session 和 turn 都与首轮不同 |
+| 时间点 | 发生的机制 | 保持不变的身份/状态 | 已变化的运行边界 | 不能推出什么 |
+|---|---|---|---|---|
+| 进程 A 启动 | ThreadManager 创建 thread `T`，并用 session `S1` 承载当前 live services、channels、policy 和 input queue。 | `thread_id=T` 作为新 durable identity。 | `S1` 是只属于进程 A 的 live object。 | 不能推出 thread 已经完成持久化；仍取决于 rollout append/flush。 |
+| 用户提问 | `S1` 发出 `TurnStarted(U1)`；`run_turn` 内可出现两次 model request 和一次 tool call。 | `T`、`S1`、`U1` 在整个模型-工具闭环中保持同一。 | Request/StepContext 随 sampling step 变化。 | 不能按 API request 次数把一个 turn 错拆成多个 turn。 |
+| `U1` 完成 | Terminal event 与 history 尝试 flush，`active_turn` 清空，`S1` 回到 idle。 | `T` 与 `S1` 仍可继续接受后续操作。 | `active_turn: U1 -> None`。 | Turn 完成不等于 session shutdown、thread 删除或 workspace checkpoint。 |
+| 进程 A 退出 | `S1`、channels 和当前内存 services 消失；成功写入的 rollout 保留。 | `T` 与已 flush 的 durable history。 | Live session 不再存在。 | 不能推出所有尾部记录都已安全落盘；partial write/corruption 未注入。 |
+| 进程 B resume | Store 按 `T` 加载 rollout，并建立新 live session `S2` 与新 services。 | 同一 `thread_id=T` 和可恢复 history。 | `S2` 的进程、内存对象、channels 与当前配置都是新的。 | Resume 不会复活 `S1`，也不会自动复用旧的临时 approval state。 |
+| 用户再提问 | `S2` 发出新 `TurnStarted(U2)`，在恢复 history 上继续 sampling。 | Durable identity 仍是 `T`。 | Session 已是 `S2`，turn 已是 `U2`。 | 对话连续不代表 workspace 回滚或外部副作用被撤销。 |
 
 本轮的跨进程实验已观察到：第二个进程 resume 后 `thread_id` 不变，provider input 包含首轮 assistant history。这直接验证了“thread 跨进程，session 不跨进程”的主路径。[X: `X-006`]
 

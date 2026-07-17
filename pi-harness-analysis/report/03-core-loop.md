@@ -20,11 +20,29 @@
 6. 注入 steering；没有工具和 steering 后检查 follow-up；
 7. 全部为空则 `agent_end`。[S: S-001]
 
+| 顺序 | 阶段 | 输入/状态 | 产出或分支 | 所属边界 |
+|---:|---|---|---|---|
+| 1 | context transform | 当前 transcript、system prompt、model | extension `transformContext` 后转成 provider messages | 每次 model request |
+| 2 | provider stream | model、converted context、tool schemas | text/thinking/toolUse deltas 或 error/abort | low-level turn |
+| 3 | tool preflight | 完整 assistant toolUse list | 参数 validation、hook block、sequential 判定 | 同一 tool batch |
+| 4 | tool execution | 允许执行的 calls | completion-order events；结果暂存在原 call index | tool runtime |
+| 5 | transcript append | assistant message + ordered toolResults | 下一次 model request 可见的新 context | 同一 agent run |
+| 6 | steering | loop 运行中排入的高优先输入 | 立即形成下一 turn | 内层 tool/steering loop |
+| 7 | follow-up | 当前 run 即将结束时排入的后续输入 | 外层 loop 再启动 turn | 外层 follow-up loop |
+| 8 | settle handoff | low-level `agent_end` | `AgentSession` 可继续 retry/compact/queue，最终发 `agent_settled` | 产品编排层 |
+
 `stopReason=length` 是特殊失败路径：即使 salvage 后参数能解析，Pi 也不会执行可能被截断的 tool call，而是为每个 call 生成 error result。[C: C-020]
 
 ## Tool batch 语义
 
 默认 parallel。preflight/validation 顺序进行，允许的工具并发执行，`tool_execution_end` 按完成顺序出现，最终 toolResult message 按原始 tool call 顺序写入；任一工具为 sequential 则整批串行。[C: C-015] [X: X-001]
+
+| 批次条件 | 实际启动语义 | Event 顺序 | 写入 transcript 的顺序 | 为什么重要 |
+|---|---|---|---|---|
+| 所有 call 允许 parallel | validation 后并发执行 | `tool_execution_end` 可按实际完成先后交错 | `Promise.all` 返回值按原 call index 对齐，再按模型 call 顺序追加 | UI 可以先展示快工具完成，但模型下轮看到稳定顺序 |
+| 任一 call 标记 sequential | 整批按模型 call 顺序串行 | start/end 与 call 顺序一致 | 同一 call 顺序 | sequential 是 batch-level 降级，不只是该工具单独排队 |
+| call validation/hook block | 被拒 call 不进入 execute | 产生对应失败结束/结果事件 | 仍占原 call 的结果位置 | 后续 toolResult 必须与原 toolUse 一一对应 |
+| `stopReason=length` | 批次中的截断 call 全部拒绝执行 | 产生 error results，不产生真实副作用 execution | error toolResults 按 call 顺序进入 context | 能解析出 JSON 不代表参数完整或可安全执行 |
 
 ## 产品级编排
 

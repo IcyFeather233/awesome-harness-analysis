@@ -4,14 +4,14 @@ Pi 的架构不能只用“有哪些 package”来解释。更有区分度的问
 
 ## 六个设计问题
 
-| 设计问题 | Pi `v0.80.7` 的答案 | 可选设计 | 证据与置信度 |
-|---|---|---|---|
-| 推理与控制放在哪里？ | 模型决定下一步；`runAgentLoop()` 只负责 model/tool/queue/stop 的确定性循环 | harness 内置 planner、typed graph 或 task state machine | `D-001`, `S-001`, `R-002`, `X-001`；高 |
-| 产品编排由谁拥有？ | 当前由 Coding Agent `AgentSession` 拥有；通用 `AgentHarness` 是尚未完成的迁移目标 | 一个统一 controller，或每个产品自己包装 low-level loop | `D-003`, `D-008`, `S-002`, `S-011`, `X-002`；高 |
-| 默认安全姿态是什么？ | 明确继承 Pi 进程权限；project trust 只保护项目资源加载；工具 gate 与 sandbox 都是可选层 | deny-first 逐工具授权、强制进程内 policy、默认容器隔离 | `D-002`, `D-004`, `D-007`, `S-006`, `S-017`；高 |
-| 扩展面如何划分？ | 统一 tool registry 加 extension hooks；MCP、subagent、permission UI 不进入核心产品假设 | 固定内置能力，或一个统一 plugin protocol 包办所有扩展 | `D-004`, `S-003`, `S-015`；高 |
-| 什么状态是 durable 的？ | append-only JSONL v3 tree 保存 message、branch、compaction 等 entry；workspace 独立存在 | mutable database row、完整 checkpoint、event sourcing + workspace snapshot | `S-008`, `R-003`, `R-004`；高 |
-| 失败如何恢复？ | truncated tool call 拒绝执行；provider retry、overflow compaction 与普通 threshold compaction 分层处理 | fail-fast、统一 retry、每轮 checkpoint 回滚 | `S-001`, `S-009`, `S-010`, `X-001`, `X-003`；高 |
+| 设计问题 | Pi `v0.80.7` 的当前机制 | 关键边界/部署条件 | 可选设计 | 证据与置信度 | 最小反证 |
+|---|---|---|---|---|---|
+| 推理与控制放在哪里？ | 模型决定下一步；`runAgentLoop()` 只负责 model/tool/queue/stop 的确定性循环 | planner、任务状态和产品 retry 不在 low-level loop 中 | harness 内置 planner、typed graph 或 task state machine | `D-001`, `S-001`, `R-002`, `X-001`；高 | 找到另一个绕过 `runAgentLoop()` 的产品级 model/tool loop |
+| 产品编排由谁拥有？ | 当前由 Coding Agent `AgentSession` 拥有；通用 `AgentHarness` 是迁移目标 | v0.80.7 两者共享 low-level loop，但不是叠加调用；新 harness 尚缺 auto-compaction/retry/migration | 单一 controller，或每个产品分别包装 low-level loop | `D-003`, `D-008`, `S-002`, `S-011`, `X-002`；高 | 证明 Coding Agent 已默认实例化 `AgentHarness` 并行为等价 |
+| 默认安全姿态是什么？ | read/write/edit/bash 与 extensions 继承 Pi 进程权限；project trust 只保护启动资源加载 | unattended/untrusted 部署必须另加 whole-process container、VM 或完整工具路由 | deny-first 逐工具授权、强制进程内 policy、默认容器隔离 | `D-002`, `D-007`, `S-006`, `S-017`；高 | 找到不可绕过且默认启用的全局 tool permission/sandbox gate |
+| 扩展面如何划分？ | tool registry 合并 built-ins/custom/extensions，hooks 可改 input/context/tool/provider/session；MCP/subagent 不进入核心假设 | extension 与 host 同权限；不同 extension 可定义不一致的安全和 delegation 语义 | 固定内置能力，或统一 capability/plugin protocol | `D-004`, `S-003`, `S-015`；高 | 证明 MCP/subagent 是默认 registry 的强制内建能力 |
+| 什么状态是 durable 的？ | append-only JSONL v3 tree 保存 message、branch、compaction 等 entry；workspace 独立持久 | resume/fork 恢复 conversation branch，不恢复文件系统 checkpoint | mutable database row、完整 checkpoint、event sourcing + workspace snapshot | `S-008`, `R-003`, `R-004`；高 | 新进程不读取 JSONL 也能恢复相同 active branch，或 fork 自动回滚 workspace |
+| 失败如何恢复？ | truncated tool call 拒绝执行；provider retry、overflow compaction 与 threshold compaction 分层 | retry budget、是否重答及 durable error 处理由产品层决定；真实 crash/半持久 turn 未覆盖 | fail-fast、统一 retry、每轮 checkpoint 回滚 | `S-001`, `S-009`, `S-010`, `X-001`, `X-003`；高 | 注入同类错误后观察到无界 retry、截断 call 被执行或统一回滚 |
 
 这些是“设计选择及其实现”，不是对作者动机的自由推测。仓库文档明确说明 minimal harness、aggressive extensibility 和外部隔离边界；“为什么选 JSONL 而不是数据库”等未文档化原因只作为可观察权衡讨论。[D: D-001, D-002, D-004]
 

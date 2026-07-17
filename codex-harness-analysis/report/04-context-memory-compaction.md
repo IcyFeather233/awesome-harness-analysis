@@ -33,7 +33,15 @@
 
 源码至少有三种触发：turn 前 token 超限、tool follow-up 中超限、模型兼容性/窗口下调。选择器再区分 remote v2、remote v1 与 local compact；compaction 会安装替换后的 history 并重算 token usage。[源码](https://github.com/openai/codex/blob/87db9bc18ba5bc82c1cb4e4381b44f693ee35623/codex-rs/core/src/session/turn.rs#L798) [S: `S-007`]
 
-本轮没有构造足够长的 context，所以图中的 compaction 是静态虚线，不能宣称在默认任务中出现频率。
+| 顺序/分支 | 条件 | 实际机制 | Survivor 与边界 | 证据状态 |
+|---|---|---|---|---|
+| 1. Previous-model compatibility check | 新旧 model 的 compaction hash 不同，或切换到更小 context window 且当前 token 已超新限制。 | 在正常 sampling step 创建前，用 previous-model StepContext 发起 pre-turn compact；符合条件时可准备 current-model fallback context。 | 目标是先用旧模型语义总结旧 history；不是每次 model switch 都执行。 | `S-007`；static-only |
+| 2. Pre-turn token check | 配置的 auto-compact budget 或 usable context window 已耗尽。 | 捕获当前 StepContext，以 `CompactionPhase::PreTurn` 运行 auto compact。 | 发生在普通 `run_turn` sampling 前；本轮未动态触发。 | `S-007`；static-only |
+| 3. Backend selector | Compact 确实被触发后。 | 选择顺序是 TokenBudget feature → remote v2（feature on）→ remote v1 → local；这些是互斥实现分支，不是依次执行四次。 | Remote/local 的 request、fallback 与 replacement 语义不同；源码可见不等于生产配置启用。 | `S-007`；static-only |
+| 4. Mid-turn threshold check | Tool follow-up 后 context 再次超过限制。 | 在同一 turn 内进入 mid-turn compaction，再决定是否继续 model sampling。 | 它附着在 tool loop，不创建新的 durable thread；是否形成新 request 取决于 compact 结果。 | `S-007`；static-only |
+| 5. Install replacement | Compact 成功返回 replacement/history。 | 更新模型可见 history、world-state/reference baseline 和 token usage，再继续后续 request。 | Survivor 是 replacement 明确保留/重注入的信息；不是 workspace rollback，也不是删除原 rollout。 | `S-005`–`S-007`；static-only |
+
+本轮没有构造足够长的 context，所以表中 compaction 全是源码确认的条件路径，不能据此声明默认任务中的出现频率或摘要信息损失大小。
 
 ## 长期 memory
 

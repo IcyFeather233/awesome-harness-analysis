@@ -59,7 +59,7 @@
   },
   "tooling": {
     "skill": "harness-analysis",
-    "skill_commit": "cb778e3",
+    "skill_commit": "7f2847d3cfa5d1964576ea99265ca83bbe234bf8",
     "skill_schema_version": "1.0"
   }
 }

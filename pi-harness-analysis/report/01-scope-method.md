@@ -13,13 +13,13 @@
 
 ## 证据等级
 
-| 标记 | 含义 | 本报告用途 |
-|---|---|---|
-| `D` | 仓库文档 | 产品边界、明确意图、已知未完成项 |
-| `S` | 固定 commit 源码 | 实现结构与可能路径 |
-| `R` | 真实运行观察 | 命名配置下一次确实发生的路径 |
-| `X` | 控制实验/定向测试 | controller 分支与反例验证 |
-| `I` | 分析推断 | 本轮没有把纯推断写成 HIR 事实 |
+| 标记 | 证据来源 | 可以建立 | 不能单独建立 | 本报告实例 |
+|---|---|---|---|---|
+| `D` | 固定 commit 的仓库文档 | 明确产品边界、公开设计立场、已知未完成项 | 代码一定实现文档描述，或生产默认启用 | security、extension、AgentHarness lifecycle 文档 |
+| `S` | 固定 commit 源码与测试 contract | 类型、控制流、condition 和可到达路径 | 该路径在本轮运行过，或生产出现频率 | `runAgentLoop`、`AgentSession`、JSONL v3 |
+| `R` | 真实 SiFlow + official Pi runtime | 命名配置下一次确实发生的路径和事件顺序 | 其他 provider/mode/tool/platform 等价 | text、read-tool、跨进程 resume |
+| `X` | faux provider/定向 test suite | controller 分支、顺序、反例和失败 contract | 真实模型质量或部署安全 | 39 + 61 + 31 tests |
+| `I` | 多条 D/S/R/X 的分析综合 | 明示 tradeoff、风险和下一步实验 | 作者意图或 HIR 中的直接事实 | workspace/session 缺少共同 checkpoint 的后果 |
 
 每条 claim 都有 falsification test；每个 HIR node/edge 都有 evidence ID。严格 validator 结果为 `0 errors, 0 warnings`。
 

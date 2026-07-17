@@ -30,3 +30,12 @@
 优先级最高的是一个本地 translation proxy：只把 developer role 与 namespace tools 降解成 endpoint 可接受格式，并完整记录变换。它能把“真实模型不可运行”从 blocker 变成可比较条件，同时诚实保留 stock 与 adapted 两种架构。
 
 其次是 fault injection：oversized tool output 触发 compaction；写入后拒绝/超时验证 side-effect reporting；截断 rollout 验证 resume；两个 child 竞争同一 fixture 文件验证 workspace ownership。
+
+| 优先级 | 实验 | 要区分的机制 | 通过标准 | 仍不能推出 |
+|---|---|---|---|---|
+| P0 | stock/adapted provider 对照 | endpoint 方言不兼容，还是 Codex loop 本身失败 | adapter 只改 role/schema；两侧请求 hash、变换日志和 tool feedback 均可审计 | adapted 成功不代表 stock Codex 兼容 |
+| P0 | shell / unified exec / direct `apply_patch` 对照 | 普通 exec policy 与专用 patch governance 的边界 | 三个入口分别记录 approval key、sandbox runtime 与是否创建 process | 单平台结果不能代表所有 sandbox backend |
+| P1 | compaction 阈值与顺序 | pre-turn、mid-turn、remote/local replacement 是否等价 | token snapshot、replacement、rollout 与 resume 顺序可重放 | 一次长上下文不能覆盖所有模型窗口变化 |
+| P1 | rollout corruption/flush failure | durable history 在部分写入后的恢复模型 | 对尾部截断、中段损坏、flush error 给出拒绝/修复/部分恢复分类 | conversation 恢复不表示 workspace 回滚 |
+| P1 | V2 child crash/cancel/mailbox | parent sampling、mailbox 和 terminal events 的因果顺序 | turn/call/agent id 可在 events、rollout 与 provider log 中对齐 | V1 的结果不能外推到 V2 |
+| P2 | 多 child workspace 冲突 | context 隔离下的共享文件竞争 | 两 child 写同一 fixture 时观察到明确冲突、序列化或最后写入语义 | 单文件结果不覆盖 git 或目录级冲突 |

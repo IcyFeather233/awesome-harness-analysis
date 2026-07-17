@@ -32,3 +32,13 @@ CLI args / stdin
 - 非交互模式没有 project trust UI；default `ask` 在无既有决策时等价于不信任项目资源。[S: S-006]
 
 本轮真实运行覆盖 JSON mode；TUI 与 RPC 源码已检查但未端到端启动。
+
+## 对象与结束边界
+
+| 对象/层 | 谁创建或拥有 | 生命周期 | Durable 内容 | 结束时发生什么 |
+|---|---|---|---|---|
+| CLI mode adapter | `main()` 按 interactive/print/JSON/RPC 选择 | 单进程 UI/transport 生命周期 | 自身不持久化 conversation | 断开 adapter 不等于删除 session 文件 |
+| `AgentSessionRuntime` | main 的 cwd-bound runtime factory | 当前 cwd/session 组合 | settings/auth/resource decisions 由各自 store 持久 | session switch/new/fork/import 时先 shutdown，再重建服务 |
+| `AgentSession` | 当前 Coding Agent 产品路径 | 可处理多次 prompt，直到 switch/shutdown | message/compaction 等通过 `SessionManager` 追加 JSONL | `agent_end` 后仍可能 retry/compact/queue；`agent_settled` 才是产品空闲 |
+| Low-level `Agent` / `runAgentLoop` | `AgentSession` 每次 prompt 驱动 | 一次 agent run，可含多次 turn | transcript 由上层 session 选择是否保存 | 无工具、steering、follow-up 后发 `agent_end` |
+| Session tree | `SessionManager` | 跨 prompt、进程、branch/fork | JSONL v3 header + parent-linked entries | resume 重建 active branch，不重建旧 workspace |

@@ -1,7 +1,7 @@
 {
   "analysis_status": "complete_with_known_gaps",
   "created_at": "2026-07-16T05:39:43.832311+00:00",
-  "completed_at": "2026-07-16T09:13:24.466688+00:00",
+  "completed_at": "2026-07-17T10:36:35.145281+00:00",
   "schema_version": "1.0",
   "target": {
     "repository_root": "/volume/med/work/users/mzchen/lab/codex",
@@ -59,7 +59,7 @@
   },
   "tooling": {
     "skill": "harness-analysis",
-    "skill_commit": "b44224f0c2666d6461e7be4fb4af840ce67e05cd",
+    "skill_commit": "7f2847d3cfa5d1964576ea99265ca83bbe234bf8",
     "skill_schema_version": "1.0",
     "image_skill": "gpt-image-2"
   }

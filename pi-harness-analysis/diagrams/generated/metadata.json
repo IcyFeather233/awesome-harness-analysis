@@ -30,7 +30,33 @@
         "../../evidence/claims.jsonl",
         "../../evidence/observations.jsonl",
         "../story-specs.json"
-      ]
+      ],
+      "question": "Pi 当前产品请求如何穿过 AgentSession、low-level loop、provider、tool 与 durable session？",
+      "caption": "Pi v0.80.7 的主路径由 Coding Agent AgentSession 编排并调用共享 runAgentLoop；默认工具在 host 权限下运行，JSONL session 与外部隔离是不同支路。",
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "S-008",
+        "S-012",
+        "S-013",
+        "S-017",
+        "R-001",
+        "R-002",
+        "R-004",
+        "X-002",
+        "X-003"
+      ],
+      "exclusions": [
+        "迁移中的 AgentHarness 不是当前 Coding Agent 默认主轴",
+        "不表示默认存在 MCP、subagent、permission gate 或 sandbox",
+        "不表示 workspace 随 session 恢复"
+      ],
+      "glossary": {
+        "AgentSession": "current Coding Agent product orchestrator",
+        "runAgentLoop": "shared low-level model/tool loop",
+        "Provider": "pi-ai model/auth/stream adapter",
+        "JSONL session": "durable parent-linked conversation tree"
+      }
     },
     {
       "figure_id": "pi-observed-turn",
@@ -54,7 +80,24 @@
         "../../evidence/claims.jsonl",
         "../../evidence/observations.jsonl",
         "../story-specs.json"
-      ]
+      ],
+      "question": "真实 Pi read 场景如何把 toolResult 回填后再调用一次模型？",
+      "caption": "R-SCENARIO-002 的第一次 SiFlow response 请求 read；314159 作为 toolResult 进入 transcript，第二次 request 返回 final，随后依次出现 agent_end 与 agent_settled。",
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "R-002"
+      ],
+      "exclusions": [
+        "没有运行 write/edit/bash、extensions、compaction、retry 或 resume",
+        "不评价长期任务正确性或路径频率"
+      ],
+      "glossary": {
+        "toolResult": "model-visible result corresponding to toolUse",
+        "agent_end": "low-level run terminal event",
+        "agent_settled": "product-level no-pending-work event",
+        "Turn": "one provider response and its tool batch"
+      }
     },
     {
       "figure_id": "pi-context-lifecycle-v2",
@@ -78,7 +121,31 @@
         "../../evidence/claims.jsonl",
         "../../evidence/observations.jsonl",
         "../story-specs.json"
-      ]
+      ],
+      "question": "Pi 的 startup、carry-forward 和 runtime context 来源如何在每次 provider request 前汇合？",
+      "caption": "资源、active session branch、toolResult、extension hook 与 compaction summary 先进入 context assembly，再按 transformContext -> convertToLlm 的顺序形成 provider request。",
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "S-004",
+        "S-005",
+        "S-008",
+        "S-009",
+        "R-002",
+        "R-004",
+        "X-003"
+      ],
+      "exclusions": [
+        "图中 toolResult 不绕过 context transform 直达 model",
+        "真实场景禁用了 project resources/extensions",
+        "未动态比较九类 context source"
+      ],
+      "glossary": {
+        "Carry-forward": "context rebuilt from the active durable branch",
+        "transformContext": "extension transform before provider conversion",
+        "convertToLlm": "AgentMessage to provider-message conversion",
+        "Compaction summary": "replacement context stored as a session entry"
+      }
     },
     {
       "figure_id": "pi-extension-surface",
@@ -105,7 +172,32 @@
         "../../evidence/claims.jsonl",
         "../../evidence/observations.jsonl",
         "../story-specs.json"
-      ]
+      ],
+      "question": "Pi 的 context 注入、tool capability 注册与 action 执行控制为何是三种不同扩展面？",
+      "caption": "Extensions 可分别改变模型所见 context、registry 中的 callable tools 和 execute 前后的 hooks；默认 action 仍在 host，optional gate/container 不是核心强制路径。",
+      "evidence_ids": [
+        "D-002",
+        "D-004",
+        "D-007",
+        "S-001",
+        "S-002",
+        "S-003",
+        "S-007",
+        "S-015",
+        "S-017",
+        "R-002"
+      ],
+      "exclusions": [
+        "extension 不是隔离 plugin VM",
+        "optional tool_call gate 不覆盖 extension 直接主机副作用",
+        "核心默认不内置 MCP 或 subagent"
+      ],
+      "glossary": {
+        "Context hook": "per-request message transform",
+        "Registry": "merged built-in/custom/extension tool map",
+        "tool_call gate": "optional pre-execute extension hook",
+        "Host execution": "action running with Pi process permissions"
+      }
     },
     {
       "figure_id": "pi-permission-boundaries",
@@ -130,7 +222,31 @@
         "../../evidence/claims.jsonl",
         "../../evidence/observations.jsonl",
         "../story-specs.json"
-      ]
+      ],
+      "question": "Project trust、可选 tool gate 与外部 sandbox 分别保护什么，默认副作用路径在哪里？",
+      "caption": "Project trust 只在 startup 限制项目资源；默认 built-ins/extensions 继承 host 权限。Tool hooks、Gondolin 和 whole-process isolation 是不同覆盖范围的可选层。",
+      "evidence_ids": [
+        "D-002",
+        "D-004",
+        "D-007",
+        "S-003",
+        "S-006",
+        "S-007",
+        "S-017",
+        "R-002",
+        "X-001"
+      ],
+      "exclusions": [
+        "本轮没有运行 write/edit/bash 或 deny side-effect 实验",
+        "Gondolin 不自动覆盖 arbitrary extension tools",
+        "bind mount 和 host agent dir 仍需独立治理"
+      ],
+      "glossary": {
+        "Project trust": "startup resource-loading decision",
+        "Tool gate": "optional extension hook before a registered tool executes",
+        "Gondolin": "example selective guest routing",
+        "Whole-process isolation": "container/VM boundary around Pi and extensions"
+      }
     },
     {
       "figure_id": "pi-subagent-topology",
@@ -155,7 +271,27 @@
         "../../evidence/claims.jsonl",
         "../../evidence/observations.jsonl",
         "../story-specs.json"
-      ]
+      ],
+      "question": "Pi 默认核心、subagent example 与 experimental orchestrator 的 delegation 语义有何不同？",
+      "caption": "默认 registry 没有 subagent；example tool 为每个 child 启动无 session 的 Pi 子进程并默认共享 cwd，orchestrator 则监督独立 RPC Pi instances。",
+      "evidence_ids": [
+        "D-004",
+        "D-006",
+        "D-010",
+        "S-015",
+        "S-016"
+      ],
+      "exclusions": [
+        "本轮未动态创建 child 或 orchestrator instance",
+        "context/process 隔离不表示 workspace、environment 或 OS capability 隔离",
+        "orchestrator 不是 loop 内 parent/child primitive"
+      ],
+      "glossary": {
+        "Subagent extension": "optional tool spawning a separate Pi process",
+        "Orchestrator": "experimental multi-instance RPC process supervisor",
+        "no-session": "child does not create normal durable session",
+        "Shared cwd": "parent and child default to the same workspace path"
+      }
     },
     {
       "figure_id": "pi-persistence-lifecycle",
@@ -183,7 +319,29 @@
         "../../evidence/claims.jsonl",
         "../../evidence/observations.jsonl",
         "../story-specs.json"
-      ]
+      ],
+      "question": "Pi 如何把 active conversation branch 追加到 JSONL，并在新进程重建 context？",
+      "caption": "SessionManager 以 id/parentId/leaf 保存 tree；resume 重建 active path，compaction 是一等 entry。R-SCENARIO-003/004 验证正常跨进程恢复，workspace 不回滚。",
+      "evidence_ids": [
+        "S-008",
+        "S-009",
+        "S-010",
+        "S-014",
+        "R-003",
+        "R-004",
+        "X-003"
+      ],
+      "exclusions": [
+        "未注入 malformed middle entry、parent cycle、tail truncation 或 migration failure",
+        "不恢复 provider stream、进程或 workspace snapshot",
+        "图中重复 JSONL 图标是同一 durable store 的视图"
+      ],
+      "glossary": {
+        "JSONL v3": "header plus parent-linked durable entries",
+        "Leaf": "active branch endpoint",
+        "Compaction entry": "summary and kept-suffix metadata",
+        "Resume": "rebuild active context in a new process"
+      }
     },
     {
       "figure_id": "pi-design-space",
@@ -208,7 +366,36 @@
         "../../evidence/claims.jsonl",
         "../../evidence/observations.jsonl",
         "../story-specs.json"
-      ]
+      ],
+      "question": "Pi 的 documented stance、恢复机制和分析者 tradeoff 如何逐行对应？",
+      "caption": "四行分别呈现 minimal loop、extension-first、external isolation 和 JSONL durability；右列点线只表示证据约束下的分析综合。",
+      "evidence_ids": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-007",
+        "D-008",
+        "S-001",
+        "S-003",
+        "S-007",
+        "S-008",
+        "S-011",
+        "S-017",
+        "R-004",
+        "X-002"
+      ],
+      "exclusions": [
+        "analyst synthesis 不表示作者未记录的动机",
+        "不声称 AgentHarness migration 已完成",
+        "不把可选 sandbox 画成默认核心能力"
+      ],
+      "glossary": {
+        "Documented stance": "product boundary stated in repository docs",
+        "Recovered mechanism": "fixed-commit implementation",
+        "Analyst synthesis": "falsifiable tradeoff inferred from evidence",
+        "External isolation": "container/VM deployment boundary"
+      }
     }
   ],
   "rejected": [

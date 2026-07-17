@@ -6,17 +6,17 @@
 
 ## Context 来源
 
-| 来源 | 生命周期 | 进入方式 |
-|---|---|---|
-| 默认/自定义 system prompt | startup + refresh | `buildSystemPrompt()` |
-| AGENTS.md / CLAUDE.md | startup/reload | `<project_instructions>`；不受 project trust 保护，除非禁用 context files |
-| `.pi/SYSTEM.md` / append prompt | startup/reload | 受 project trust 保护 |
-| Skills metadata | startup/reload | 有 read tool 时列在 system prompt |
-| `/skill:name` full body | lazy, per invocation | 展开成 user-side invocation text |
-| Active session branch | carry-forward | `buildSessionContext()` |
-| ToolResult | per tool turn | 追加 transcript 后进入下一模型请求 |
-| Extension messages/system override | per turn | `before_agent_start` |
-| Context hook transform | per provider request | `transformContext` 后再 `convertToLlm` |
+| 来源 | 首次装载/刷新时机 | 信任与持久性 | 进入模型的精确方式 | 本轮动态覆盖 |
+|---|---|---|---|---|
+| 默认/自定义 system prompt | startup；model/resource refresh 后重建 | 配置/CLI 来源；不作为 session message entry | `buildSystemPrompt()` 形成每次 request 的 system instructions | 最小 system prompt 路径运行；未做 source diff |
+| AGENTS.md / CLAUDE.md | startup/reload，可用 flag 禁用 | context file；**不受 project trust gate** | 包装为 `<project_instructions>` 并入 system prompt | 真实场景显式 `--no-context-files`，仅静态确认 |
+| `.pi/SYSTEM.md` / append prompt | trusted project resources 加载或 reload | 未信任项目时不加载 | resource loader 合并到 system prompt | 真实场景禁用，未动态加载 |
+| Skills metadata | resource load/reload | global/project skill；project 部分受 trust | 有 read tool 时在 system prompt 列出可用 skill | 真实场景禁用 |
+| `/skill:name` full body | 用户显式调用时 lazy expansion | body 在调用 turn 进入 transcript | 展开成 user-side invocation text | 未运行 skill invocation |
+| Active session branch | open/resume/branch/fork 后重建 | JSONL v3 durable parent chain | `buildSessionContext()` 选择 active path/messages/summary | R-003/004 验证跨进程恢复 |
+| ToolResult | 每个 tool batch 完成后 | 作为 message entry 可被 session 保存 | 先追加 transcript，再经 transform/convert 进入下一 request | R-002 直接观察 `314159` 回填 |
+| Extension message/system override | 每个 prompt 开始 | extension 与 host 同权限；是否 durable 取决于 message API | `before_agent_start` 可加 custom message 或替换本轮 system prompt | X-001 hooks；真实 extensions 禁用 |
+| Context hook transform | **每次 provider request** | transient，默认不回写原 session tree | `transformContext` 后再 `convertToLlm` | X-001 覆盖 hook contract；未做真实 payload diff |
 
 [C: C-003] 的置信度为 medium，因为本轮没有部署 request proxy 做全部 source 的差分；真实场景只验证了最小路径和 toolResult 回填。
 
@@ -34,3 +34,9 @@ Coding Agent 分两类：
 Compaction entry 保存 summary、`firstKeptEntryId`、`tokensBefore` 和 details；随后重建 active context。[S: S-009] [X: X-003]
 
 新 `AgentHarness.compact()` 已有手动结构操作和 compaction helpers，但 auto-compaction decision 尚未实现。[D: D-008]
+
+| 路径 | 触发条件 | 操作顺序 | 是否自动重答 | Durable 结果 | 未验证边界 |
+|---|---|---|---|---|---|
+| Overflow compaction | provider 报 context overflow，或 usage 超出当前 model window | 从 live context 移除 error -> 生成 summary -> 追加 compaction entry -> 重建 active context -> 最多 retry 一次 | 是，最多一次 compact-and-retry | error 仍可留在 session；summary/firstKept/tokens 写入 JSONL | 真实超长 SiFlow request 未运行 |
+| Threshold compaction | token usage 接近阈值，但当前 assistant turn 已正常完成 | 计算 summary -> 追加 compaction entry -> 重建后续 context | 否，不重新回答已完成 turn | compaction 成为 active branch 的一等 entry | summary 信息损失未做质量评估 |
+| Manual `AgentHarness.compact()` | host 显式调用 helper | 在 phase/save-point 约束下准备并提交结构变更 | 由 host 决定后续 prompt | helper/session tests 验证 ordering | auto decision、产品迁移和半持久恢复尚未实现 |

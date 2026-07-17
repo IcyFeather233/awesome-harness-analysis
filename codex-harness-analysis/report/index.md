@@ -1,6 +1,6 @@
 # OpenAI Codex 0.144.5 Harness 架构分析
 
-> 冻结对象：`rust-v0.144.5`，peeled commit `87db9bc18ba5bc82c1cb4e4381b44f693ee35623`。本报告分析的是 Codex harness，而不是模型本身，也不把代码形状推断出的理由冒充作者意图。
+> 冻结对象：`rust-v0.144.5`，peeled commit `87db9bc18ba5bc82c1cb4e4381b44f693ee35623`。本报告分析的是 Codex harness，而不是模型本身，也不把代码形状推断出的理由冒充作者意图。首次遇到内部类型、状态名或缩写时，可查[全局术语表](16-glossary.md)。
 
 ![Codex system overview](../diagrams/generated/codex-system-overview.png)
 
@@ -39,7 +39,7 @@ Codex 0.144.5 不是“一个 while-loop 加几个工具”，而是一个以 **
 1. `run_turn` 是模型-工具闭环；`RegularTask` 负责 turn 生命周期和排队输入，不是第二套 loop。[S: `S-002`, `S-003`] [X: `X-002`]
 2. context 不只是 message list：模型可见 history 与可差分 world state 分开维护，compaction 会替换信息而非仅截断字符串。[S: `S-005`–`S-007`]
 3. registry 与 exposure 分离，当前 provider/config 决定模型看见哪些已注册能力；V1 multi-agent 的 namespace tool 就是一个条件 surface。[S: `S-009`] [X: `X-005`]
-4. 安全决策先由 exec/approval policy 作出，再由 platform sandbox 执行；`never` 对提权请求是前置硬拒绝。[S: `S-012`–`S-014`] [X: `X-004`, `X-007`]
+4. 对真正创建进程的 exec 路径，approval/exec policy 在 platform sandbox 前决策；`never` 对提权请求是前置硬拒绝。但 shell 中的 `apply_patch` 会先被识别并进入专用 patch safety、按路径 approval 与 sandbox runtime，不能把普通 exec 顺序泛化到所有工具输入。[S: `S-012`–`S-014`, `S-028`] [X: `X-004`, `X-007`]
 5. thread durability 不是 UI 附件：LiveThread/ThreadStore/rollout 构成可恢复状态模型；跨进程 resume 已被本轮实验证实。[S: `S-018`, `S-019`] [X: `X-006`]
 
 ## 阅读路径
@@ -58,3 +58,5 @@ Codex 0.144.5 不是“一个 while-loop 加几个工具”，而是一个以 **
 - [运行实验](11-runtime-experiments.md)
 - [失败模式与开放问题](12-failure-modes-open-questions.md)
 - [覆盖率与复现](13-coverage-reproducibility.md)
+- [源码与 Claim 索引](14-source-claim-index.md)
+- [全局术语表](16-glossary.md)

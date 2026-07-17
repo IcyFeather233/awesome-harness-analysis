@@ -338,7 +338,7 @@ MANIFEST = {
         "model_provider": "siflow/qwen3.6-35ba3b",
         "runtime_versions": {"node": "22.19.0", "npm": "10.9.3", "vitest": "4.1.9", "python": "3.x"},
     },
-    "tooling": {"skill": "harness-analysis", "skill_schema_version": "1.0", "skill_commit": "cb778e3"},
+    "tooling": {"skill": "harness-analysis", "skill_schema_version": "1.0", "skill_commit": "7f2847d3cfa5d1964576ea99265ca83bbe234bf8"},
 }
 
 

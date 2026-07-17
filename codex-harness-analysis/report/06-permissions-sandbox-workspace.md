@@ -27,6 +27,16 @@
 
 因此可审计边界是组合关系：policy 决定是否允许/询问/拒绝，sandbox 限制获准执行能触达什么。[I: `I-002`] 把二者任意一个画成“唯一安全层”都会丢失真实语义。
 
+## 特殊治理路径：apply_patch 不是普通进程 exec
+
+源码复核发现，shell 与 unified-exec handler 会先调用 `intercept_apply_patch`；若输入确实是 patch，它在创建普通 command 的 exec-policy requirement 之前转入 `ApplyPatchRuntime`。该 runtime 仍执行 patch safety assessment、按文件路径生成 approval keys、复用 session approval cache，并作为 sandboxable runtime 落地文件变更；它不是“跳过治理直接 spawn”。[S: `S-028`] [C: `C-024`]
+
+| Tool 输入族 | 进入副作用前的主要路径 | 当前证据能证明什么 | 不能泛化的结论 |
+|---|---|---|---|
+| 普通 shell/exec command | Escalation mode guard → ExecPolicy decision → optional user approval/cache → permission profile/sandbox transform → process。 | `never + require_escalated` 在本实验中先于进程创建被拒绝。 | 不能据此覆盖 apply_patch、MCP、dynamic host tool 或 startup side effects。 |
+| `apply_patch`（直接 tool 或 shell interception） | Patch parse/safety → per-path approval requirement/cache → ApplyPatchRuntime → sandboxed file mutation。 | 源码证明它有独立治理链，并非普通 command policy chain。 | 尚未运行三入口 differential scenario，不能宣称所有入口事件序列完全等价。 |
+| MCP / dynamic / extension tool | 各自 handler 与 host callback，是否复用 exec/sandbox 取决于具体实现。 | Registry/router 和 handler source 已覆盖。 | “工具都经过同一个 ExecPolicy”不成立为已证明的 universal claim。 |
+
 ## 反例实验
 
 fixture 请求 `touch forbidden-marker` 且显式 `sandbox_permissions=require_escalated`，配置为 `approval_policy=never`。router 返回 “you cannot ask for escalated permissions if the approval policy is Never”；随后 fixture 只有收到 tool output 才结束。运行前后 `FACTS.txt` SHA-256 都是 `277992...8ed`，目录仍只有 `FACTS.txt`。[X: `X-004`, `X-007`]
