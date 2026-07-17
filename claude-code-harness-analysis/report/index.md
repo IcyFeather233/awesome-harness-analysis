@@ -1,6 +1,6 @@
 # Claude Code Harness 架构分析
 
-> **证据边界。** 本报告分析 source-only commit `16a676f`。其 1,884 个 TS/TSX 文件、关键 symbol 与 feature gates 和论文所述 Claude Code v2.1.88 corpus 强指纹一致，但缺少 package version、上游 tree hash、build manifest，不能视为已证明的 exact 官方 artifact。快照仍有 657 个无法解析的相对 import；除 SiFlow 协议探针外，主循环、安全、session 与 subagent 结论均为 static-only。官方材料只支持产品立场，五价值/十三原则是 analyst synthesis。[X: X-001–X-003] [D: D-001–D-008] [C: C-001, C-024–C-026]
+> **证据边界。** 本报告分析 source-only commit `16a676f`。其 1,884 个 TS/TSX 文件、关键 symbol 与 feature gates 和论文所述 Claude Code v2.1.88 corpus 强指纹一致，但缺少 package version、上游 tree hash、build manifest，不能视为已证明的 exact 官方 artifact。快照仍有 657 个无法解析的相对 import；除 SiFlow 协议探针外，主循环、安全、session 与 subagent 结论均为 static-only。官方材料只支持产品立场，五价值/十三原则是 analyst synthesis。[X: X-001–X-003] [D: D-001–D-008] [C: C-001, C-024–C-026] 首次遇到缩写或内部名词时，可查 [全局术语表](16-glossary.md)。
 
 
 ## 核心结论
@@ -15,13 +15,15 @@
 
 ## 定义架构的五个选择
 
-| 设计问题 | 该快照中的答案 | 主要代价 |
+下面只是一页式结论索引；每个选项、替代设计和术语的完整解释位于[设计空间章节](00-design-space-and-running-example.md)。
+
+| 设计问题 | 该快照中的答案 | 主要代价与读者注意 |
 |---|---|---|
-| 多界面是否共用控制器 | REPL 与 headless 都消费 `query()` | 界面状态与 headless mutable state 仍有差异 |
-| context 如何增长 | 分层来源 + 每轮附件 + tool result carry-forward | 来源多且生命周期不同，压缩损失难静态量化 |
-| 工具如何受控 | schema/validation → hook → permission → call | canonical gate 不自动证明所有子系统同等受控 |
-| child 如何隔离 | context/tools/transcript 分开；workspace 默认共享，worktree 可选 | “subagent”不是单一 process/isolation 语义 |
-| 什么是 durable state | transcript、sidechain、team inbox 和部分 metadata | resume 恢复会话，不回滚普通 workspace 文件 |
+| 多界面是否共用控制器 | 交互 REPL、`--print`/SDK 等 surface 先各自处理 UI、structured I/O、permission callback 和 live state，然后都消费共享 `query()` generator。 | 核心 loop 语义更一致，但不同 surface 的 approval UI、ESC、中断、排队和输出格式仍不同；不能把“共享 core”读成“所有入口行为完全相同”。 |
+| context 如何增长 | Startup、lazy、per-turn、carry-forward 与 durable 来源在每次 model request 前合流，再经过 tool-result budget、snip、microcompact、collapse/autocompact 等变换。 | 这种流水线节省无关 context，但来源、顺序和 compaction survivor 更难追踪；静态分析不能量化摘要损失。 |
+| 工具如何受控 | 工具从 registered capability 到 visible schema、requested tool_use、validated dispatch、hook/permission、可选 sandbox 和 backend call，经过多级状态转换。 | canonical tool path 有 gate，不自动证明 startup、hook、MCP lifecycle、bridge/daemon 等副作用面都同等受控；这些仍是审计边界。 |
+| child 如何隔离 | Agent child 重建自己的 context、tool pool 与 sidechain transcript；普通 child 默认共享 cwd/files，显式 worktree 才提供工作区隔离。 | “subagent”不是单一 process/isolation 语义，必须分别看 context、policy、workspace、process、cancellation 和 result channel。 |
+| 什么是 durable state | Transcript JSONL、sidechain、team inbox、compaction boundary 和部分 metadata 可跨进程恢复；普通 workspace 文件属于外部持久状态。 | Resume/fork 恢复 conversational/session view，不是事务式 rollback；临时 session permission grants 也不会从旧 transcript 静默恢复。 |
 
 > **读者图待生成。** 问题：Surface、Core、Safety/Action、State 与 Backend 如何依赖？ evidence-grounded story spec 与 gpt-image-2 prompt 已生成；外部图像 API 尚未获本轮风险授权，因此当前不嵌入占位图或技术 SVG。
 
@@ -46,5 +48,6 @@
 15. [覆盖率与复现](13-coverage-reproducibility.md)
 16. [源码与 claim 索引](14-source-claim-index.md)
 17. [与 arXiv 2604.14228v2 的对照](15-paper-benchmark.md)
+18. [全局术语表](16-glossary.md)
 
 结构化真值位于 [HIR](../hir.json)、[claims](../evidence/claims.jsonl)、[observations](../evidence/observations.jsonl)、[coverage](../evidence/coverage.json) 和 [scenarios](../scenarios/catalog.json)。

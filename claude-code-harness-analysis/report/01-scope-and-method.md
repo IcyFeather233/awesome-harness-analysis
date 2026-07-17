@@ -1,6 +1,6 @@
 # 范围、证据与方法
 
-> **证据边界。** 本报告分析 source-only commit `16a676f`。其 1,884 个 TS/TSX 文件、关键 symbol 与 feature gates 和论文所述 Claude Code v2.1.88 corpus 强指纹一致，但缺少 package version、上游 tree hash、build manifest，不能视为已证明的 exact 官方 artifact。快照仍有 657 个无法解析的相对 import；除 SiFlow 协议探针外，主循环、安全、session 与 subagent 结论均为 static-only。官方材料只支持产品立场，五价值/十三原则是 analyst synthesis。[X: X-001–X-003] [D: D-001–D-008] [C: C-001, C-024–C-026]
+> **证据边界。** 本报告分析 source-only commit `16a676f`。其 1,884 个 TS/TSX 文件、关键 symbol 与 feature gates 和论文所述 Claude Code v2.1.88 corpus 强指纹一致，但缺少 package version、上游 tree hash、build manifest，不能视为已证明的 exact 官方 artifact。快照仍有 657 个无法解析的相对 import；除 SiFlow 协议探针外，主循环、安全、session 与 subagent 结论均为 static-only。官方材料只支持产品立场，五价值/十三原则是 analyst synthesis。[X: X-001–X-003] [D: D-001–D-008] [C: C-001, C-024–C-026] 首次遇到缩写或内部名词时，可查 [全局术语表](16-glossary.md)。
 
 
 ## 冻结对象
@@ -16,7 +16,18 @@
 
 分析按 14 个 module 深读入口、loop、context、compaction、provider、tools、permission、sandbox、workspace、session、subagent、orchestration、observability 和 recovery。重要结论先写 claim，再关联 evidence，最后投影到 HIR 与图。
 
-本轮 D 是 first-party 产品材料，S 是源码结构，X 是控制实验，I 是分析推断。没有 R，因为 target harness 未启动。论文只作为 prior-analysis benchmark 和反例线索，不直接作为实现真值。[C: C-024–C-026]
+## 证据记录中的缩写
+
+- **Claim（C）**：报告希望成立、并且能被反例推翻的一条明确结论。claim 必须列 supporting evidence、confidence、coverage 和 falsification test。
+- **Documented evidence（D）**：first-party 文档、ADR 或作者声明，可支持产品目标和公开意图，但不能单独证明当前 commit 的控制流。
+- **Static evidence（S）**：固定源码、配置和 schema 中能定位的结构或潜在路径。S 能证明代码存在，不证明当前 build 可达或生产中常走。
+- **Runtime observation（R）**：真实 target harness 某次执行产生的 trace。R 证明路径至少发生过一次，不证明所有配置都如此。
+- **Controlled experiment（X）**：为区分某个 claim 专门设计的探针、scripted run 或 fault injection。本报告的 provider probe 和 corpus fingerprint 属于 X，但前者绕过了 target loop。
+- **Inference（I）**：分析者根据多条 D/S/R/X 得出的设计归纳或风险解释，不能伪装成作者原话。
+- **HIR（Harness Intermediate Representation）**：把 agent loop、context、tools、policy、state 和 delegation 表成 typed nodes/edges 的机器可读模型；正文和图是它的投影视图。
+- **Coverage**：这条结论检查了哪些目录、入口、配置和场景。`not found` 只有在 coverage 足够明确时才能接近“没有”。
+
+本轮没有 target R，因为 Claude Code 快照未能启动。论文只作为 prior-analysis benchmark 和反例线索，不直接作为实现真值。[C: C-024–C-026]
 
 ## 版本指纹，而不是版本猜测
 
