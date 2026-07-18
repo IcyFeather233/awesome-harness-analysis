@@ -20,6 +20,44 @@
 
 因此“Claude Code 支持某工具”至少可能指前四种不同事实。安全分析必须说明自己证明到了哪一级。
 
+## 固定快照的内置工具清单
+
+这里的 **内置工具** 指由 `getAllBaseTools()` 在产品源码中组装的候选实现，不包括动态 MCP server tools、plugin/SDK 注入工具或单纯注入 prompt 的 skill 内容。候选工具还要经过 `getTools()` 的 simple/REPL mode、deny rule 和 `isEnabled()` 过滤，之后才可能成为当前 request 的 visible schema。[源码：base pool](https://github.com/IcyFeather233/claude-code/blob/16a676ffa36eadbfb28eec39007dff73941346b1/src/tools.ts#L193) [源码：过滤](https://github.com/IcyFeather233/claude-code/blob/16a676ffa36eadbfb28eec39007dff73941346b1/src/tools.ts#L271) [S: S-019]
+
+### 常规 base candidates
+
+| 工具名 | 作用 | 默认/条件边界 |
+|---|---|---|
+| `Bash` | 在 shell backend 执行命令并返回 stdout/stderr、退出和 background 信息。 | 常规 base candidate；simple mode 仍保留；具体命令还经过 permission/sandbox。 |
+| `Read` | 读取文本、图片等文件内容，并执行范围、大小和 token 限制。 | 常规 base candidate；simple mode 仍保留。 |
+| `Edit` | 对文件执行基于匹配内容的局部替换。 | 常规 base candidate；simple mode 仍保留。 |
+| `Write` | 创建或覆盖文件。 | 常规 base candidate；simple mode 不包含；写入仍需具体 input 授权。 |
+| `NotebookEdit` | 修改 Jupyter notebook cell。 | 常规 base candidate，但 `isEnabled()` 和当前文件/环境仍可过滤。 |
+| `Glob`、`Grep` | 分别按路径模式和文件内容搜索。 | 当构建内嵌 bfs/ugrep 时两者从独立 tool pool 移除，搜索改由 shell 内嵌工具承担。 |
+| `Agent`（legacy matcher: `Task`） | 启动具有独立 context/sidechain 的 child agent。 | 是否允许及 child tool set 受 agent type、mode、depth 和 policy 约束。 |
+| `TaskOutput`、`TaskStop` | 读取 background task/agent 输出，或停止正在运行的 task。 | 只有存在对应 background task 时才有实际对象可操作。 |
+| `SendMessage` | 向 team/agent 通信目标发送消息。 | 实现进入 base pool；有效目标取决于 team/agent runtime。 |
+| `WebFetch`、`WebSearch` | 获取 URL 内容或使用 web search backend。 | backend、网络 policy、provider/build feature 和 enable state 可使其不可见或不可执行。 |
+| `TodoWrite` | 写入旧版 todo list。 | Todo V2 开启时还会增加 task CRUD 工具；旧工具是否可见受 mode/config 影响。 |
+| `EnterPlanMode`、`ExitPlanMode` | 进入或退出只规划工作流。 | 当前 mode 决定其中哪个工具有意义；名称存在不表示两者同时可用。 |
+| `AskUserQuestion` | 暂停 autonomous path，向用户请求结构化选择或补充信息。 | headless/surface capability 会影响能否完成交互。 |
+| `Skill` | 按名称加载并执行 skill 的 instruction/workflow。 | 工具本身内置；具体 skill 来自资源加载，不是另一项内置 executable tool。 |
+| `SendUserMessage`（legacy: `Brief`） | 向用户发送消息/brief 类结果。 | base pool 中由 `BriefTool` 实现；旧名称只用于兼容匹配。 |
+
+### 条件内置 candidates
+
+| 条件 | 可能增加的内置工具 | 不能推出 |
+|---|---|---|
+| Todo V2 | `TaskCreate`、`TaskGet`、`TaskUpdate`、`TaskList` | 开启 Todo V2 不表示旧 transcript 中的 todo 自动迁移。 |
+| LSP / worktree | `LSP`；`EnterWorktree`、`ExitWorktree` | LSP 是语言服务入口；worktree 是 Git workspace 隔离，不是 container。 |
+| Agent swarms / inbox | `TeamCreate`、`TeamDelete`、`ListPeers` | team capability 仍受 feature、agent role 和 runtime state 限制。 |
+| REPL / shell variant | `REPL`、`PowerShell` | REPL mode 会隐藏部分 primitive tools；PowerShell 只在对应平台/配置启用。 |
+| Tool discovery / MCP resources | `ToolSearch`；`ListMcpResourcesTool`、`ReadMcpResourceTool` | 后两个在 `getTools()` 中被列为 special tools，不属于普通 base visible set；MCP server 提供的动态 tool 仍是外部能力。 |
+| Proactive/Kairos/triggers build | `Sleep`、`CronCreate`、`CronDelete`、`CronList`、`RemoteTrigger`，以及 `MonitorTool`、`WorkflowTool`、`WebBrowserTool` 等 build-gated class | source-only mirror 缺少部分条件模块，类名可以证明组装槽位，不能证明该构建中的最终 model-visible name 或 reachability。 |
+| Ant-only / test / verification | `Config`、`TungstenTool`、`SuggestBackgroundPRTool`、`VerifyPlanExecutionTool`、`OverflowTestTool`、`TestingPermissionTool` 等 | 这些不是普通 public configuration 下稳定可见的工具；test-only 工具不能写入产品默认清单。 |
+
+`StructuredOutput` 是协议生成的 synthetic output tool，MCP server tools 由 `assembleToolPool()` 动态合并；二者都不应与上表的普通 base candidates 混为一谈。由于该快照仍有 657 个 unresolved relative imports，条件模块只按固定源码中的组装槽位报告，不把缺失模块的 class name 冒充已验证 schema name。
+
 ## 图中层次与扩展名词
 
 - **Built-in Tools**：Bash、Read/Edit/Write、search、Agent、Task、plan 等；进入 pool 仍受 mode、feature、deny 和 enabled state 影响。[S: S-019]

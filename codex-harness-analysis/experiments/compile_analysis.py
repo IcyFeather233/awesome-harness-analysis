@@ -622,6 +622,31 @@ REPORTS["05-models-tools-extensions.md"] = """# 模型、工具与扩展
 
 以报告的 read scenario 为例：`exec_command` 已在 registry，read-only 配置下也处于 exposure；模型提出 call 后 router 找到 handler，runtime 读取文件，结果回到 context，再发第二次 Responses 请求。`X-SCENARIO-003` 的未知工具则在 router/registry 查找阶段失败，但错误仍沿第 7 段返回模型。[S: `S-009`–`S-011`, `S-025`, `S-026`] [X: `X-002`, `X-003`, `X-005`]
 
+## 固定版本的内置工具清单
+
+Codex `rust-v0.144.5` 没有一个对所有 request 恒定的“默认工具数组”。`ToolSpecPlan` 每个 turn 按 environment、model/provider capability、feature、tool mode 和 agent depth 组装 runtimes，再把其中 direct exposure 的 specs 发给模型；所以表中“内置”表示 core 自带 handler/spec，不表示本轮一定 visible。[源码：tool sources](https://github.com/openai/codex/blob/87db9bc18ba5bc82c1cb4e4381b44f693ee35623/codex-rs/core/src/tools/spec_plan.rs#L583) [S: `S-009`]
+
+| 类别 | 内置工具名 | 加入/可见条件 | 主要作用 |
+|---|---|---|---|
+| 计划 | `update_plan` | core utility builder 总会注册；code-mode 可把它作为 nested tool。 | 更新结构化 plan steps/status。 |
+| Shell: unified exec | `exec_command`、`write_stdin` | 有 execution environment，且 model/feature 选择 `UnifiedExec`。legacy `shell_command` 同时保留为 dispatch-only，不发给模型。 | 启动/轮询交互式命令、写 stdin。 |
+| Shell: legacy/local | `shell_command` | 有 environment，且 shell type 为 Default/Local/ShellCommand。 | 执行 shell 命令；与 `exec_command` 是按配置二选一的模型表面。 |
+| 文件补丁 | `apply_patch` | 有 environment，且 model 声明 `apply_patch_tool_type`。 | 解析并应用 patch；也可从 shell/unified-exec 输入被提前拦截到专用 patch runtime。[S: `S-028`] |
+| 本地媒体 | `view_image` | 有 environment；schema 是否允许 `detail=original` 还取决于 model capability。 | 读取本地图片并作为模型输入返回。 |
+| 用户与权限 | `request_user_input`、`request_permissions` | 前者需 experimental config；后者需 environment + `RequestPermissionsTool` feature。 | 请求用户选择，或请求扩大当前 tool permission。 |
+| Deferred environment | `wait_for_environment` | `DeferredExecutor` feature。 | 等待 deferred/remote execution environment 状态。 |
+| Token/context | `new_context`、`get_context_remaining` | `TokenBudget` feature；`new_context` 是 direct-model-only。 | 创建新 context window，或查询剩余 context。 |
+| 时间 | `clock.curr_time`、`clock.sleep` | `CurrentTimeReminder`；sleep 还需 reminder config 开启。namespace tools 需 provider 支持。 | 读取当前时间或等待指定时长。 |
+| Tool/plugin discovery | `tool_search`、`list_available_plugins_to_install`、`request_plugin_install` | tool search 需 provider 支持 search + namespace；plugin tools 还需 ToolSuggest + Apps + Plugins 和候选项。 | 发现 deferred tools，或请求安装明确匹配的 plugin/connector。 |
+| MCP resource helpers | `list_mcp_resources`、`list_mcp_resource_templates`、`read_mcp_resource` | 当前 session 存在 MCP tool state。 | 浏览/读取 MCP resources；不是 MCP server 动态提供的业务 tool。 |
+| Multi-agent V1 | `spawn_agent`、`send_input`、`resume_agent`、`wait_agent`、`close_agent` | V1 开启且未超过 depth；provider 支持 namespace 时合并进 V1 namespace，tool search 开启时可 deferred。 | 管理 child session 生命周期和输入。 |
+| Multi-agent V2 | `spawn_agent`、`send_message`、`followup_task`、`wait_agent`、`interrupt_agent`、`list_agents` | V2 feature/config；可按配置放入 namespace 或 direct-model-only。 | V2 agent tree、mailbox、follow-up 与 interrupt。 |
+| Agent jobs | `spawn_agents_on_csv`、`report_agent_job_result` | `SpawnCsv` + collaboration；report 只给 agent-job worker。 | 批量派生 CSV 任务并回报 worker 结果。 |
+| Provider-hosted | `web_search`（具体 schema type 由 model info 决定） | 非 Responses Lite、provider 支持 web search，且未被 standalone `web.run` 替代。 | 由 provider 执行 web search，不经过普通本地 handler。 |
+| Test-only | `test_sync_tool` | model `experimental_supported_tools` 显式包含该名字。 | 同步测试，不属于正常产品默认面。 |
+
+此外，Code Mode 会增加一个公共 JavaScript executor 和对应 wait handler，并把可嵌套工具投影到其内部；公开名称来自 `codex_code_mode` dependency，不应在本仓库证据不足时硬编码。MCP runtime tools、extension executors 和 host dynamic tools 虽然进入同一个 registry，但它们的名称/实现由外部 server、extension 或 host 提供，因此不属于 core 内置工具。
+
 ## Model boundary
 
 `ModelProviderInfo` 把 base URL、auth、wire transport、request/stream retry 与 remote compaction capability 收拢到 provider abstraction；`ModelClientSession` 保存 turn 内稳定 transport 状态和 WebSocket fallback。[源码](https://github.com/openai/codex/blob/87db9bc18ba5bc82c1cb4e4381b44f693ee35623/codex-rs/model-provider-info/src/lib.rs#L90) [S: `S-008`, `S-024`]
