@@ -1,0 +1,12 @@
+Create a precise educational infographic for a Chinese technical architecture report. This is a reader illustration of Pi v0.80.7, NOT a speculative design. Use a warm white background, navy text, restrained coral for orchestration, blue for model/tool processing, green for state. Flat vector-like icons, clean rounded cards, strong spacing, no gradients or watermarks. Large readable labels, English identifiers exactly as given; short Chinese subtitles. All necessary facts are specified below. Add no components, arrows, safety shields or claims. Do not connect adjacent cards unless an arrow is explicitly specified. No legend unless requested. Landscape composition, 1536x1024. Use very few words; captions outside the image will carry evidence and scope.
+
+Title: "Pi：新会话的首次落盘".
+Three large sequential cards left to right with simple forward arrows, numbered 1, 2, 3.
+Card 1 light blue: heading "仅有 user / 配置记录". Show a small RAM icon containing three generic record lines. Large subtitle "先保留在内存". Bottom line "尚未创建新文件". No file icon here.
+Card 2 light coral: heading "首条 assistant entry". Show the RAM record stack flowing to one green file icon labeled "JSONL". Subtitle "创建文件，写入已有记录". Use one clear intra-card arrow from memory to file.
+Card 3 light green: heading "后续 entry". Show one new record being added to the same conceptual JSONL file. Subtitle "逐条追加". The repeated file across cards is successive time states, not parallel stores.
+Across the top, a small scope label "新建、尚未写过文件的持久会话".
+At bottom one detached gray note "已有空文件初始化与格式迁移另有路径".
+No branch/fork arrows, no workspace rollback icon, no fsync/transaction guarantee, no success checkmark. Do not imply that merely allocating a session filename creates the file.
+
+IMPORTANT TEXT LAYOUT CORRECTION: The large topmost title MUST read exactly "Pi：新会话的首次落盘". The scope line "新建、尚未写过文件的持久会话" must be a separate smaller subtitle immediately below this title, not a replacement for it. Keep the three sequential cards and all other labels. Include both title and subtitle.

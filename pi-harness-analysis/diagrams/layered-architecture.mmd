@@ -26,7 +26,7 @@ flowchart TB
   end
   subgraph g_215bf50cac07["infrastructure"]
     direction TB
-    n_fefc5c1c7ccb["pi-ai Models / ModelRegistry<br/>ModelAdapter"]
+    n_fefc5c1c7ccb["ModelRegistry + pi-ai/compat<br/>ModelAdapter"]
     n_6327a3e9cdd9["Provider request<br/>ModelCall"]
   end
   subgraph g_2f995d99d5f5["interface"]
@@ -41,7 +41,6 @@ flowchart TB
   subgraph g_2c174a8c5967["orchestration"]
     direction TB
     n_825e7b7c4e51["Coding Agent AgentSession<br/>AgentLoop"]
-    n_546fb0dae98a["New AgentHarness<br/>AgentLoop"]
     n_1f48ee0d4fd8["runAgentLoop<br/>AgentLoop"]
     n_2fb97928aabe["Coding Agent compaction<br/>Compactor"]
     n_9021d26f0f99["agent_end / agent_settled<br/>ExitCondition"]
@@ -53,9 +52,8 @@ flowchart TB
     n_6fad310cfe27["Live active session<br/>Session"]
     n_110ebbcc690b["Session JSONL v3<br/>SessionStore"]
   end
-  class n_825e7b7c4e51,n_546fb0dae98a,n_1f48ee0d4fd8,n_2fb97928aabe,n_3af45ee25e84,n_822e4631e8d0,n_9021d26f0f99,n_9b238fc5ebe1,n_d82b55feeebb,n_fefc5c1c7ccb,n_6327a3e9cdd9,n_c1d0b90b4198,n_cb9c10e1a22e,n_6fad310cfe27,n_110ebbcc690b,n_95a05335b894,n_c223520f774e,n_26809c922930,n_94fdf21bba59 observed;
+  class n_825e7b7c4e51,n_1f48ee0d4fd8,n_2fb97928aabe,n_3af45ee25e84,n_822e4631e8d0,n_9021d26f0f99,n_9b238fc5ebe1,n_d82b55feeebb,n_fefc5c1c7ccb,n_6327a3e9cdd9,n_c1d0b90b4198,n_cb9c10e1a22e,n_6fad310cfe27,n_110ebbcc690b,n_95a05335b894,n_c223520f774e,n_26809c922930,n_94fdf21bba59 observed;
   class n_eae4eb8662ed,n_66d060a3ce72,n_1606289c70f4,n_bfbbd360512f,n_a17ca7733626 staticOnly;
-  n_546fb0dae98a -->|"direct loop"| n_1f48ee0d4fd8
   n_825e7b7c4e51 -->|"prompt/continue"| n_1f48ee0d4fd8
   n_66d060a3ce72 -.->|"local shell"| n_94fdf21bba59
   n_d82b55feeebb -->|"invoke"| n_822e4631e8d0
@@ -66,7 +64,7 @@ flowchart TB
   n_1f48ee0d4fd8 -->|"convert before request"| n_3af45ee25e84
   n_1f48ee0d4fd8 -->|"dispatch"| n_c223520f774e
   n_822e4631e8d0 -->|"create runtime"| n_cb9c10e1a22e
-  n_fefc5c1c7ccb -->|"auth + dispatch"| n_6327a3e9cdd9
+  n_fefc5c1c7ccb -->|"compat stream dispatch"| n_6327a3e9cdd9
   n_1606289c70f4 -.->|"allow/block"| n_c223520f774e
   n_bfbbd360512f -.->|"load project resources"| n_eae4eb8662ed
   n_eae4eb8662ed -.->|"resources"| n_3af45ee25e84
@@ -74,20 +72,19 @@ flowchart TB
   n_cb9c10e1a22e -->|"own/rebind"| n_825e7b7c4e51
   n_26809c922930 -->|"active tool"| n_c223520f774e
   linkStyle 0 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 1 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 2 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 1 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 2 stroke:#2E7D32,stroke-width:2px;
   linkStyle 3 stroke:#2E7D32,stroke-width:2px;
   linkStyle 4 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 5 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 6 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 5 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 6 stroke:#2E7D32,stroke-width:2px;
   linkStyle 7 stroke:#2E7D32,stroke-width:2px;
   linkStyle 8 stroke:#2E7D32,stroke-width:2px;
   linkStyle 9 stroke:#2E7D32,stroke-width:2px;
   linkStyle 10 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 11 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 11 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
   linkStyle 12 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
   linkStyle 13 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
-  linkStyle 14 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 14 stroke:#2E7D32,stroke-width:2px;
   linkStyle 15 stroke:#2E7D32,stroke-width:2px;
   linkStyle 16 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 17 stroke:#2E7D32,stroke-width:2px;

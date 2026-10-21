@@ -131,7 +131,7 @@ EVIDENCE = [
     evidence("S-005", "S", "DefaultResourceLoader 先以不信任状态加载 bootstrap extensions，再解析 trust 并加载最终资源集合。", source("packages/coding-agent/src/core/resource-loader.ts", 330, 413), ["C-003", "C-006"]),
     evidence("S-006", "S", "resolveProjectTrusted 优先 override/extension/store，default ask 且无 UI 时返回 false。", source("packages/coding-agent/src/core/project-trust.ts", 46, 95), ["C-006"]),
     evidence("S-007", "S", "内置 bash 使用 cwd、继承环境和 detached process group；timeout 无默认值，abort/timeout kill process tree。", source("packages/coding-agent/src/core/tools/bash.ts", 27, 148), ["C-007"]),
-    evidence("S-008", "S", "SessionManager 实现 v3 append-only JSONL tree、active leaf、compaction-aware context、restore 与 fork。", source("packages/coding-agent/src/core/session-manager.ts", 457, 1540), ["C-008", "C-012"]),
+    evidence("S-008", "S", "SessionManager 实现 v3 append-only JSONL tree、active leaf、分支选取、entry 到应用消息的转换、compaction-aware context、restore 与 fork。", source("packages/coding-agent/src/core/session-manager.ts", 322, 1540), ["C-008", "C-012", "C-025"]),
     evidence("S-009", "S", "AgentSession 把 overflow 与 threshold 分开处理，overflow 最多一次 compact-and-retry，并持久化 compaction entry 后重建 context。", source("packages/coding-agent/src/core/agent-session.ts", 1890, 2161), ["C-009", "C-020"]),
     evidence("S-010", "S", "普通 retryable assistant error 使用受 maxRetries 限制的指数退避，error 留在 session 但从 live context 移除。", source("packages/coding-agent/src/core/agent-session.ts", 2573, 2637), ["C-009", "C-020"]),
     evidence("S-011", "S", "新 AgentHarness 直接调用 runAgentLoop，创建 turn snapshot，在 turn_end flush writes 与发出 save_point。", source("packages/agent/src/harness/agent-harness.ts", 314, 616), ["C-010", "C-016"]),
@@ -366,6 +366,8 @@ def main() -> int:
     write_json(ROOT / "hir.json", {"schema_version": "1.0", "repository": {"root": TARGET, "commit": COMMIT, "entrypoints": MANIFEST["scope"]["entrypoints"], "configurations": MANIFEST["scope"]["configurations"]}, "nodes": NODES, "edges": EDGES})
     write_json(ROOT / "scenarios" / "catalog.json", SCENARIOS)
     write_json(ROOT / "questions.json", QUESTIONS)
+    from refine_mechanism_analysis import refine
+    refine(ROOT)
     return 0
 
 

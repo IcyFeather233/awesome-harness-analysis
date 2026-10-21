@@ -1,0 +1,43 @@
+{
+  "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+  "started_at": "2026-10-20T13:31:42.215719+00:00",
+  "node_version": "v22.19.0",
+  "dependency_lock_sha256": "c55060a6c2e05ad6131f1bf9db1f26247365f80d6c2820a97026b7801e1481f0",
+  "source_copy": "git archive of the pinned commit; original worktree is not edited",
+  "dependencies": "existing node_modules linked read-only by convention; cache disabled",
+  "model_mode": "mock/faux only; no credentials passed; no external model requests",
+  "isolation": "temporary source/cache/test data; no OS-level network sandbox",
+  "groups": [
+    {
+      "evidence_id": "X-010",
+      "package": "coding-agent",
+      "config": "vitest.config.ts",
+      "test_files": [
+        "test/session-file-invalid.test.ts"
+      ],
+      "started_at": "2026-10-20T13:31:43.514298+00:00",
+      "exit_code": 0,
+      "command": [
+        "/tmp/pi-analysis-20261020-runtime/node",
+        "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-mgzym8gb/source/packages/coding-agent/node_modules/vitest/dist/cli.js",
+        "--run",
+        "--config",
+        "vitest.config.ts",
+        "--maxWorkers=1",
+        "--no-cache",
+        "--reporter=json",
+        "--outputFile",
+        "/volume/med/work/users/mzchen/lab/awesome-harness-analysis/pi-harness-analysis/traces/checks/20261020-cli/X-010.vitest.json",
+        "test/session-file-invalid.test.ts"
+      ],
+      "cwd": "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-mgzym8gb/source/packages/coding-agent",
+      "loader": "tsx with workspace tsconfig",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "total": 1,
+      "result_file": "X-010.vitest.json"
+    }
+  ],
+  "completed_at": "2026-10-20T13:31:49.245051+00:00"
+}

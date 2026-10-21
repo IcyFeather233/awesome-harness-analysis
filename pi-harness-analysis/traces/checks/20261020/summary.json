@@ -1,0 +1,143 @@
+{
+  "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+  "started_at": "2026-10-20T13:28:26.280660+00:00",
+  "node_version": "v22.19.0",
+  "dependency_lock_sha256": "c55060a6c2e05ad6131f1bf9db1f26247365f80d6c2820a97026b7801e1481f0",
+  "source_copy": "git archive of the pinned commit; original worktree is not edited",
+  "dependencies": "existing node_modules linked read-only by convention; cache disabled",
+  "model_mode": "mock/faux only; no credentials passed; no external model requests",
+  "isolation": "temporary source/cache/test data; no OS-level network sandbox",
+  "groups": [
+    {
+      "evidence_id": "X-004",
+      "package": "agent",
+      "config": "vitest.config.ts",
+      "test_files": [
+        "test/agent-loop.test.ts",
+        "test/agent.test.ts"
+      ],
+      "started_at": "2026-10-20T13:28:28.062589+00:00",
+      "exit_code": 0,
+      "command": [
+        "/tmp/pi-analysis-20261020-runtime/node",
+        "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-cajxq7ci/source/packages/agent/node_modules/vitest/dist/cli.js",
+        "--run",
+        "--config",
+        "vitest.config.ts",
+        "--maxWorkers=1",
+        "--no-cache",
+        "--reporter=json",
+        "--outputFile",
+        "/volume/med/work/users/mzchen/lab/awesome-harness-analysis/pi-harness-analysis/traces/checks/20261020/X-004.vitest.json",
+        "test/agent-loop.test.ts",
+        "test/agent.test.ts"
+      ],
+      "cwd": "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-cajxq7ci/source/packages/agent",
+      "passed": 39,
+      "failed": 0,
+      "total": 39,
+      "result_file": "X-004.vitest.json"
+    },
+    {
+      "evidence_id": "X-005",
+      "package": "coding-agent",
+      "config": "vitest.config.ts",
+      "test_files": [
+        "test/agent-session-compaction.test.ts",
+        "test/agent-session-auto-compaction-queue.test.ts",
+        "test/agent-session-dynamic-tools.test.ts",
+        "test/suite/regressions/1717-2113-agent-session-event-settlement.test.ts",
+        "test/suite/regressions/3317-network-connection-lost-retry.test.ts"
+      ],
+      "started_at": "2026-10-20T13:28:35.297934+00:00",
+      "exit_code": 0,
+      "command": [
+        "/tmp/pi-analysis-20261020-runtime/node",
+        "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-cajxq7ci/source/packages/coding-agent/node_modules/vitest/dist/cli.js",
+        "--run",
+        "--config",
+        "vitest.config.ts",
+        "--maxWorkers=1",
+        "--no-cache",
+        "--reporter=json",
+        "--outputFile",
+        "/volume/med/work/users/mzchen/lab/awesome-harness-analysis/pi-harness-analysis/traces/checks/20261020/X-005.vitest.json",
+        "test/agent-session-compaction.test.ts",
+        "test/agent-session-auto-compaction-queue.test.ts",
+        "test/agent-session-dynamic-tools.test.ts",
+        "test/suite/regressions/1717-2113-agent-session-event-settlement.test.ts",
+        "test/suite/regressions/3317-network-connection-lost-retry.test.ts"
+      ],
+      "cwd": "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-cajxq7ci/source/packages/coding-agent",
+      "passed": 12,
+      "failed": 0,
+      "total": 17,
+      "result_file": "X-005.vitest.json"
+    },
+    {
+      "evidence_id": "X-006",
+      "package": "coding-agent",
+      "config": "vitest.config.ts",
+      "test_files": [
+        "test/session-manager/build-context.test.ts",
+        "test/session-manager/tree-traversal.test.ts",
+        "test/session-file-invalid.test.ts"
+      ],
+      "started_at": "2026-10-20T13:28:51.217414+00:00",
+      "exit_code": 1,
+      "command": [
+        "/tmp/pi-analysis-20261020-runtime/node",
+        "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-cajxq7ci/source/packages/coding-agent/node_modules/vitest/dist/cli.js",
+        "--run",
+        "--config",
+        "vitest.config.ts",
+        "--maxWorkers=1",
+        "--no-cache",
+        "--reporter=json",
+        "--outputFile",
+        "/volume/med/work/users/mzchen/lab/awesome-harness-analysis/pi-harness-analysis/traces/checks/20261020/X-006.vitest.json",
+        "test/session-manager/build-context.test.ts",
+        "test/session-manager/tree-traversal.test.ts",
+        "test/session-file-invalid.test.ts"
+      ],
+      "cwd": "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-cajxq7ci/source/packages/coding-agent",
+      "passed": 46,
+      "failed": 1,
+      "total": 47,
+      "result_file": "X-006.vitest.json"
+    },
+    {
+      "evidence_id": "X-007",
+      "package": "agent",
+      "config": "vitest.harness.config.ts",
+      "test_files": [
+        "test/harness/agent-harness.test.ts",
+        "test/harness/session.test.ts",
+        "test/harness/compaction.test.ts"
+      ],
+      "started_at": "2026-10-20T13:28:57.259312+00:00",
+      "exit_code": 0,
+      "command": [
+        "/tmp/pi-analysis-20261020-runtime/node",
+        "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-cajxq7ci/source/packages/agent/node_modules/vitest/dist/cli.js",
+        "--run",
+        "--config",
+        "vitest.harness.config.ts",
+        "--maxWorkers=1",
+        "--no-cache",
+        "--reporter=json",
+        "--outputFile",
+        "/volume/med/work/users/mzchen/lab/awesome-harness-analysis/pi-harness-analysis/traces/checks/20261020/X-007.vitest.json",
+        "test/harness/agent-harness.test.ts",
+        "test/harness/session.test.ts",
+        "test/harness/compaction.test.ts"
+      ],
+      "cwd": "/volume/med/work/users/mzchen/.runtime-cache/tmp/pi-mechanism-checks-cajxq7ci/source/packages/agent",
+      "passed": 61,
+      "failed": 0,
+      "total": 61,
+      "result_file": "X-007.vitest.json"
+    }
+  ],
+  "completed_at": "2026-10-20T13:28:59.903522+00:00"
+}

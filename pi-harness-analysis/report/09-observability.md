@@ -1,52 +1,35 @@
-# 09 可观测性
+# 事件与可观测性
 
-## 已实现
+Pi 的事件同时服务界面、extension 和产品状态处理。JSON 模式将 session header 与这些事件写到 stdout，RPC 除命令响应外也转发事件。当前核心提供生命周期事件，默认没有完整的 OpenTelemetry trace/span 关联模型。[D: D-005, D-009; R: R-001, R-002]
 
-Agent event vocabulary 包含：
+## 事件表示哪个阶段
 
-- `agent_start`, `agent_end`, `agent_settled`；
-- `turn_start`, `turn_end`；
-- `message_start/update/end`；
-- `tool_execution_start/update/end`；
-- `queue_update`；
-- `compaction_start/end`；
-- `auto_retry_start/end`。
+| 事件 | 可确认的阶段 | 需要另外检查的内容 |
+|---|---|---|
+| message_start / update | 消息开始或流式内容变化 | 尚不是最终消息，也不等于落盘 |
+| message_end | 最终消息进入状态/监听处理路径 | 当前监听位置、是否持久化、文件是否首次创建 |
+| tool_execution_start | 开始处理一次工具调用 | handler 可能被校验、block 或截断保护跳过 |
+| tool_execution_end | 该调用的结果处理完成 | 结果可能是执行错误或准备阶段拒绝 |
+| turn_end | 一轮 assistant 及工具批次结束 | 后续可能有下一轮模型请求 |
+| agent_end | 一次低层循环结束 | 产品层可能重试、压缩或消费队列 |
+| agent_settled | 产品层本次运行收尾完成 | 最终结果是否成功仍要看任务或错误 |
 
-JSON mode 把 header + events 写到 stdout；RPC 在 command response 之外转发同一事件，并提供 extension UI request/response。[D: D-005] [R: R-001, R-002]
+这张表依据 `Agent.processEvents()`、`AgentSession._handleAgentEvent()` 和工具批次实现。外部监听者与内部持久化有明确先后，事件名本身不足以推断磁盘或 OS 副作用。[S: S-018, S-019]
 
-| 表面 | 面向谁 | 关联键/顺序 | 包含内容 | 缺口与敏感性 |
-|---|---|---|---|---|
-| In-process agent events | `AgentSession`、extensions、UI adapter | 单次 runtime 的 event sequence、message/tool 对象 | run/turn/message/tool/queue/compaction/retry/settled lifecycle | 默认没有全局 trace/span parent；payload 可含 prompt/tool data |
-| JSON mode stdout | 自动化消费者、分析脚本 | header + 发出顺序 | 同一 session events 的结构化序列 | 原始输出含 assistant thinking、args/results；需要 redaction |
-| RPC stream | 外部 host/UI | command response id + 并行 agent events | session control、events、extension UI request/response | command 与 event 因果关系需 host 自行维护 |
-| JSONL session | resume/branch/fork | entry `id/parentId`、timestamp、file order | durable message/config/compaction/tree state | 不是低开销 telemetry；不包含完整内部 timing/span |
-| OTel/Sentry adapter notes | 未来外部 adapter | 设计目标是 stable vendor-neutral event mapping | 文档化方向，不是默认 exporter | 本版本不能声明 collector delivery 或 trace propagation |
-| 本分析 normalized trace | 复核者 | scenario id + sequence | role/type/length/model/usage/stop/tool lifecycle | 是分析产物，不是 Pi 产品 API；主动删除文本、thinking、args/results |
+## 执行事件与持久历史
 
-`R-SCENARIO-002` 归一化后可重建：
+工具批次的结束事件可以按完成顺序到达，而持久消息按模型调用顺序形成。Session JSONL 记录可恢复的会话内容和配置，不保存每一次内部回调耗时。要分析延迟，需要额外关联请求、工具和时间信息。
 
-```text
-session
-  -> run.started
-  -> turn.started
-  -> user message
-  -> assistant toolUse
-  -> tool.started(read)
-  -> tool.completed(read)
-  -> toolResult
-  -> turn.completed
-  -> turn.started
-  -> assistant stop
-  -> run.completed
-  -> run.settled
-```
+历史 read 轨迹归一化后呈现 `run.started → turn.started → assistant(toolUse) → tool.started/completed → toolResult → turn.completed → 下一 turn → run.completed → run.settled`。其中 `tool.started` 是分析脚本对 Pi 事件的映射，含义仍受上述阶段边界约束。[R: R-002]
 
-## 未实现为默认核心的部分
+## 轨迹保留什么
 
-当前 event 没有统一 `traceId/spanId/parentSpanId`，也没有默认 OTel exporter。`packages/agent/docs/observability.md` 是 design notes：目标是 Pi 自己产 stable vendor-neutral events，外部 adapter 再映射到 OTel/Sentry。[D: D-009]
+原始 JSON 输出可含用户输入、模型文本/thinking、工具参数和结果。当前 normalized trace 去掉这些内容，保留事件序号、角色、类型、长度、usage 和工具关联信息。本次 Vitest JSON 则保留断言名称、状态、耗时及失败信息，可从[实验章节](11-runtime-experiments.md)定位。
 
-因此本分析通过 scenario id + sequence 做归一化 correlation，而没有把 JSON events 宣称成完整 distributed trace。[C: C-014]
+OTel/Sentry adapter 在这个固定版本的相关文档中属于设计方向。本报告按 scenario 和事件序号关联记录，未验证 exporter 或 collector 端链路。[C: C-014]
 
-## 数据敏感性
+## 运行完成和任务答对需要分别观测
 
-原始 JSON mode 会包含 prompt、assistant text/thinking、tool args/result。报告使用的 normalized trace 只保留角色、内容类型/长度、provider/model、usage、stop reason、tool name 与 lifecycle。生产接入应默认执行同类 redaction。
+[Scott 的 my-pi 实践](https://scottspence.com/posts/building-my-pi-claude-code-alternative-with-pi)区分运行故障与完成后的错误回答。[Kahtaf 的领域 Agent 记录](https://kahtaf.com/blog/lessons-from-building-a-domain-agent/)则按路由、工具、证据和回答层定位问题。[I: I-003]
+
+当前 Pi 的 event stream 能帮助还原请求和工具经过了哪些阶段，任务产物是否符合要求仍需要单独的验收。`agent_settled` 也会在错误或取消收尾后出现。本报告的 controller 测试因此只支持所断言的机制，不当作真实任务成功率；外部项目加入的 telemetry、脱敏和评测组件也不记为默认 Pi 能力。[S: S-019]

@@ -1,0 +1,69 @@
+{
+  "scope": "New AgentHarness is retained as historical evidence, outside the current AgentSession report.",
+  "claim_ids": [
+    "C-010",
+    "C-016"
+  ],
+  "evidence_ids": [
+    "D-003",
+    "D-008",
+    "S-011",
+    "X-002",
+    "X-007"
+  ],
+  "scenario_ids": [
+    "X-SCENARIO-002",
+    "X-SCENARIO-007"
+  ],
+  "hir_nodes": [
+    {
+      "attributes": {
+        "layer": "orchestration",
+        "lifecycle": "runtime",
+        "persistence_tier": "live",
+        "trust_zone": "process"
+      },
+      "conditions": {
+        "surface": "agent-core API, not default coding-agent"
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "D-003",
+        "S-011",
+        "X-002"
+      ],
+      "id": "N-AgentHarness",
+      "name": "New AgentHarness",
+      "source_refs": [
+        {
+          "end_line": 1010,
+          "path": "packages/agent/src/harness/agent-harness.ts",
+          "start_line": 152,
+          "symbol": "AgentHarness"
+        }
+      ],
+      "status": "experimental_verified",
+      "summary": "New generic orchestration layer with snapshots and save points; migration incomplete.",
+      "type": "AgentLoop"
+    }
+  ],
+  "hir_edges": [
+    {
+      "conditions": {
+        "surface": "new AgentHarness"
+      },
+      "confidence": "high",
+      "evidence_ids": [
+        "S-011",
+        "X-002"
+      ],
+      "id": "E-AgentHarness-Loop",
+      "label": "direct loop",
+      "source": "N-AgentHarness",
+      "source_refs": [],
+      "status": "experimental_verified",
+      "target": "N-LowLoop",
+      "type": "calls"
+    }
+  ]
+}

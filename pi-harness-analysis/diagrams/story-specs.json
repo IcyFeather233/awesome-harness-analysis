@@ -4,7 +4,7 @@
     {
       "id": "pi-system-story",
       "title": "Pi: thin loop, explicit state, external isolation",
-      "description": "The current Coding Agent path at v0.80.7, with migration and optional policy branches separated from the observed spine.",
+      "description": "The current Coding Agent path at v0.80.7, with optional policy branches separated from the observed spine.",
       "kicker": "PRODUCT BOUNDARY",
       "width": 1600,
       "height": 720,
@@ -54,9 +54,7 @@
           "hir_ids": [
             "N-AgentSession"
           ],
-          "claim_ids": [
-            "C-010"
-          ],
+          "claim_ids": [],
           "evidence_ids": [
             "S-002",
             "S-009",
@@ -177,29 +175,6 @@
           "y": 270,
           "width": 220,
           "height": 96
-        },
-        {
-          "id": "new-harness",
-          "hir_ids": [
-            "N-AgentHarness"
-          ],
-          "claim_ids": [
-            "C-010",
-            "C-016"
-          ],
-          "evidence_ids": [
-            "D-003",
-            "S-011",
-            "X-002"
-          ],
-          "label": "AgentHarness v2",
-          "subtitle": "Migration target; incomplete",
-          "tone": "muted",
-          "x": 460,
-          "y": 135,
-          "width": 190,
-          "height": 90,
-          "badge": "WIP"
         },
         {
           "id": "optional-gate",
@@ -498,29 +473,6 @@
           ]
         },
         {
-          "id": "story-new-harness",
-          "source": "new-harness",
-          "target": "low-loop",
-          "points": [
-            [
-              555,
-              225
-            ],
-            [
-              555,
-              270
-            ]
-          ],
-          "label": "direct loop",
-          "label_x": 600,
-          "label_y": 252,
-          "status": "experimental",
-          "evidence_ids": [
-            "S-011",
-            "X-002"
-          ]
-        },
-        {
           "id": "story-optional-gate",
           "source": "optional-gate",
           "target": "tools",
@@ -575,7 +527,6 @@
         "Provider",
         "Tools",
         "Workspace",
-        "AgentHarness v2",
         "Tool gate",
         "Session JSONL v3",
         "Lifecycle events",
@@ -589,7 +540,6 @@
         "Provider",
         "Tools",
         "Workspace",
-        "AgentHarness v2",
         "Tool gate",
         "Session JSONL v3",
         "Lifecycle events",
@@ -602,7 +552,6 @@
         "JSONL session": "durable parent-linked conversation tree"
       },
       "exclusions": [
-        "迁移中的 AgentHarness 不是当前 Coding Agent 默认主轴",
         "不表示默认存在 MCP、subagent、permission gate 或 sandbox",
         "不表示 workspace 随 session 恢复"
       ],
@@ -616,7 +565,6 @@
         "R-001",
         "R-002",
         "R-004",
-        "X-002",
         "X-003"
       ],
       "caption": "Pi v0.80.7 的主路径由 Coding Agent AgentSession 编排并调用共享 runAgentLoop；默认工具在 host 权限下运行，JSONL session 与外部隔离是不同支路。"
@@ -1171,513 +1119,6 @@
         "R-002"
       ],
       "caption": "R-SCENARIO-002 的第一次 SiFlow response 请求 read；314159 作为 toolResult 进入 transcript，第二次 request 返回 final，随后依次出现 agent_end 与 agent_settled。"
-    },
-    {
-      "id": "pi-design-space",
-      "title": "Pi design space: stance, mechanism, consequence",
-      "description": "Documented product choices are separated from analyst-synthesized tradeoffs; dotted edges are interpretation, not author intent.",
-      "kicker": "DESIGN SYNTHESIS",
-      "width": 1600,
-      "height": 820,
-      "footer": "Left: documented stance | Center: recovered implementation | Right: observable tradeoff (analyst synthesis)",
-      "groups": [
-        {
-          "label": "Documented stance",
-          "x": 35,
-          "y": 115,
-          "width": 420,
-          "height": 635,
-          "tone": "interface"
-        },
-        {
-          "label": "Recovered mechanism",
-          "x": 590,
-          "y": 115,
-          "width": 420,
-          "height": 635,
-          "tone": "core"
-        },
-        {
-          "label": "Observable tradeoff",
-          "x": 1145,
-          "y": 115,
-          "width": 420,
-          "height": 635,
-          "tone": "policy"
-        }
-      ],
-      "nodes": [
-        {
-          "id": "stance-thin",
-          "kind": "concept",
-          "claim_ids": [
-            "C-002",
-            "C-010"
-          ],
-          "evidence_ids": [
-            "D-001",
-            "D-003"
-          ],
-          "label": "Thin generic core",
-          "subtitle": "Keep model decisions in the model",
-          "tone": "interface",
-          "x": 70,
-          "y": 165,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "mechanism-thin",
-          "hir_ids": [
-            "N-LowLoop",
-            "N-AgentSession",
-            "N-AgentHarness"
-          ],
-          "claim_ids": [
-            "C-002",
-            "C-010"
-          ],
-          "evidence_ids": [
-            "S-001",
-            "S-011",
-            "X-002"
-          ],
-          "label": "runAgentLoop + orchestration",
-          "subtitle": "One loop, two product layers",
-          "tone": "core",
-          "x": 625,
-          "y": 165,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "tradeoff-thin",
-          "kind": "concept",
-          "claim_ids": [
-            "C-010"
-          ],
-          "evidence_ids": [
-            "D-008",
-            "S-011"
-          ],
-          "label": "Composable, but split ownership",
-          "subtitle": "Migration and parity become architecture work",
-          "tone": "policy",
-          "x": 1180,
-          "y": 165,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "stance-extension",
-          "kind": "concept",
-          "claim_ids": [
-            "C-004",
-            "C-013"
-          ],
-          "evidence_ids": [
-            "D-004"
-          ],
-          "label": "Extension over built-ins",
-          "subtitle": "MCP, subagent and policy are optional",
-          "tone": "interface",
-          "x": 70,
-          "y": 310,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "mechanism-extension",
-          "hir_ids": [
-            "N-ToolRegistry",
-            "N-Hooks",
-            "N-SubagentPlugin"
-          ],
-          "claim_ids": [
-            "C-004",
-            "C-017"
-          ],
-          "evidence_ids": [
-            "S-003",
-            "S-015",
-            "S-017"
-          ],
-          "label": "Registry + lifecycle hooks",
-          "subtitle": "Capabilities merge at runtime",
-          "tone": "capability",
-          "x": 625,
-          "y": 310,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "tradeoff-extension",
-          "kind": "concept",
-          "claim_ids": [
-            "C-005",
-            "C-017"
-          ],
-          "evidence_ids": [
-            "D-002",
-            "S-017"
-          ],
-          "label": "Flexible, but policy can fragment",
-          "subtitle": "Optional hooks are not a global boundary",
-          "tone": "policy",
-          "x": 1180,
-          "y": 310,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "stance-isolation",
-          "kind": "concept",
-          "claim_ids": [
-            "C-005",
-            "C-007"
-          ],
-          "evidence_ids": [
-            "D-002",
-            "D-007"
-          ],
-          "label": "Externalize isolation",
-          "subtitle": "Do not imply an in-process sandbox",
-          "tone": "interface",
-          "x": 70,
-          "y": 455,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "mechanism-isolation",
-          "hir_ids": [
-            "N-Bash",
-            "N-Workspace",
-            "N-ExternalSandbox"
-          ],
-          "claim_ids": [
-            "C-005",
-            "C-007"
-          ],
-          "evidence_ids": [
-            "S-007",
-            "D-007"
-          ],
-          "label": "Host process + optional container",
-          "subtitle": "Whole-process or routed-tool isolation",
-          "tone": "execution",
-          "x": 625,
-          "y": 455,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "tradeoff-isolation",
-          "kind": "concept",
-          "claim_ids": [
-            "C-007",
-            "C-017"
-          ],
-          "evidence_ids": [
-            "D-002",
-            "D-007"
-          ],
-          "label": "Honest boundary, deployment burden",
-          "subtitle": "Custom tools can escape partial routing",
-          "tone": "risk",
-          "x": 1180,
-          "y": 455,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "stance-state",
-          "kind": "concept",
-          "claim_ids": [
-            "C-008",
-            "C-012"
-          ],
-          "evidence_ids": [
-            "S-008"
-          ],
-          "label": "Append-oriented durable state",
-          "subtitle": "Preserve branches and summaries",
-          "tone": "interface",
-          "x": 70,
-          "y": 600,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "mechanism-state",
-          "hir_ids": [
-            "N-Session",
-            "N-SessionStore",
-            "N-Compactor"
-          ],
-          "claim_ids": [
-            "C-008",
-            "C-009"
-          ],
-          "evidence_ids": [
-            "S-008",
-            "S-009",
-            "R-004"
-          ],
-          "label": "JSONL tree + compaction entries",
-          "subtitle": "Active leaf reconstructs context",
-          "tone": "state",
-          "x": 625,
-          "y": 600,
-          "width": 350,
-          "height": 96
-        },
-        {
-          "id": "tradeoff-state",
-          "kind": "concept",
-          "claim_ids": [
-            "C-008"
-          ],
-          "evidence_ids": [
-            "S-008"
-          ],
-          "label": "Auditable, not workspace-transactional",
-          "subtitle": "Session branch does not roll back files",
-          "tone": "policy",
-          "x": 1180,
-          "y": 600,
-          "width": 350,
-          "height": 96
-        }
-      ],
-      "edges": [
-        {
-          "id": "design-e1",
-          "source": "stance-thin",
-          "target": "mechanism-thin",
-          "points": [
-            [
-              420,
-              213
-            ],
-            [
-              625,
-              213
-            ]
-          ],
-          "status": "static",
-          "evidence_ids": [
-            "D-001",
-            "S-001"
-          ]
-        },
-        {
-          "id": "design-e2",
-          "source": "mechanism-thin",
-          "target": "tradeoff-thin",
-          "points": [
-            [
-              975,
-              213
-            ],
-            [
-              1180,
-              213
-            ]
-          ],
-          "status": "inferred",
-          "evidence_ids": [
-            "D-008",
-            "S-011"
-          ],
-          "claim_ids": [
-            "C-010"
-          ]
-        },
-        {
-          "id": "design-e3",
-          "source": "stance-extension",
-          "target": "mechanism-extension",
-          "points": [
-            [
-              420,
-              358
-            ],
-            [
-              625,
-              358
-            ]
-          ],
-          "status": "static",
-          "evidence_ids": [
-            "D-004",
-            "S-003"
-          ]
-        },
-        {
-          "id": "design-e4",
-          "source": "mechanism-extension",
-          "target": "tradeoff-extension",
-          "points": [
-            [
-              975,
-              358
-            ],
-            [
-              1180,
-              358
-            ]
-          ],
-          "status": "inferred",
-          "evidence_ids": [
-            "D-002",
-            "S-017"
-          ],
-          "claim_ids": [
-            "C-017"
-          ]
-        },
-        {
-          "id": "design-e5",
-          "source": "stance-isolation",
-          "target": "mechanism-isolation",
-          "points": [
-            [
-              420,
-              503
-            ],
-            [
-              625,
-              503
-            ]
-          ],
-          "status": "static",
-          "evidence_ids": [
-            "D-002",
-            "S-007"
-          ]
-        },
-        {
-          "id": "design-e6",
-          "source": "mechanism-isolation",
-          "target": "tradeoff-isolation",
-          "points": [
-            [
-              975,
-              503
-            ],
-            [
-              1180,
-              503
-            ]
-          ],
-          "status": "inferred",
-          "evidence_ids": [
-            "D-007"
-          ],
-          "claim_ids": [
-            "C-007"
-          ]
-        },
-        {
-          "id": "design-e7",
-          "source": "stance-state",
-          "target": "mechanism-state",
-          "points": [
-            [
-              420,
-              648
-            ],
-            [
-              625,
-              648
-            ]
-          ],
-          "status": "static",
-          "evidence_ids": [
-            "S-008"
-          ]
-        },
-        {
-          "id": "design-e8",
-          "source": "mechanism-state",
-          "target": "tradeoff-state",
-          "points": [
-            [
-              975,
-              648
-            ],
-            [
-              1180,
-              648
-            ]
-          ],
-          "status": "inferred",
-          "evidence_ids": [
-            "S-008"
-          ],
-          "claim_ids": [
-            "C-008"
-          ]
-        }
-      ],
-      "question": "Pi 的 documented stance、恢复机制和分析者 tradeoff 如何逐行对应？",
-      "exact_text": [
-        "Thin generic core",
-        "runAgentLoop + orchestration",
-        "Composable, but split ownership",
-        "Extension over built-ins",
-        "Registry + lifecycle hooks",
-        "Flexible, but policy can fragment",
-        "Externalize isolation",
-        "Host process + optional container",
-        "Honest boundary, deployment burden",
-        "Append-oriented durable state",
-        "JSONL tree + compaction entries",
-        "Auditable, not workspace-transactional"
-      ],
-      "exactly_once": [
-        "Thin generic core",
-        "runAgentLoop + orchestration",
-        "Composable, but split ownership",
-        "Extension over built-ins",
-        "Registry + lifecycle hooks",
-        "Flexible, but policy can fragment",
-        "Externalize isolation",
-        "Host process + optional container",
-        "Honest boundary, deployment burden",
-        "Append-oriented durable state",
-        "JSONL tree + compaction entries",
-        "Auditable, not workspace-transactional"
-      ],
-      "glossary": {
-        "Documented stance": "product boundary stated in repository docs",
-        "Recovered mechanism": "fixed-commit implementation",
-        "Analyst synthesis": "falsifiable tradeoff inferred from evidence",
-        "External isolation": "container/VM deployment boundary"
-      },
-      "exclusions": [
-        "analyst synthesis 不表示作者未记录的动机",
-        "不声称 AgentHarness migration 已完成",
-        "不把可选 sandbox 画成默认核心能力"
-      ],
-      "evidence_ids": [
-        "D-001",
-        "D-002",
-        "D-003",
-        "D-004",
-        "D-007",
-        "D-008",
-        "S-001",
-        "S-003",
-        "S-007",
-        "S-008",
-        "S-011",
-        "S-017",
-        "R-004",
-        "X-002"
-      ],
-      "caption": "四行分别呈现 minimal loop、extension-first、external isolation 和 JSONL durability；右列点线只表示证据约束下的分析综合。"
     },
     {
       "id": "pi-context-assembly",

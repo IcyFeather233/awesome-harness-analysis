@@ -1,0 +1,10 @@
+Create a precise educational infographic for a Chinese technical architecture report. This is a reader illustration of Pi v0.80.7, NOT a speculative design. Use a warm white background, navy text, restrained coral for orchestration, blue for model/tool processing, green for state. Flat vector-like icons, clean rounded cards, strong spacing, no gradients or watermarks. Large readable labels, English identifiers exactly as given; short Chinese subtitles. All necessary facts are specified below. Add no components, arrows, safety shields or claims. Do not connect adjacent cards unless an arrow is explicitly specified. No legend unless requested. Landscape composition, 1536x1024. Use very few words; captions outside the image will carry evidence and scope.
+
+Title: "Pi：从会话记录到模型请求".
+Create a clean left-to-right pipeline across the middle with five compact cards:
+"Session entries" (green; subtitle "历史记录") -> "Active branch" (green; subtitle "选分支与摘要") -> "transformContext" (blue; subtitle "处理消息") -> "convertToLlm" (blue; subtitle "转换消息类型") -> "Model request" (coral; subtitle "messages + system + tools").
+Above the LAST card only, one separate gray card "System prompt + Active tools". Draw its single arrow directly DOWN into "Model request". It must NOT enter transformContext or convertToLlm. This distinction is essential.
+Below the convertToLlm card, a small blue two-line annotation, without arrows: "custom / summary -> user" and "excluded bash -> filtered".
+Above Active branch, a small note without arrow: "最新摘要 + 保留消息 + 后续消息".
+At bottom left a plain footer: "完整历史与本次请求是不同视图".
+No other nodes, no feedback loops, no direct tool-to-model shortcuts. Exact five pipeline arrows including the top input. The two conversion functions process messages only.

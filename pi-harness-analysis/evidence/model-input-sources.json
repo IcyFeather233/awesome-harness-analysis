@@ -1,0 +1,44 @@
+{
+  "scope": "External model encoding examples; not a Pi runtime integration test",
+  "reviewed_on": "2026-10-21",
+  "source_identity": "Official upstream main files read through web; no immutable revision established for the complete comparison",
+  "sources": [
+    {
+      "id": "M-01",
+      "repo": "Qwen/Qwen3.8-27B",
+      "path": "chat_template.jinja",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B/blob/main/chat_template.jinja",
+      "read_url": "https://huggingface.co/Qwen/Qwen3.8-27B/raw/main/chat_template.jinja",
+      "reviewed_sections": "system/tools block, message roles, XML tool calls, tool responses, assistant generation prefix",
+      "evidence_id": "S-038"
+    },
+    {
+      "id": "M-02",
+      "repo": "deepseek-ai/DeepSeek-V4-Flash",
+      "path": "encoding/encoding_dsv4.py",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/blob/main/encoding/encoding_dsv4.py",
+      "read_url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/raw/main/encoding/encoding_dsv4.py",
+      "reviewed_sections": "tool schema rendering, system/user/assistant encoding, tool result preprocessing, output parser",
+      "evidence_id": "S-039"
+    },
+    {
+      "id": "M-03",
+      "repo": "deepseek-ai/DeepSeek-V4-Flash",
+      "path": "encoding/README.md",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/blob/main/encoding/README.md",
+      "reviewed_sections": "message format, reasoning delimiters, DSML tool calls and tool result representation",
+      "evidence_id": "S-039"
+    }
+  ],
+  "documentation": [
+    "https://huggingface.co/docs/transformers/main/en/chat_templating",
+    "https://huggingface.co/docs/transformers/main/en/llm_tutorial",
+    "https://api-docs.deepseek.com/guides/tool_calls/"
+  ],
+  "snapshot_attempt": {
+    "method": "urllib HTTPS download from official Hugging Face resolve/main",
+    "result": "HTTP 429 on first file; no source snapshots or hashes recorded",
+    "fallback": "Previously reviewed official web sources and source URLs; no claim of byte-for-byte captured cloud prompt"
+  },
+  "validation": "Static source and documentation reading. No Qwen or DeepSeek model execution; cloud API internals not captured."
+}

@@ -56,6 +56,11 @@
         "runAgentLoop": "shared low-level model/tool loop",
         "Provider": "pi-ai model/auth/stream adapter",
         "JSONL session": "durable parent-linked conversation tree"
+      },
+      "subsequent_review": {
+        "date": "2026-10-20",
+        "decision": "retired_from_report",
+        "reason": "Migration arrow toward AgentSession and workspace isolation framing can imply an incorrect default topology."
       }
     },
     {
@@ -97,6 +102,15 @@
         "agent_end": "low-level run terminal event",
         "agent_settled": "product-level no-pending-work event",
         "Turn": "one provider response and its tool batch"
+      },
+      "subsequent_review": {
+        "date": "2026-10-20",
+        "decision": "reused_after_review",
+        "reviewed_dimensions": [
+          "original size",
+          "800px report preview"
+        ],
+        "notes": "与当前正文的场景顺序或静态可选路径一致；caption 保留实际覆盖范围。"
       }
     },
     {
@@ -291,6 +305,15 @@
         "Orchestrator": "experimental multi-instance RPC process supervisor",
         "no-session": "child does not create normal durable session",
         "Shared cwd": "parent and child default to the same workspace path"
+      },
+      "subsequent_review": {
+        "date": "2026-10-20",
+        "decision": "reused_after_review",
+        "reviewed_dimensions": [
+          "original size",
+          "800px report preview"
+        ],
+        "notes": "与当前正文的场景顺序或静态可选路径一致；caption 保留实际覆盖范围。"
       }
     },
     {
@@ -396,6 +419,303 @@
         "Analyst synthesis": "falsifiable tradeoff inferred from evidence",
         "External isolation": "container/VM deployment boundary"
       }
+    },
+    {
+      "model": "gpt-image-2.5-flare",
+      "requested_size": "1536x1024",
+      "actual_size": "1536x1024",
+      "quality": "high",
+      "started_at": "2026-10-20T16:48:20.863669+00:00",
+      "completed_at": "2026-10-20T16:50:23.501219+00:00",
+      "endpoint_family": "configured OpenAI-compatible Responses/Images API",
+      "credential_source": "explicit_codex_configuration",
+      "generator_sha256": "f744c6850300e5ccb41c545691d621aac5be3d01b2d5820379dffb7710592ebe",
+      "prompt_sha256": "24796a5e2d6cf179a145a4104051272378749b23b7d71838766136b2d2336d09",
+      "output_sha256": "91de3841269a2aa680aa455c50a3642141d787fc5bceefb2e6678933defd976e",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "full resolution",
+        "1200px report preview",
+        "800px narrow preview"
+      ],
+      "reviewed_at": "2026-10-20T16:56:45.185445+00:00",
+      "review_notes": "Reviewed actual labels, arrows, multiplicity, state boundaries, scope and readability against the figure contract and current report.",
+      "figure_id": "pi-system-overview-v2",
+      "file": "pi-system-overview-v2.png",
+      "prompt_file": "prompts/pi-system-overview-v2.txt",
+      "question": "当前 Coding Agent 如何驱动模型与工具循环，并保存会话？",
+      "caption": "当前 CLI 路径由 AgentSession 调用 Agent 与低层循环；循环分别请求模型和调度工具，再处理返回消息。SessionManager 保存会话，新 AgentHarness 单独标为迁移路径。图中聚合了对象职责，未展开单条消息的落盘时机。",
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "S-008",
+        "S-019",
+        "S-024",
+        "R-002"
+      ],
+      "exclusions": [
+        "不表示模型直接执行工具",
+        "不展示默认 sandbox",
+        "不展开新 AgentHarness",
+        "不表示每条消息立即落盘"
+      ],
+      "glossary": {
+        "AgentSession": "当前产品编排",
+        "Agent + runAgentLoop": "内存状态包装与模型工具循环",
+        "compat": "当前模型兼容分派入口",
+        "SessionManager": "会话树与文件管理"
+      },
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "reader-contracts-20261020.json"
+      ],
+      "reviewed_against": [
+        "reader-contracts-20261020.json",
+        "S-001",
+        "S-002",
+        "S-008",
+        "S-019",
+        "S-024",
+        "R-002"
+      ],
+      "subsequent_review": {
+        "decision": "replaced_for_scope",
+        "replacement": "pi-system-overview-session-only.png",
+        "reason": "Current report focuses on AgentSession."
+      }
+    },
+    {
+      "model": "gpt-image-2.5-flare",
+      "requested_size": "1536x1024",
+      "actual_size": "1536x1024",
+      "quality": "high",
+      "started_at": "2026-10-20T16:51:17.854544+00:00",
+      "completed_at": "2026-10-20T16:51:56.010730+00:00",
+      "endpoint_family": "configured OpenAI-compatible Responses/Images API",
+      "credential_source": "explicit_codex_configuration",
+      "generator_sha256": "f744c6850300e5ccb41c545691d621aac5be3d01b2d5820379dffb7710592ebe",
+      "prompt_sha256": "240bc95e58134a234971736fa986707faba26de502cf57b27f6625be04ed87cf",
+      "output_sha256": "0de52f76519da0b7dc8fd02c5b4ebd7313aa72dee1e552362cebfbbab97211e8",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "full resolution",
+        "1200px report preview",
+        "800px narrow preview"
+      ],
+      "reviewed_at": "2026-10-20T16:56:45.190662+00:00",
+      "review_notes": "Reviewed actual labels, arrows, multiplicity, state boundaries, scope and readability against the figure contract and current report.",
+      "figure_id": "pi-context-views-v3",
+      "file": "pi-context-views-v3.png",
+      "prompt_file": "prompts/pi-context-views-v3.txt",
+      "question": "持久历史怎样变成本次模型请求，system prompt 和 tools 在哪里加入？",
+      "caption": "会话记录先选出当前分支，有压缩记录时组合最新摘要与保留消息，再经过消息变换和类型转换；system prompt 与 active tools 在请求组装处单独加入。图示源码中的视图转换，不表示压缩触发频率。",
+      "evidence_ids": [
+        "S-001",
+        "S-004",
+        "S-008",
+        "S-022"
+      ],
+      "exclusions": [
+        "不展示压缩触发条件",
+        "system prompt 和 tools 不经过消息转换函数",
+        "不展开 provider 内部格式转换"
+      ],
+      "glossary": {
+        "Active branch": "当前 leaf 的分支视图",
+        "transformContext": "消息变换 hook",
+        "convertToLlm": "应用消息转 provider 消息",
+        "Model request": "合并 messages/system/tools 的请求"
+      },
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "reader-contracts-20261020.json"
+      ],
+      "reviewed_against": [
+        "reader-contracts-20261020.json",
+        "S-001",
+        "S-004",
+        "S-008",
+        "S-022"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-flare",
+      "requested_size": "1536x1024",
+      "actual_size": "1536x1024",
+      "quality": "high",
+      "started_at": "2026-10-20T16:51:19.073593+00:00",
+      "completed_at": "2026-10-20T16:51:58.199357+00:00",
+      "endpoint_family": "configured OpenAI-compatible Responses/Images API",
+      "credential_source": "explicit_codex_configuration",
+      "generator_sha256": "f744c6850300e5ccb41c545691d621aac5be3d01b2d5820379dffb7710592ebe",
+      "prompt_sha256": "59782e723f498ae3b938d48c337ff0d70d4492cef534dfa564cac9342e211464",
+      "output_sha256": "3375c3dd86b3a441d1dddb659a5b023a809189eddbc70ae6f3c6658399b7594d",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "full resolution",
+        "1200px report preview",
+        "800px narrow preview"
+      ],
+      "reviewed_at": "2026-10-20T16:56:45.195810+00:00",
+      "review_notes": "Reviewed actual labels, arrows, multiplicity, state boundaries, scope and readability against the figure contract and current report.",
+      "figure_id": "pi-tool-order-v2",
+      "file": "pi-tool-order-v2.png",
+      "prompt_file": "prompts/pi-tool-order-v2.txt",
+      "question": "并行工具为何有执行完成顺序和回填顺序两种顺序？",
+      "caption": "A、B 是说明顺序的示例：B 可以先完成，但 toolResult 按模型调用次序 A、B 回填。时间条不表示实测耗时；tool_execution_start 只表示开始处理调用。",
+      "evidence_ids": [
+        "S-018",
+        "X-004"
+      ],
+      "exclusions": [
+        "A/B 时长是示例，不是性能测量",
+        "不展示 sequential 批次",
+        "start 事件不证明真实 handler 执行"
+      ],
+      "glossary": {
+        "tool_execution_start": "开始处理工具调用的事件",
+        "handler": "实际执行函数",
+        "回填": "将 toolResult 加入后续模型上下文"
+      },
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "reader-contracts-20261020.json"
+      ],
+      "reviewed_against": [
+        "reader-contracts-20261020.json",
+        "S-018",
+        "X-004"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-flare",
+      "requested_size": "1536x1024",
+      "actual_size": "1536x1024",
+      "quality": "high",
+      "started_at": "2026-10-20T16:54:05.029936+00:00",
+      "completed_at": "2026-10-20T16:54:45.434363+00:00",
+      "endpoint_family": "configured OpenAI-compatible Responses/Images API",
+      "credential_source": "explicit_codex_configuration",
+      "generator_sha256": "f744c6850300e5ccb41c545691d621aac5be3d01b2d5820379dffb7710592ebe",
+      "prompt_sha256": "224274f00e0d6abb8dec11f034a1d2ddb38ff7255529c3cfebfb519d5836ade9",
+      "output_sha256": "6328feec7a4b69409b1ba067462102f41b9465b69c1a19ad2dbbf867f6589998",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "full resolution",
+        "1200px report preview",
+        "800px narrow preview"
+      ],
+      "reviewed_at": "2026-10-20T16:56:45.199405+00:00",
+      "review_notes": "Reviewed actual labels, arrows, multiplicity, state boundaries, scope and readability against the figure contract and current report.",
+      "figure_id": "pi-session-first-write-v2",
+      "file": "pi-session-first-write-v3.png",
+      "prompt_file": "prompts/pi-session-first-write-v3.txt",
+      "question": "新会话什么时候真正创建文件，之后如何追加？",
+      "caption": "对新建且尚未写过文件的持久会话，user/配置 entry 先留在内存，首条 assistant entry 触发创建文件并写入已有记录，之后逐条追加。已有空文件、格式迁移与分支副本另有条件路径。",
+      "evidence_ids": [
+        "S-020",
+        "X-006"
+      ],
+      "exclusions": [
+        "范围为新建且未写过的会话",
+        "不表示 fsync 或 workspace 事务",
+        "不展开空文件/迁移重写路径"
+      ],
+      "glossary": {
+        "entry": "会话记录",
+        "JSONL": "逐行 JSON 会话文件",
+        "assistant entry": "包含 assistant 消息的会话记录",
+        "RAM": "内存中的会话记录"
+      },
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "reader-contracts-20261020.json"
+      ],
+      "reviewed_against": [
+        "reader-contracts-20261020.json",
+        "S-020",
+        "X-006"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-flare",
+      "requested_size": "1536x1024",
+      "actual_size": "1536x864",
+      "quality": "high",
+      "started_at": "2026-10-20T16:48:20.863669+00:00",
+      "completed_at": "2026-10-20T16:50:23.501219+00:00",
+      "endpoint_family": "configured OpenAI-compatible Responses/Images API",
+      "credential_source": "explicit_codex_configuration",
+      "generator_sha256": "f744c6850300e5ccb41c545691d621aac5be3d01b2d5820379dffb7710592ebe",
+      "prompt_sha256": "24796a5e2d6cf179a145a4104051272378749b23b7d71838766136b2d2336d09",
+      "output_sha256": "194f36ee2878fe4a39cc4d44b02abd9683b950a26b3463c2b838b7475c1b42bb",
+      "semantic_review": "passed",
+      "reviewed_dimensions": [
+        "full resolution",
+        "1200px report preview",
+        "800px narrow preview"
+      ],
+      "reviewed_at": "2026-10-20T17:32:19.967705+00:00",
+      "review_notes": "Current-path components, arrows and labels remain intact after cropping; checked at full and report widths. Original generation prompt and source image are preserved.",
+      "figure_id": "pi-system-overview-session-only",
+      "file": "pi-system-overview-session-only.png",
+      "prompt_file": "prompts/pi-system-overview-v2.txt",
+      "question": "当前 Coding Agent 如何驱动模型与工具循环，并保存会话？",
+      "caption": "当前 AgentSession 调用 Agent 与低层循环，由循环请求模型、调度工具，并由 SessionManager 管理会话。",
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "S-008",
+        "S-019",
+        "S-024",
+        "R-002"
+      ],
+      "exclusions": [
+        "不表示模型直接执行工具",
+        "不展示默认 sandbox",
+        "不表示每条消息立即落盘"
+      ],
+      "glossary": {
+        "AgentSession": "当前产品编排",
+        "Agent + runAgentLoop": "内存状态包装与模型工具循环",
+        "compat": "当前模型兼容分派入口",
+        "SessionManager": "会话树与文件管理"
+      },
+      "evidence_sources": [
+        "../../hir.json",
+        "../../evidence/claims.jsonl",
+        "../../evidence/observations.jsonl",
+        "reader-contracts-20261020.json"
+      ],
+      "reviewed_against": [
+        "reader-contracts-20261020.json",
+        "S-001",
+        "S-002",
+        "S-008",
+        "S-019",
+        "S-024",
+        "R-002"
+      ],
+      "postprocess": {
+        "operation": "crop",
+        "box": [
+          0,
+          0,
+          1536,
+          864
+        ],
+        "source_file": "pi-system-overview-v2.png",
+        "source_sha256": "91de3841269a2aa680aa455c50a3642141d787fc5bceefb2e6678933defd976e",
+        "reason": "Remove the detached out-of-scope migration annotation; preserve all current-path components and arrows."
+      }
     }
   ],
   "rejected": [
@@ -404,6 +724,47 @@
       "prompt_file": "prompts/03-context-lifecycle.txt",
       "semantic_review": "rejected",
       "reason": "Tool result was drawn as a direct path to Model request, bypassing the required context transformations."
+    },
+    {
+      "file": "pi-session-first-write-v2.png",
+      "semantic_review": "rejected",
+      "reason": "Mechanism ordering is correct, but the required title Pi：新会话的首次落盘 was omitted and replaced by the scope subtitle; revised prompt retains both."
     }
-  ]
+  ],
+  "current_report_usage": {
+    "status": "reviewed_reader_figures",
+    "active_figure_ids": [
+      "pi-observed-turn",
+      "pi-subagent-topology",
+      "pi-system-overview-session-only",
+      "pi-context-views-v3",
+      "pi-tool-order-v2",
+      "pi-session-first-write-v2"
+    ],
+    "pending_figure_ids": [],
+    "notes": "Six reviewed illustrations retained; overview scoped to current AgentSession without the detached migration note."
+  },
+  "pending_figures": [],
+  "generation_attempts_20261020": {
+    "pilot_attempts": 3,
+    "last_reported_endpoint": "/v1/images/generations",
+    "last_http_status": 404,
+    "model_list_http_status": 200,
+    "advertised_image_model_count": 0,
+    "generated_files": [],
+    "credentials_or_endpoint_address_stored": false
+  },
+  "endpoint_recheck": {
+    "queried_at": "2026-10-20T16:48:20.808991+00:00",
+    "model_count": 27,
+    "image_model_ids": [
+      "gpt-image-1",
+      "gpt-image-1.5",
+      "gpt-image-2",
+      "gpt-image-2.5-flare",
+      "gpt-image-2.5-sunburst"
+    ],
+    "generation_succeeded": true,
+    "pilot_attempt_number": 4
+  }
 }

@@ -1,41 +1,28 @@
-# 12 失败模式与开放问题
+# 失败处理与待验证路径
 
-## 已验证或源码明确的 failure path
+Pi 的失败处理分布在工具、低层循环、产品编排和 session 存储四处。先定位失败发生在哪一层，再判断后续状态和事件。[S: S-001, S-008, S-010, S-018, S-021]
 
-| 失败/触发 | 当前行为 | 状态影响范围 | 可恢复条件 | 尚未验证的边界 | Evidence |
-|---|---|---|---|---|---|
-| Provider retryable error | 指数退避，`maxRetries` 有界；live context 移除 error，session 保留 entry | 当前 provider request/产品 prompt | 后续 retry 成功或用户再次 prompt | 真实断网、rate-limit header、进程重启时 budget 是否保留 | `S-010`, `X-003` |
-| Context overflow | 生成 compaction；错误型 overflow 最多自动 retry 一次 | active context 与当前 prompt | summary 成功且 compact 后 request 可接受 | 真实长上下文、summary provider 失败、连续 model window 变化 | `S-009`, `X-003` |
-| Length-truncated tool call | 全部拒绝执行，为每个 call 生成 error result | 当前 tool batch | 模型下一 turn 重发完整参数 | 部分工具已先产生 delta 时是否有额外 side effect surface | `S-001`, `X-001` |
-| Tool exception | 转为 `isError` toolResult 并进入模型 context | 单个 call；batch 继续按 contract 汇总 | 模型可根据 error 自我修复 | extension 在抛错前已产生的主机副作用不能自动回滚 | `S-001`, `X-001` |
-| Bash timeout/abort | kill detached process group/tree；保留输出和状态 | shell process tree | handler 返回后 session 可继续 | orphan/grandchild、不可中断 I/O、Windows 行为 | `S-007` |
-| Session file 非空但无合法 header | 拒绝打开 | 整个 session file | 需人工修复/恢复合法 header | 中段 malformed line 被跳过后 branch 是否静默错误 | `S-008` |
-| New AgentHarness hook failure | 归一化 `AgentHarnessError`；部分 post-commit failure 不回滚 | 当前 phase/save point | host 根据错误和 committed state 决定继续 | reentrancy、settled 与半持久 turn 仍 provisional | `D-003`, `S-011` |
-| Orchestrator child exit | instance 标 error、reject pending、清理 resources | 单个 RPC Pi instance | supervisor 可新建/重启实例 | in-flight task、session 与外部副作用不能恢复 | `S-016` |
+| 触发条件 | 当前处理 | 证据 |
+|---|---|---|
+| 未知工具、参数非法或 hook block | 返回错误 toolResult；相应 handler 不执行 | S-018，X-004 |
+| assistant 以 length 截断且含工具调用 | 所有调用返回截断错误，模型可重新提出完整调用 | S-018，X-004 |
+| bash 中命令联网失败并以非零退出结束 | 包装为错误 toolResult，由模型决定下一步 | S-018，S-034 |
+| 普通可重试 provider 错误 | AgentSession 有界退避，错误保留在历史但从 live context 移除 | S-010，X-005 |
+| 当前模型 context overflow | 按 stop reason 决定压缩后是否恢复；错误恢复有一次限制 | S-021，X-008 |
+| 压缩过程中出现排队消息 | 压缩完成后可继续消费队列 | S-021，X-005 |
+| 非空文件不是有效 session | 拒绝打开并保留文件内容 | S-020，X-009/X-010 |
+| 取消运行 | 沿 AbortSignal 和各 backend 的取消逻辑处理，最终进入相应收尾 | S-001、S-007、S-015；具体 backend 的动态覆盖不同 |
 
-## 产品风险，不是分析器缺陷
+普通 tool error 会回到模型，模型可以据此改变下一次工具调用；provider error 的普通自动重试由 `AgentSession` 的代码规则触发。错误分类与默认退避见[自动重试机制](10-implementation-details.md#自动重试由代码规则触发)，命令内部重试、工具失败和模型服务失败的区别见[三层重试示例](10-implementation-details.md#bash-联网失败和模型-api-失败分别怎么处理)。自动重试也不表示已经执行的外部动作可以安全重复，尤其是请求超时前副作用已经发生的情况。
 
-- 默认无 permission/sandbox，对 untrusted/unattended workload 风险高。
-- AGENTS/CLAUDE context 不受 project trust gate，prompt injection 是明确接受的本地 agent 风险。
-- optional tool-routing sandbox 不自动覆盖 arbitrary extension tools。
-- session branch 与 workspace filesystem 没有事务性一致性。
-- subagent child 默认共享 cwd 与环境，context 隔离不等于 capability 隔离。
+## 当前还缺哪些行为证据
 
-## 分析限制
+当前 `AgentSession` 的运行中配置刷新尚缺完整 request diff。可以在 tool hook 或事件监听者中更新 tools/model，分别记录当前请求和下一请求，检查变更在什么边界生效。
 
-- 未运行 write/edit/bash、Gondolin、Docker、OpenShell、subagent extension、orchestrator。
-- 未做 corrupted session、SIGINT、tool timeout、child crash、long-context real model。
-- 未获得 production feature flags、使用频率或 maintainer 访谈。
-- 新 AgentHarness lifecycle 文档自己标记 phase/settled/reentrancy 仍 provisional。
+真实长上下文压缩的摘要质量没有测量。当前 tests 验证触发条件、状态更新和续跑，不衡量重要约束是否在真实摘要中丢失。
 
-## 优先实验
+会话文件校验与分支重建已经执行；进程被 SIGKILL、半写入记录、损坏 parent 链和 workspace 漂移仍需要独立故障实验。解析器跳过坏行也可能留下不完整的逻辑历史。
 
-| 优先级 | 实验 | 要区分的假设 | 通过标准 | 仍不能推出 |
-|---|---|---|---|---|
-| P0 | `AgentSession` vs `AgentHarness` differential suite | 共享 low-level loop 是否足以保证产品行为等价 | 相同 scripted turns 对齐 messages、events、retry、compaction、writes 与 settled；差异有明确 contract | 单元场景一致不代表迁移已完成 |
-| P0 | Container/VM permission bypass matrix | 可选 gate/路由是否覆盖所有副作用 backend | built-in、`!`、custom tool、extension direct process、subagent 分别记录 host/guest 文件、进程、网络副作用 | 单一 container 配置不代表所有 bind mount/credential 策略 |
-| P1 | JSONL corruption matrix | parser 宽容跳行是否可能形成静默错误 branch | header/middle/tail/parent/compaction/leaf 注入后明确分类拒绝、修复或降级 | conversation 恢复不证明 workspace 一致 |
-| P1 | Provider proxy context differential | 九类 context source 的装载和 request 时机是否符合静态结论 | 每次 request 保存 redacted type/hash diff，并对 trust/reload/hook 条件逐项开关 | 一个 provider 方言不覆盖其他 adapter |
-| P2 | Orchestrator restart/crash | supervisor cleanup 与 durable session 能否恢复 in-flight child | crash 前后 instance/session/pending request/resource 状态可重放并有明确 terminal result | orchestrator 结果不能外推到 subagent extension |
+Subagent 示例的取消和文件竞争、orchestrator 重启、容器或 VM 的文件与网络隔离仍是静态路径。应分别观察 child 退出、残留进程、文件变化和实际隔离边界。
 
-机器可读问题清单见 [questions.json](../questions.json)。
+这些是后续检查队列。先完成当前机制理解，再按需要选择具体实验或开展设计比较。

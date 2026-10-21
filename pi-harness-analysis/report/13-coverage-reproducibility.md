@@ -1,76 +1,46 @@
-# 13 覆盖与复现
+# 覆盖与复现
 
-## 产物
+报告的结论由固定源码、历史 trace 和本次测试记录支持。当前 HIR 含 28 个 nodes、34 条 edges；正文采用 28 条 claims 和 65 条 evidence records，其余历史记录标记为范围外。计数用于核对产物，不表示代码覆盖率。
 
-- 固定配置：[manifest.json](../manifest.json)
-- 仓库 inventory：[inventory.json](../inventory.json)
-- HIR：[hir.json](../hir.json)
-- Claims：[claims.jsonl](../evidence/claims.jsonl)
-- Evidence：[observations.jsonl](../evidence/observations.jsonl)
-- Coverage：[coverage.json](../evidence/coverage.json)
-- Scenarios：[catalog.json](../scenarios/catalog.json)
-- Raw traces：`traces/raw/`
-- Redacted normalized traces：`traces/normalized/`
-- Diagram source models/metadata：`diagrams/`
-- Narrative story spec：[story-specs.json](../diagrams/story-specs.json)
-- Reader PNG/prompt/review metadata：`diagrams/generated/`
+## 从哪里查证
 
-## 结构化规模
+| 产物 | 用途 |
+|---|---|
+| [manifest](../manifest.json) 与 [analysis brief](../analysis-brief.json) | 固定版本、历史/本次执行范围和待解释问题 |
+| [claims](../evidence/claims.jsonl) 与 [observations](../evidence/observations.jsonl) | 结论、依据、条件和反例检查 |
+| [coverage](../evidence/coverage.json) | 14 个模块的具体检查范围与剩余未知项 |
+| [外部来源目录](../evidence/external-sources.json) | 16 篇页面的作者、版本、阅读状态与采用方式 |
+| [模型输入来源](../evidence/model-input-sources.json) | 外部模板和编码器的查阅范围；未执行模型或抓取云端 prompt |
+| [HIR](../hir.json) | 组件、关系和证据标记 |
+| [scenario catalog](../scenarios/catalog.json) | 历史和新增检查的配置、结果与 artifact |
+| [20261020](../traces/checks/20261020/summary.json)、[followup](../traces/checks/20261020-followup/summary.json)、[CLI](../traces/checks/20261020-cli/summary.json) | 本次逐组命令、时间、通过/失败记录 |
 
-当前 bundle 包含 **29 个 HIR nodes、35 条 typed edges、20 个 supported claims 和 35 条 D/S/R/X evidence records**。这些计数描述可审计产物规模，不代表源码覆盖百分比或生产路径频率。
+## 本次覆盖的机制
 
-## 14 模块覆盖矩阵
+主线从 CLI/SDK session 构建到 AgentSession、Agent、低层循环、模型与工具边界，再到会话记录。新增阅读集中在 compat 分派、事件等待、工具 preflight、next-turn 刷新、压缩条件和首次文件写入。Subagent、orchestrator 与外部隔离作为静态旁支记录。
 
-`analyzed` 表示固定版本主机制和关键条件已静态恢复；`partial` 表示仍缺少会改变结论边界的平台、feature、真实 side effect 或故障注入。状态不是“读了多少行代码”。
+动态覆盖采用本地 mock/faux/controller 测试；原来的真实 JSON-mode 文本、read、resume 证据保留。TUI/RPC 的完整交互、真实长上下文、OS 崩溃、并发 child 文件竞争和容器/VM backend 不在本次运行覆盖内。
 
-| 模块 | 状态 | 已恢复机制 | 动态边界 | 未解决问题 |
-|---|---|---|---|---|
-| `compaction` | analyzed | overflow、threshold 与 AgentHarness manual compaction helper | 31 Coding Agent tests + AgentHarness helper tests；无真实长上下文 | 未用真实模型触发 262K 上下文 overflow。 |
-| `context_assembly` | partial（关键运行或故障路径尚缺动态覆盖） | system/resources/session/toolResult/extensions/hooks 到 per-request context | 动态验证最小 prompt、toolResult、resume；资源/trust/hook payload 差分未跑 | 未代理捕获完整 provider request；未动态差分 skills/context files/extensions。 |
-| `core_loop` | analyzed | runAgentLoop 的 provider/tool/steering/follow-up/stop 双层循环 | R-001/002 + 39 tests 覆盖 stop、tool feedback、queue、双顺序 | 无额外模块级未知项；仍受全局运行配置限制 |
-| `interfaces` | analyzed | CLI interactive/print/JSON/RPC 收敛到 cwd-bound AgentSession runtime | 真实运行 JSON mode；TUI/RPC 仅静态检查 | 无额外模块级未知项；仍受全局运行配置限制 |
-| `model_abstraction` | analyzed | pi-ai provider/model/auth/base URL/stream runtime contract | SiFlow model discovery/text/read 成功；未比较其他 provider | SiFlow 服务端默认 thinking 与 Pi reasoning=false 存在兼容差异。 |
-| `observability` | partial（关键运行或故障路径尚缺动态覆盖） | agent events、JSON/RPC stream、session JSONL 与 adapter design notes | R-001/002 JSON events 可重建；无默认 OTel exporter | 默认没有 trace/span correlation IDs；OTel adapter 设计未实现。 |
-| `orchestration` | analyzed | 当前 AgentSession 产品编排与迁移中 AgentHarness snapshot/save point | 当前 AgentSession 真实运行；AgentHarness 61 tests，未做差分迁移 | Coding Agent 迁移到新 AgentHarness 尚未完成。 |
-| `permissions_safety` | analyzed | project trust、可选 tool gate、protected paths 与默认进程权限 | 只验证 trust/resource source；未运行 deny 或副作用工具 | 未执行破坏性 allow/deny side-effect 场景；结论主要来自明确文档与源码。 |
-| `recovery` | analyzed | retry、overflow、truncated call、abort、hook/orchestrator failures | 定向 tests 覆盖逻辑分支；无 SIGINT、timeout、crash、半持久 turn | 未执行真实 SIGINT、tool timeout、进程 crash 或半持久 turn recovery。 |
-| `sandbox_execution` | partial（关键运行或故障路径尚缺动态覆盖） | Gondolin selective routing 与 whole-process Docker/OpenShell/VM 边界 | Gondolin/Docker/OpenShell/VM 均未动态执行 | Gondolin 要求 Node >=23.6 与 QEMU，本轮 Node 22.19 环境未运行；Docker/OpenShell 未运行。 |
-| `sessions_persistence` | analyzed | JSONL v3 parent tree、leaf、branch/fork/resume/migration | R-003/004 验证正常跨进程恢复；无 corruption/fork 动态矩阵 | 未做 corrupted JSONL 注入与跨版本 migration 动态测试。 |
-| `subagents` | partial（关键运行或故障路径尚缺动态覆盖） | 默认无 subagent、示例 extension 子进程、experimental orchestrator | 示例和 orchestrator 仅源码；未创建 child | 核心无内置 subagent；可选 extension 与 experimental orchestrator 均未动态运行。 |
-| `tools_extensions` | analyzed | built-in/custom/extension registry 与 input/context/tool/provider/session hooks | hooks/registry 有定向 tests；真实 runs 禁用 extensions | 未动态运行自定义 extension tool。 |
-| `workspace` | analyzed | cwd、host filesystem、session branch 与共享 subagent workspace | 合成 read workspace 与 session resume；未测写入、branch drift、冲突 | 只验证只读 workspace；写/edit/bash 未动态执行。 |
+## 复现定向测试
 
-## 关键复现命令
+需要固定 commit 的 Pi checkout、它的依赖和 Node 22.19.0。脚本检查 commit，将源码导出到临时目录，使用已安装依赖，关闭测试缓存并使用独立 agent 配置；不会安装包或调用外部模型。
 
 ```bash
-# 归一化 synthetic traces
-python3 reproduce/normalize_pi_trace.py   traces/raw/R-002-read-tool.jsonl   traces/normalized/R-002-read-tool.normalized.jsonl   --scenario-id R-SCENARIO-002
-
-# 重建 structured evidence/HIR
-python3 reproduce/compile_analysis.py
-
-# 严格校验
-python3 ../../harness-analysis-skill/scripts/validate_analysis.py . --strict
-
-# gpt-image-2 prompts 和发布图位于 diagrams/generated/；metadata 固定 prompt/output hash
-
-# 重写报告
-python3 reproduce/compile_report.py
-
-# 检查 Markdown links、8 张正文 PNG、hash 与 semantic review metadata
-python3 ../../harness-analysis-skill/scripts/audit_outputs.py . --strict
+python3 pi-harness-analysis/reproduce/run_mechanism_checks.py   --repo /path/to/pi   --node /path/to/node   --output /tmp/pi-mechanism-results   --group X-004 --group X-008 --group X-009 --group X-010
 ```
 
-## 验证结果
+`--output` 必须为空，以免覆盖既有记录。`--group X-005` 可复现产品层组及其五个 e2e 跳过项；`--group X-006` 保留原未加载 tsx 的诊断配置，CLI 子项可能在模块解析时失败。X-010 是相应的加载器对照组。各组具体文件清单在脚本和 summary 中。
 
-- Analysis validator：`0 errors, 0 warnings`
-- PNG decode/hash：8/8 reader figures valid
-- Output audit：Markdown links、8 张 report-facing PNG、prompt/output hash 与 semantic review metadata 通过 strict
-- Diagram density：overview 16 nodes；turn 11；context 9；permission 11；subagent 10；persistence 7
-- Narrative density：system 12 nodes；observed turn 12；context 8；extension 11；design space 12
-- Tests：39 + 61 + 31 = 131 passed
-- Target `git status --short`：clean（依赖目录被 gitignore，不改变固定源码）
+Node 官方归档 URL 与 SHA-256 保存在[运行时来源](../traces/checks/node-runtime-provenance.json)。依赖 lockfile hash 在每批 summary 中；这些记录不包含模型凭据。
 
-## Coverage statement
+## 重建分析产物与报告
 
-源码 inventory 共 1021 files，未达到 file/size scan limit。14 模块均有记录；partial 模块与 unresolved 条目不会被“未发现”等价成“不存在”。Runtime coverage 只代表 Linux/Node/JSON-mode/SiFlow 与命名 faux-provider tests。
+```bash
+python3 pi-harness-analysis/reproduce/compile_analysis.py
+python3 pi-harness-analysis/reproduce/compile_report.py
+python3 /path/to/harness-analysis-skill/scripts/render_diagrams.py pi-harness-analysis
+python3 /path/to/harness-analysis-skill/scripts/validate_analysis.py pi-harness-analysis --strict
+python3 /path/to/harness-analysis-skill/scripts/audit_outputs.py pi-harness-analysis --strict
+```
+
+`compile_analysis.py` 先构建历史记录，再应用本次源码复核及已保存测试结果；它不会重新运行实验。`compile_report.py` 写入此次维护的正文，并从当前 claims/evidence 生成索引。当前正文使用 6 张经复核的插图；图片、提示词、生成参数与审核状态见[插图记录](../diagrams/generated/README.md)。图片与机制说明使用同一组证据。

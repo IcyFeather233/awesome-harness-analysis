@@ -1,13 +1,6 @@
 {
   "questions": [
     {
-      "id": "Q-001",
-      "next_experiment": "对同一 faux script 做 AgentSession/AgentHarness differential test。",
-      "priority": "high",
-      "question": "Coding Agent 何时以及如何迁移到新 AgentHarness？迁移前两套编排语义会怎样保持一致？",
-      "status": "open"
-    },
-    {
       "id": "Q-002",
       "next_experiment": "在 Node 24 + QEMU 或容器环境运行 side-effect matrix。",
       "priority": "high",

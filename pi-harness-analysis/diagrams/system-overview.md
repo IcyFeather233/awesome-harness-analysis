@@ -22,7 +22,7 @@ flowchart LR
   end
   subgraph g_010ee689036e["infrastructure"]
     direction LR
-    n_fefc5c1c7ccb["pi-ai Models / ModelRegistry<br/>ModelAdapter"]
+    n_fefc5c1c7ccb["ModelRegistry + pi-ai/compat<br/>ModelAdapter"]
     n_6327a3e9cdd9["Provider request<br/>ModelCall"]
   end
   subgraph g_5675c2848ee9["interface"]
@@ -37,7 +37,6 @@ flowchart LR
   subgraph g_64b4da5568e7["orchestration"]
     direction LR
     n_825e7b7c4e51["Coding Agent AgentSession<br/>AgentLoop"]
-    n_546fb0dae98a["New AgentHarness<br/>AgentLoop"]
     n_1f48ee0d4fd8["runAgentLoop<br/>AgentLoop"]
     n_9021d26f0f99["agent_end / agent_settled<br/>ExitCondition"]
     n_c1d0b90b4198["Retry / overflow recovery<br/>RecoveryPolicy"]
@@ -47,8 +46,7 @@ flowchart LR
     n_6fad310cfe27["Live active session<br/>Session"]
     n_110ebbcc690b["Session JSONL v3<br/>SessionStore"]
   end
-  class n_825e7b7c4e51,n_546fb0dae98a,n_1f48ee0d4fd8,n_3af45ee25e84,n_822e4631e8d0,n_9021d26f0f99,n_d82b55feeebb,n_fefc5c1c7ccb,n_6327a3e9cdd9,n_c1d0b90b4198,n_6fad310cfe27,n_110ebbcc690b,n_95a05335b894,n_c223520f774e,n_26809c922930,n_94fdf21bba59 observed;
-  n_546fb0dae98a -->|"direct loop"| n_1f48ee0d4fd8
+  class n_825e7b7c4e51,n_1f48ee0d4fd8,n_3af45ee25e84,n_822e4631e8d0,n_9021d26f0f99,n_d82b55feeebb,n_fefc5c1c7ccb,n_6327a3e9cdd9,n_c1d0b90b4198,n_6fad310cfe27,n_110ebbcc690b,n_95a05335b894,n_c223520f774e,n_26809c922930,n_94fdf21bba59 observed;
   n_825e7b7c4e51 -->|"prompt/continue"| n_1f48ee0d4fd8
   n_d82b55feeebb -->|"invoke"| n_822e4631e8d0
   n_3af45ee25e84 -->|"system/messages/tools"| n_6327a3e9cdd9
@@ -56,7 +54,7 @@ flowchart LR
   n_1f48ee0d4fd8 -->|"lifecycle events"| n_95a05335b894
   n_1f48ee0d4fd8 -->|"no tools/queues"| n_9021d26f0f99
   n_1f48ee0d4fd8 -->|"dispatch"| n_c223520f774e
-  n_fefc5c1c7ccb -->|"auth + dispatch"| n_6327a3e9cdd9
+  n_fefc5c1c7ccb -->|"compat stream dispatch"| n_6327a3e9cdd9
   n_6fad310cfe27 -->|"append JSONL"| n_110ebbcc690b
   n_110ebbcc690b -->|"active branch"| n_6fad310cfe27
   linkStyle 0 stroke:#2E7D32,stroke-width:2px;
@@ -69,5 +67,4 @@ flowchart LR
   linkStyle 7 stroke:#2E7D32,stroke-width:2px;
   linkStyle 8 stroke:#2E7D32,stroke-width:2px;
   linkStyle 9 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 10 stroke:#2E7D32,stroke-width:2px;
 ~~~

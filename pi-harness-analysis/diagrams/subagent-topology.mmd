@@ -8,7 +8,6 @@ flowchart TB
   subgraph g_0146b2da27ba["Ungrouped"]
     direction TB
     n_825e7b7c4e51["Coding Agent AgentSession<br/>AgentLoop"]
-    n_546fb0dae98a["New AgentHarness<br/>AgentLoop"]
     n_1f48ee0d4fd8["runAgentLoop<br/>AgentLoop"]
     n_3af45ee25e84["Context assembly<br/>ContextBuilder"]
     n_c1d0b90b4198["Retry / overflow recovery<br/>RecoveryPolicy"]
@@ -24,9 +23,8 @@ flowchart TB
     direction TB
     n_deaa5a1626b3["Child pi process<br/>Subagent"]
   end
-  class n_825e7b7c4e51,n_546fb0dae98a,n_1f48ee0d4fd8,n_3af45ee25e84,n_c1d0b90b4198,n_cb9c10e1a22e,n_6fad310cfe27,n_94fdf21bba59 observed;
+  class n_825e7b7c4e51,n_1f48ee0d4fd8,n_3af45ee25e84,n_c1d0b90b4198,n_cb9c10e1a22e,n_6fad310cfe27,n_94fdf21bba59 observed;
   class n_156b03ba3464,n_deaa5a1626b3 staticOnly;
-  n_546fb0dae98a -->|"direct loop"| n_1f48ee0d4fd8
   n_825e7b7c4e51 -->|"prompt/continue"| n_1f48ee0d4fd8
   n_825e7b7c4e51 -->|"live messages"| n_6fad310cfe27
   n_156b03ba3464 -.->|"independent RPC instance"| n_deaa5a1626b3
@@ -37,10 +35,9 @@ flowchart TB
   n_deaa5a1626b3 -.->|"same cwd by default"| n_94fdf21bba59
   linkStyle 0 stroke:#2E7D32,stroke-width:2px;
   linkStyle 1 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 2 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 3 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 2 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 3 stroke:#2E7D32,stroke-width:2px;
   linkStyle 4 stroke:#2E7D32,stroke-width:2px;
   linkStyle 5 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 6 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 6 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
   linkStyle 7 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
-  linkStyle 8 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;

@@ -29,7 +29,6 @@ flowchart LR
   subgraph g_92e93e576aba["orchestration"]
     direction LR
     n_825e7b7c4e51["Coding Agent AgentSession<br/>AgentLoop"]
-    n_546fb0dae98a["New AgentHarness<br/>AgentLoop"]
     n_1f48ee0d4fd8["runAgentLoop<br/>AgentLoop"]
     n_2fb97928aabe["Coding Agent compaction<br/>Compactor"]
     n_9021d26f0f99["agent_end / agent_settled<br/>ExitCondition"]
@@ -39,9 +38,8 @@ flowchart LR
     direction LR
     n_6fad310cfe27["Live active session<br/>Session"]
   end
-  class n_825e7b7c4e51,n_546fb0dae98a,n_1f48ee0d4fd8,n_2fb97928aabe,n_3af45ee25e84,n_9021d26f0f99,n_6327a3e9cdd9,n_c1d0b90b4198,n_6fad310cfe27,n_c223520f774e observed;
+  class n_825e7b7c4e51,n_1f48ee0d4fd8,n_2fb97928aabe,n_3af45ee25e84,n_9021d26f0f99,n_6327a3e9cdd9,n_c1d0b90b4198,n_6fad310cfe27,n_c223520f774e observed;
   class n_1606289c70f4 staticOnly;
-  n_546fb0dae98a -->|"direct loop"| n_1f48ee0d4fd8
   n_825e7b7c4e51 -->|"prompt/continue"| n_1f48ee0d4fd8
   n_2fb97928aabe -->|"summary boundary"| n_6fad310cfe27
   n_3af45ee25e84 -->|"system/messages/tools"| n_6327a3e9cdd9
@@ -58,7 +56,6 @@ flowchart LR
   linkStyle 4 stroke:#2E7D32,stroke-width:2px;
   linkStyle 5 stroke:#2E7D32,stroke-width:2px;
   linkStyle 6 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 7 stroke:#2E7D32,stroke-width:2px;
-  linkStyle 8 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
-  linkStyle 9 stroke:#2E7D32,stroke-width:2px;
+  linkStyle 7 stroke:#64748B,stroke-width:1.5px,stroke-dasharray:6 4;
+  linkStyle 8 stroke:#2E7D32,stroke-width:2px;
 ~~~

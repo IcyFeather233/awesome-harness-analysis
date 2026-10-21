@@ -1,0 +1,72 @@
+{
+  "model": "gpt-image-2.5-flare",
+  "requested_size": "1536x1024",
+  "actual_size": "1536x864",
+  "quality": "high",
+  "started_at": "2026-10-20T16:48:20.863669+00:00",
+  "completed_at": "2026-10-20T16:50:23.501219+00:00",
+  "endpoint_family": "configured OpenAI-compatible Responses/Images API",
+  "credential_source": "explicit_codex_configuration",
+  "generator_sha256": "f744c6850300e5ccb41c545691d621aac5be3d01b2d5820379dffb7710592ebe",
+  "prompt_sha256": "24796a5e2d6cf179a145a4104051272378749b23b7d71838766136b2d2336d09",
+  "output_sha256": "194f36ee2878fe4a39cc4d44b02abd9683b950a26b3463c2b838b7475c1b42bb",
+  "semantic_review": "passed",
+  "reviewed_dimensions": [
+    "full resolution",
+    "1200px report preview",
+    "800px narrow preview"
+  ],
+  "reviewed_at": "2026-10-20T17:32:19.967705+00:00",
+  "review_notes": "Current-path components, arrows and labels remain intact after cropping; checked at full and report widths. Original generation prompt and source image are preserved.",
+  "figure_id": "pi-system-overview-session-only",
+  "file": "pi-system-overview-session-only.png",
+  "prompt_file": "prompts/pi-system-overview-v2.txt",
+  "question": "当前 Coding Agent 如何驱动模型与工具循环，并保存会话？",
+  "caption": "当前 AgentSession 调用 Agent 与低层循环，由循环请求模型、调度工具，并由 SessionManager 管理会话。",
+  "evidence_ids": [
+    "S-001",
+    "S-002",
+    "S-008",
+    "S-019",
+    "S-024",
+    "R-002"
+  ],
+  "exclusions": [
+    "不表示模型直接执行工具",
+    "不展示默认 sandbox",
+    "不表示每条消息立即落盘"
+  ],
+  "glossary": {
+    "AgentSession": "当前产品编排",
+    "Agent + runAgentLoop": "内存状态包装与模型工具循环",
+    "compat": "当前模型兼容分派入口",
+    "SessionManager": "会话树与文件管理"
+  },
+  "evidence_sources": [
+    "../../hir.json",
+    "../../evidence/claims.jsonl",
+    "../../evidence/observations.jsonl",
+    "reader-contracts-20261020.json"
+  ],
+  "reviewed_against": [
+    "reader-contracts-20261020.json",
+    "S-001",
+    "S-002",
+    "S-008",
+    "S-019",
+    "S-024",
+    "R-002"
+  ],
+  "postprocess": {
+    "operation": "crop",
+    "box": [
+      0,
+      0,
+      1536,
+      864
+    ],
+    "source_file": "pi-system-overview-v2.png",
+    "source_sha256": "91de3841269a2aa680aa455c50a3642141d787fc5bceefb2e6678933defd976e",
+    "reason": "Remove the detached out-of-scope migration annotation; preserve all current-path components and arrows."
+  }
+}

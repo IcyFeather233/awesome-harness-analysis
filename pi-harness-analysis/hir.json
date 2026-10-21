@@ -62,23 +62,6 @@
       "type": "calls"
     },
     {
-      "conditions": {
-        "surface": "new AgentHarness"
-      },
-      "confidence": "high",
-      "evidence_ids": [
-        "S-011",
-        "X-002"
-      ],
-      "id": "E-AgentHarness-Loop",
-      "label": "direct loop",
-      "source": "N-AgentHarness",
-      "source_refs": [],
-      "status": "experimental_verified",
-      "target": "N-LowLoop",
-      "type": "calls"
-    },
-    {
       "conditions": {},
       "confidence": "high",
       "evidence_ids": [
@@ -187,11 +170,11 @@
       "conditions": {},
       "confidence": "high",
       "evidence_ids": [
-        "S-012",
+        "S-024",
         "R-001"
       ],
       "id": "E-Models-Call",
-      "label": "auth + dispatch",
+      "label": "compat stream dispatch",
       "source": "N-Models",
       "source_refs": [],
       "status": "runtime_verified",
@@ -664,36 +647,6 @@
         "persistence_tier": "live",
         "trust_zone": "process"
       },
-      "conditions": {
-        "surface": "agent-core API, not default coding-agent"
-      },
-      "confidence": "high",
-      "evidence_ids": [
-        "D-003",
-        "S-011",
-        "X-002"
-      ],
-      "id": "N-AgentHarness",
-      "name": "New AgentHarness",
-      "source_refs": [
-        {
-          "end_line": 1010,
-          "path": "packages/agent/src/harness/agent-harness.ts",
-          "start_line": 152,
-          "symbol": "AgentHarness"
-        }
-      ],
-      "status": "experimental_verified",
-      "summary": "New generic orchestration layer with snapshots and save points; migration incomplete.",
-      "type": "AgentLoop"
-    },
-    {
-      "attributes": {
-        "layer": "orchestration",
-        "lifecycle": "runtime",
-        "persistence_tier": "live",
-        "trust_zone": "process"
-      },
       "conditions": {},
       "confidence": "high",
       "evidence_ids": [
@@ -713,7 +666,7 @@
         }
       ],
       "status": "runtime_verified",
-      "summary": "Low-level model/tool/queue loop shared by Agent and AgentHarness.",
+      "summary": "Low-level model/tool/queue loop invoked by Agent on the current Coding Agent path.",
       "type": "AgentLoop"
     },
     {
@@ -856,22 +809,26 @@
       "conditions": {},
       "confidence": "high",
       "evidence_ids": [
-        "S-012",
-        "R-005",
-        "R-001"
+        "S-024",
+        "R-001",
+        "R-005"
       ],
       "id": "N-Models",
-      "name": "pi-ai Models / ModelRegistry",
+      "name": "ModelRegistry + pi-ai/compat",
       "source_refs": [
         {
-          "end_line": 369,
-          "path": "packages/ai/src/models.ts",
-          "start_line": 24,
-          "symbol": "ModelsImpl"
+          "path": "packages/coding-agent/src/core/sdk.ts",
+          "start_line": 301,
+          "end_line": 400
+        },
+        {
+          "path": "packages/ai/src/compat.ts",
+          "start_line": 209,
+          "end_line": 287
         }
       ],
       "status": "runtime_verified",
-      "summary": "Provider catalog, auth and API dispatch boundary.",
+      "summary": "Coding Agent model/auth entrypoint; compat selects builtin Models or the API registry by model and override conditions.",
       "type": "ModelAdapter"
     },
     {
@@ -1109,7 +1066,10 @@
       "evidence_ids": [
         "S-008",
         "R-003",
-        "R-004"
+        "R-004",
+        "S-020",
+        "X-006",
+        "X-009"
       ],
       "id": "N-SessionStore",
       "name": "Session JSONL v3",
@@ -1122,7 +1082,7 @@
         }
       ],
       "status": "runtime_verified",
-      "summary": "Append-only durable tree with header, entries and parent links.",
+      "summary": "Parent-linked JSONL entries; new files are deferred until the first assistant entry, with explicit rewrite paths for migration and empty files.",
       "type": "SessionStore"
     },
     {

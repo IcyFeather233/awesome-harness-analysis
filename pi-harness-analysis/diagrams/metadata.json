@@ -1,11 +1,10 @@
 {
-  "hir_file": "/volume/med/work/users/mzchen/lab/pi-harness-analysis/hir.json",
-  "projection_file": "/volume/med/work/users/mzchen/lab/pi-harness-analysis/diagrams/projections.json",
+  "hir_file": "/volume/med/work/users/mzchen/lab/awesome-harness-analysis/pi-harness-analysis/hir.json",
+  "projection_file": "/volume/med/work/users/mzchen/lab/awesome-harness-analysis/pi-harness-analysis/diagrams/projections.json",
   "projections": [
     {
       "description": "Major runtime responsibilities and external boundaries.",
       "edge_ids": [
-        "E-AgentHarness-Loop",
         "E-AgentSession-Loop",
         "E-CLI-Main",
         "E-Context-Model",
@@ -18,7 +17,6 @@
         "E-Store-Session"
       ],
       "evidence_ids": [
-        "D-003",
         "D-005",
         "R-001",
         "R-002",
@@ -33,17 +31,18 @@
         "S-008",
         "S-009",
         "S-010",
-        "S-011",
         "S-012",
         "S-013",
+        "S-020",
+        "S-024",
         "X-001",
-        "X-002",
-        "X-003"
+        "X-003",
+        "X-006",
+        "X-009"
       ],
       "id": "system-overview",
       "node_ids": [
         "N-AgentSession",
-        "N-AgentHarness",
         "N-LowLoop",
         "N-Context",
         "N-Main",
@@ -61,7 +60,7 @@
       ],
       "status_counts": {
         "conflicted": 0,
-        "experimental_verified": 3,
+        "experimental_verified": 1,
         "inferred": 0,
         "runtime_verified": 24,
         "static_only": 0,
@@ -73,7 +72,6 @@
     {
       "description": "Control flow from interface input through loop iterations and exit.",
       "edge_ids": [
-        "E-AgentHarness-Loop",
         "E-AgentSession-Loop",
         "E-Compactor-Session",
         "E-Context-Model",
@@ -85,7 +83,6 @@
         "E-Retry-Agent"
       ],
       "evidence_ids": [
-        "D-003",
         "D-004",
         "R-001",
         "R-002",
@@ -98,17 +95,14 @@
         "S-008",
         "S-009",
         "S-010",
-        "S-011",
         "S-012",
         "S-017",
         "X-001",
-        "X-002",
         "X-003"
       ],
       "id": "turn-flow",
       "node_ids": [
         "N-AgentSession",
-        "N-AgentHarness",
         "N-LowLoop",
         "N-Compactor",
         "N-Context",
@@ -121,7 +115,7 @@
       ],
       "status_counts": {
         "conflicted": 0,
-        "experimental_verified": 6,
+        "experimental_verified": 4,
         "inferred": 0,
         "runtime_verified": 13,
         "static_only": 2,
@@ -133,7 +127,6 @@
     {
       "description": "Responsibilities grouped by their architectural layer.",
       "edge_ids": [
-        "E-AgentHarness-Loop",
         "E-AgentSession-Loop",
         "E-Bash-Workspace",
         "E-CLI-Main",
@@ -154,7 +147,6 @@
       ],
       "evidence_ids": [
         "D-002",
-        "D-003",
         "D-004",
         "D-005",
         "D-007",
@@ -173,19 +165,20 @@
         "S-008",
         "S-009",
         "S-010",
-        "S-011",
         "S-012",
         "S-013",
         "S-014",
         "S-017",
+        "S-020",
+        "S-024",
         "X-001",
-        "X-002",
-        "X-003"
+        "X-003",
+        "X-006",
+        "X-009"
       ],
       "id": "layered-architecture",
       "node_ids": [
         "N-AgentSession",
-        "N-AgentHarness",
         "N-LowLoop",
         "N-Compactor",
         "N-Context",
@@ -211,7 +204,7 @@
       ],
       "status_counts": {
         "conflicted": 0,
-        "experimental_verified": 7,
+        "experimental_verified": 5,
         "inferred": 0,
         "runtime_verified": 25,
         "static_only": 10,
@@ -249,7 +242,10 @@
         "S-008",
         "S-009",
         "S-012",
-        "X-003"
+        "S-020",
+        "X-003",
+        "X-006",
+        "X-009"
       ],
       "id": "context-lifecycle",
       "node_ids": [
@@ -277,7 +273,6 @@
     {
       "description": "Capability registration, authorization, execution, and result return.",
       "edge_ids": [
-        "E-AgentHarness-Loop",
         "E-AgentSession-Loop",
         "E-Context-Model",
         "E-Sandbox-Bash",
@@ -292,7 +287,6 @@
       ],
       "evidence_ids": [
         "D-002",
-        "D-003",
         "D-004",
         "D-005",
         "D-006",
@@ -304,18 +298,15 @@
         "S-003",
         "S-004",
         "S-007",
-        "S-011",
         "S-012",
         "S-015",
         "S-017",
         "X-001",
-        "X-002",
         "X-003"
       ],
       "id": "tool-extension-surface",
       "node_ids": [
         "N-AgentSession",
-        "N-AgentHarness",
         "N-LowLoop",
         "N-Context",
         "N-Bash",
@@ -330,7 +321,7 @@
       ],
       "status_counts": {
         "conflicted": 0,
-        "experimental_verified": 4,
+        "experimental_verified": 2,
         "inferred": 0,
         "runtime_verified": 14,
         "static_only": 7,
@@ -342,7 +333,6 @@
     {
       "description": "Policy decisions and trust boundaries before side effects.",
       "edge_ids": [
-        "E-AgentHarness-Loop",
         "E-AgentSession-Loop",
         "E-Bash-Workspace",
         "E-Sandbox-Bash",
@@ -355,7 +345,6 @@
       ],
       "evidence_ids": [
         "D-002",
-        "D-003",
         "D-004",
         "D-005",
         "D-007",
@@ -366,17 +355,14 @@
         "S-002",
         "S-003",
         "S-007",
-        "S-011",
         "S-014",
         "S-017",
         "X-001",
-        "X-002",
         "X-003"
       ],
       "id": "permission-pipeline",
       "node_ids": [
         "N-AgentSession",
-        "N-AgentHarness",
         "N-LowLoop",
         "N-Bash",
         "N-Hooks",
@@ -389,7 +375,7 @@
       ],
       "status_counts": {
         "conflicted": 0,
-        "experimental_verified": 4,
+        "experimental_verified": 2,
         "inferred": 0,
         "runtime_verified": 11,
         "static_only": 6,
@@ -401,7 +387,6 @@
     {
       "description": "Delegation, inheritance, isolation, and result aggregation.",
       "edge_ids": [
-        "E-AgentHarness-Loop",
         "E-AgentSession-Loop",
         "E-AgentSession-Session",
         "E-Orchestrator-Subagent",
@@ -412,7 +397,6 @@
         "E-Subagent-Workspace"
       ],
       "evidence_ids": [
-        "D-003",
         "D-006",
         "D-010",
         "R-001",
@@ -427,18 +411,15 @@
         "S-008",
         "S-009",
         "S-010",
-        "S-011",
         "S-014",
         "S-015",
         "S-016",
         "X-001",
-        "X-002",
         "X-003"
       ],
       "id": "subagent-topology",
       "node_ids": [
         "N-AgentSession",
-        "N-AgentHarness",
         "N-LowLoop",
         "N-Context",
         "N-Orchestrator",
@@ -450,7 +431,7 @@
       ],
       "status_counts": {
         "conflicted": 0,
-        "experimental_verified": 4,
+        "experimental_verified": 2,
         "inferred": 0,
         "runtime_verified": 10,
         "static_only": 5,
@@ -481,8 +462,11 @@
         "S-004",
         "S-008",
         "S-009",
+        "S-020",
         "X-001",
-        "X-003"
+        "X-003",
+        "X-006",
+        "X-009"
       ],
       "id": "persistence-lifecycle",
       "node_ids": [

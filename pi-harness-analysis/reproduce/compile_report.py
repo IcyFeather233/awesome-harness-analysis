@@ -1,948 +1,1384 @@
 #!/usr/bin/env python3
-"""Regenerate the curated report for the pinned Pi analysis bundle."""
-
-from __future__ import annotations
-
+"""Compile the maintained Pi analysis report and current claim index."""
 from pathlib import Path
-
+import json
 
 ROOT = Path(__file__).resolve().parent.parent
 REPORT = ROOT / "report"
-REPORTS: dict[str, str] = {}
+SOURCE = "https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/"
+REPORTS = {}
 
-REPORTS["00-design-space-and-running-example.md"] = r"""# 00 设计空间与贯穿案例
+REPORTS['index.md'] = r"""# Pi Agent Harness 分析报告：从一次请求看懂它怎样工作
 
-Pi 的架构不能只用“有哪些 package”来解释。更有区分度的问题是：推理放在哪里、产品编排由谁拥有、默认信任边界在哪里、上下文和持久状态如何增长，以及扩展能力由核心还是用户定义。
+打开 Pi，输入一句话：
 
-## 六个设计问题
+> 看一下这个项目的配置，告诉我服务监听哪个端口。
 
-| 设计问题 | Pi `v0.80.7` 的当前机制 | 关键边界/部署条件 | 可选设计 | 证据与置信度 | 最小反证 |
-|---|---|---|---|---|---|
-| 推理与控制放在哪里？ | 模型决定下一步；`runAgentLoop()` 只负责 model/tool/queue/stop 的确定性循环 | planner、任务状态和产品 retry 不在 low-level loop 中 | harness 内置 planner、typed graph 或 task state machine | `D-001`, `S-001`, `R-002`, `X-001`；高 | 找到另一个绕过 `runAgentLoop()` 的产品级 model/tool loop |
-| 产品编排由谁拥有？ | 当前由 Coding Agent `AgentSession` 拥有；通用 `AgentHarness` 是迁移目标 | v0.80.7 两者共享 low-level loop，但不是叠加调用；新 harness 尚缺 auto-compaction/retry/migration | 单一 controller，或每个产品分别包装 low-level loop | `D-003`, `D-008`, `S-002`, `S-011`, `X-002`；高 | 证明 Coding Agent 已默认实例化 `AgentHarness` 并行为等价 |
-| 默认安全姿态是什么？ | read/write/edit/bash 与 extensions 继承 Pi 进程权限；project trust 只保护启动资源加载 | unattended/untrusted 部署必须另加 whole-process container、VM 或完整工具路由 | deny-first 逐工具授权、强制进程内 policy、默认容器隔离 | `D-002`, `D-007`, `S-006`, `S-017`；高 | 找到不可绕过且默认启用的全局 tool permission/sandbox gate |
-| 扩展面如何划分？ | tool registry 合并 built-ins/custom/extensions，hooks 可改 input/context/tool/provider/session；MCP/subagent 不进入核心假设 | extension 与 host 同权限；不同 extension 可定义不一致的安全和 delegation 语义 | 固定内置能力，或统一 capability/plugin protocol | `D-004`, `S-003`, `S-015`；高 | 证明 MCP/subagent 是默认 registry 的强制内建能力 |
-| 什么状态是 durable 的？ | append-only JSONL v3 tree 保存 message、branch、compaction 等 entry；workspace 独立持久 | resume/fork 恢复 conversation branch，不恢复文件系统 checkpoint | mutable database row、完整 checkpoint、event sourcing + workspace snapshot | `S-008`, `R-003`, `R-004`；高 | 新进程不读取 JSONL 也能恢复相同 active branch，或 fork 自动回滚 workspace |
-| 失败如何恢复？ | truncated tool call 拒绝执行；provider retry、overflow compaction 与 threshold compaction 分层 | retry budget、是否重答及 durable error 处理由产品层决定；真实 crash/半持久 turn 未覆盖 | fail-fast、统一 retry、每轮 checkpoint 回滚 | `S-001`, `S-009`, `S-010`, `X-001`, `X-003`；高 | 注入同类错误后观察到无界 retry、截断 call 被执行或统一回滚 |
+屏幕上很快出现一次文件读取，接着是回答：“8080。”这个过程看起来像模型自己打开了文件。但在模型提出读取请求之后，还需要程序找到工具、检查参数、访问文件，再把内容交回模型。我们看到的一次回答，实际上已经经过了几次不同的交接。
 
-这些是“设计选择及其实现”，不是对作者动机的自由推测。仓库文档明确说明 minimal harness、aggressive extensibility 和外部隔离边界；“为什么选 JSONL 而不是数据库”等未文档化原因只作为可观察权衡讨论。[D: D-001, D-002, D-004]
+Pi 把这套运行程序称为 agent harness。要理解它，可以先跟着这条请求走一遍，再看任务变长、遇到错误或需要换一个方向时，系统会怎样处理。下文基于 Pi `v0.80.7` 的当前 Coding Agent 实现；读取配置等场景是串讲源码的示例，实际实验记录放在文末的查证入口。
 
-![Pi design space](../diagrams/generated/pi-design-space.png)
+## 模型提出动作，Pi 把动作做完
 
-> 图 A（gpt-image-2 读者插图）：左列是文档化产品立场，中列是源码恢复出的机制，右列是分析者根据实现和失败边界归纳的权衡；点线表示分析推断，不代表作者声明。图像 provenance 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；设计映射来自[story spec](../diagrams/story-specs.json)和下列 Evidence IDs。Evidence: `D-001`, `D-002`, `D-003`, `D-004`, `D-007`, `D-008`, `S-001`, `S-003`, `S-007`, `S-008`, `S-011`, `S-017`, `R-004`, `X-002`。
+模型收到请求时，除了你的问题，还会收到系统提示、已有消息，以及当前可以使用的工具说明。Pi 新会话默认开放 `read`、`bash`、`edit` 和 `write`：读取文件、执行命令、修改文本和写入文件。仓库里还定义了其他工具，只是默认没有全部启用。
 
-## 贯穿案例：一次真实 read turn
+对于端口问题，模型可能先返回一个 `read` 调用，参数是配置文件路径。这条响应表达了“接下来需要读取什么”。Pi 接手之后才会去查找工具、校验参数、执行读取，并把结果包装成一条与该调用关联的消息，也就是 `toolResult`。
 
-本报告以 `R-SCENARIO-002` 作为贯穿案例，而不是构造一条未运行的“理想路径”。场景在隔离 HOME 和合成 workspace 中启动 Pi JSON mode，只开放 `read`，要求读取 `fixture.txt` 并回答其内容。SiFlow `qwen3.6-35ba3b` 实际走过：
+假设文件中写着 `{"port": 8080}`。Pi 把这段结果加入上下文，再请求一次模型。第二次，模型已经有了文件内容，才给出“服务监听 8080 端口”的回答。
 
-1. `main()` 进入共享 Coding Agent runtime；
-2. `AgentSession` 解析输入并启动 turn；
-3. `runAgentLoop()` 用 active session、system prompt 和 read schema 形成第一次 provider request；
-4. 模型返回一个 `read` tool call；
-5. registry dispatch read，事件流发出 `tool_execution_start` 与 `tool_execution_end`；
-6. `314159` 作为 toolResult 追加到 transcript/context；
-7. 第二次 provider request 带上先前 assistant message 和 toolResult；
-8. 模型返回最终文本，不再请求工具；
-9. low-level loop 发出 `agent_end`，产品层随后发出 `agent_settled`。[R: R-002] [S: S-001, S-002]
+因此，一次用户提问可以包含多次模型请求。在 Pi 的低层循环里，一轮模型响应加上它提出的工具处理叫一个 `turn`。上面的例子有两个 turn：第一轮要求读文件并取得结果，第二轮根据结果回答。模型如果在一条响应中提出多个工具调用，它们也可以属于同一个 turn。
 
-![Observed Pi turn](../diagrams/generated/pi-observed-turn.png)
+这条闭环在源码中由 `runAgentLoop` 执行。围绕它，`Agent` 管理当前消息、工具配置和输入队列，`AgentSession` 则负责把用户输入、扩展、重试和会话管理接起来。先记住这层关系就够了：循环负责持续推进模型和工具之间的交接，产品层负责组织整次运行。[循环与实际 read 轨迹](00-task-walkthrough.md)
 
-> 图 B（gpt-image-2 读者插图）：严格展示同一次真实 read trace 的两轮迭代、`314159` 回填，以及 `agent_end -> agent_settled`；未把 retry、compaction 或 resume 伪装成该场景发生的分支。图像 provenance 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；运行事实来自 `R-SCENARIO-002` 和下列 Evidence IDs。Evidence: `S-001`, `S-002`, `S-008`, `S-009`, `S-010`, `R-002`, `R-003`, `R-004`, `X-003`。
+## 两个文件一起读，结果怎样接回来
 
-## 这个案例不能证明什么
+把问题稍微扩大一点：你让 Pi 同时检查配置文件和启动脚本。模型可能一次提出两个读取调用。Pi 默认允许工具并行执行，其中一个文件先读完，界面就可以先显示它的结束通知。
 
-该 trace 没有启用 extensions、skills、context files 或 project approval，也没有执行 bash/write/edit。因此它能证明 model -> read -> toolResult -> second model call -> settled 至少发生过一次，不能证明：
+但下一次模型请求里的结果顺序，仍按模型最初提出调用的顺序组织。
 
-- 所有工具都经过 permission gate；Pi 默认不存在这样的全局 gate；
-- deny 之后没有文件、进程或网络副作用；本轮没有做 deny fault injection；
-- compaction、retry、subagent 或 session resume 在这一次 read turn 中发生；这些由其他实验或静态证据支撑；
-- 真实用户任务中的路径频率、成本分布或长期正确性。
+![Pi 工具调用、并行完成与结果回填的顺序](../diagrams/generated/pi-tool-order-v2.png)
 
-后续章节会沿用这个案例解释 loop、context、tool result 和 event stream；对于它没有覆盖的安全、恢复与持久化路径，会显式切换到对应的 `S`、`R` 或 `X` 证据。
-"""
+*图中的 A、B 是顺序示例：完成通知可以是 B、A，回填给模型的结果仍是 A、B。时间条不表示实测耗时。*
 
-REPORTS["01-scope-method.md"] = r"""# 01 范围与方法
+这让界面进度和对话历史各自遵循合适的顺序：界面反映哪个操作先结束，模型看到的消息则保留稳定的调用与结果关系。如果批次中有工具声明需要串行，或配置要求串行，Pi 会让整个批次按顺序执行。
 
-## 冻结对象
+工具执行前还有准备步骤。名称不存在、参数不合法，或者扩展明确阻断调用时，Pi 可以直接返回错误结果，跳过真正的执行函数。一个容易忽略的细节是，`tool_execution_start` 事件在这些检查之前就已经发出。它表示开始处理一次调用，不能单凭这个事件认定文件已被修改或命令已经启动。
 
-- Repository：`https://github.com/earendil-works/pi`
-- Tag：`v0.80.7`
-- Commit：`818d67457cdd6b60bce6b121d16b23141c252dd8`
-- Worktree：detached HEAD，分析开始和结束时目标代码无 tracked changes
-- Runtime：Linux x86_64；临时 Node `22.19.0`；npm `10.9.3`；Vitest `4.1.9`
-- Real model：`siflow/qwen3.6-35ba3b`，OpenAI-compatible endpoint；无 API key
+如果测试命令确实执行了，但返回失败，错误通常会作为工具结果交回模型。模型读到报错后，可以修改代码，再提出新的测试调用。这仍是刚才那条模型—工具循环。[工具批次与事件顺序](03-core-loop.md)
 
-完整配置见 [manifest.json](../manifest.json)。
+## 你中途说一句话，Pi 会在什么时候听见
 
-## 证据等级
+假设 Pi 正在检查文件，你发现它方向不对，补充一句：“先看启动脚本，端口可能被环境变量覆盖了。”在默认交互键位下，此时按 Enter 提交，界面就明确把这条普通消息送入 steering 队列。当前模型响应及其工具批次处理完后，循环检查队列，把消息放到下一次模型请求中；入队本身不会撤销已经发出的工具操作。
 
-| 标记 | 证据来源 | 可以建立 | 不能单独建立 | 本报告实例 |
-|---|---|---|---|---|
-| `D` | 固定 commit 的仓库文档 | 明确产品边界、公开设计立场、已知未完成项 | 代码一定实现文档描述，或生产默认启用 | security、extension、AgentHarness lifecycle 文档 |
-| `S` | 固定 commit 源码与测试 contract | 类型、控制流、condition 和可到达路径 | 该路径在本轮运行过，或生产出现频率 | `runAgentLoop`、`AgentSession`、JSONL v3 |
-| `R` | 真实 SiFlow + official Pi runtime | 命名配置下一次确实发生的路径和事件顺序 | 其他 provider/mode/tool/platform 等价 | text、read-tool、跨进程 resume |
-| `X` | faux provider/定向 test suite | controller 分支、顺序、反例和失败 contract | 真实模型质量或部署安全 | 39 + 61 + 31 tests |
-| `I` | 多条 D/S/R/X 的分析综合 | 明示 tradeoff、风险和下一步实验 | 作者意图或 HIR 中的直接事实 | workspace/session 缺少共同 checkpoint 的后果 |
+如果想排在当前工作之后，例如“这一轮完成后，再检查一下文档里的端口说明”，可以用 Alt+Enter 提交。界面会选择 follow-up 队列，等当前工具和 steering 消息都处理完、循环准备停下时再取出。
 
-每条 claim 都有 falsification test；每个 HIR node/edge 都有 evidence ID。严格 validator 结果为 `0 errors, 0 warnings`。
+决定队列的是提交方式，Pi 不会请求 LLM 根据句子意思分类。同一句“忙完之后，再检查文档”，按 Enter 仍进入 steering，按 Alt+Enter 才进入 follow-up。前一种情况下，模型较早收到消息后，也许会理解“忙完之后”并选择稍后执行；那属于模型收到内容后的行动选择，和程序何时递交消息是两个阶段。
 
-## 动态安全边界
+通过 SDK 或 RPC 接入时，由调用方明确指定模式或调用相应的入队方法。快捷键可以自定义；Pi 空闲时，Alt+Enter 则像普通 Enter 一样提交新请求。
 
-所有真实 model runs 使用：
+两种队列让用户选择何时影响运行：及时调整接下来的方向，或把输入排到当前循环准备结束时。Haochuan 从交互角度讨论过这一区分；具体入口、参数和消费时机见[双队列的实现](03-core-loop.md#双队列对应两种交互意图)。
 
-- `/tmp/pi-analysis-runtime/home` 作为独立 HOME；
-- `/tmp/pi-analysis-runtime/fixture` 作为合成 workspace；
-- `/tmp/pi-analysis-runtime/sessions` 作为合成 session store；
-- `--no-extensions --no-skills --no-prompt-templates --no-context-files --no-approve`；
-- 无工具或只开放 `read`；
-- 不运行 write/edit/bash；
-- raw trace 只包含合成内容，normalized trace 删除 prompt、thinking、工具参数和文件内容。
+## 停下来之前，产品层还要处理什么
 
-## 解释边界
+正常情况下，模型给出回答，工具和输入队列也都耗尽，低层循环就发出 `agent_end`。不过，一次低层运行也可能因为 Pi 请求 LLM 服务失败而结束。
 
-`R` 只能证明某路径在指定模式中发生过一次，不能证明生产频率或所有配置。没有运行到的 path 仍可能存在；没有在源码中找到的行为也不能在 coverage 不完整时直接判定为不存在。设计“为什么”仅在文档明确说明时归为 documented intent，否则只讨论可观察 tradeoff。
+这里需要分清网络错误发生在哪里。如果模型让 bash 执行 curl 下载文件，curl 超时或连接失败，通常会变成错误的 `toolResult`，再交回模型。模型可以决定换地址、检查网络，或者提出 `sleep 10` 后再下载的新命令；这仍是正常工具循环中的下一次决策。
 
-## 覆盖
+另一种情况是 Pi 自己向 LLM 服务发请求，服务返回了临时的不可用错误。此时轮到 `AgentSession` 处理：它检查最后的错误状态，用代码规则判断错误是否可重试，再看开关和次数限制。默认设置下，连续失败可以额外重试三次，分别等待 2、4、8 秒。等待期间可以取消；后续收到非 error 的响应时，计数会重置。
 
-14 个 codebook 模块全部有状态：interfaces/core loop/model/tools/session/recovery 等为 analyzed；context、sandbox、subagents、observability 为 partial。详细文件与未覆盖面见 [coverage.json](../evidence/coverage.json)。
-"""
+这一步不需要让 LLM 判断“要不要再试”。分类器检查的是最后的 assistant 错误状态，不会扫描全部工具输出，看到“network error”就重试。符合规则的模型服务或传输错误可以重试，配额和账单限制则会被排除。上下文溢出有另一条压缩恢复路径，也不直接套用普通重试。
 
-REPORTS["02-interfaces-lifecycle.md"] = r"""# 02 入口与生命周期
+因此，同一条用户请求中可能出现这样的过程：第一次低层运行因模型 API 请求失败而发出 `agent_end`，产品层等待后再次调用 `Agent.continue()`，重新请求模型。这不会直接重跑上一条 bash，也不会把用户任务从头执行；模型恢复响应后仍可自行提出新的工具调用。直到重试、压缩和排队输入等后续工作都处理完，`AgentSession` 才发出 `agent_settled`。
 
-## 入口收敛
+这也解释了为什么“运行结束”和“任务做对”要分别检查。重试耗尽后报错退出，产品层同样需要收尾；模型给出一个错误的端口，也可能正常结束。事件告诉我们程序走到了哪里，回答是否正确还要看文件和任务要求。模型 API 错误后的自动重发与模型看到工具失败后主动调整动作，由不同的机制决定。命令自身也可能有重试，例如 curl 的重试选项；那段时间 Pi 通常仍在等待本次 bash 完成。[三层重试的例子](10-implementation-details.md#bash-联网失败和模型-api-失败分别怎么处理)
 
-`main()` 解析 CLI、session、trust、资源和模型，然后创建 `AgentSessionRuntime`。最终只有 UI 适配不同：RPC 进入 `runRpcMode()`，TUI 进入 `InteractiveMode`，print/JSON 进入 `runPrintMode()`；它们共享同一个 `AgentSession`。[S: S-012, S-013]
+## 模型看到的历史，是每次请求选出来的
+
+现在假设对话已经持续了一段时间：Pi 读过配置、跑过测试，你还尝试过两种修复方式。会话里积累的内容，已经比最初那句提问丰富得多。
+
+Pi 会保存发生过的消息和其他记录，但模型每次请求使用的是经过选择的视图。完整记录可以包含多条分支，当前只沿其中一条继续；较早的内容也可能已经被压缩摘要代表。随后，扩展可以调整请求用的消息，类型转换函数再把它们整理成模型接口接受的形式。
+
+![Pi 从会话记录选择分支，再构造模型请求](../diagrams/generated/pi-context-views-v3.png)
+
+*消息经过分支选择、变换和类型转换；system prompt 与 active tools 在请求组装处单独加入。有压缩记录时，当前视图包含摘要与保留片段。*
+
+一个具体例子是扩展补充的“不要修改公共 API”。Pi 内部可以把它记成 `custom` 消息，同时保留扩展类型、显示选项和附加数据。发送前，`convertToLlm` 取出它的正文，包装成 pi-ai 的 `user` 消息。因此，模型消息中的 user 角色也可能承载程序加入的上下文，不一定是人刚刚键入的文字。
+
+另一个例子是你直接在 Pi 中执行 `!npm test`。应用记录里可以分别保存命令、输出、退出码和取消状态；转换函数再把这些字段组织成模型可读的文本。模型主动调用 bash 工具时，得到的则是与工具调用关联的 `toolResult`。两条路径都涉及 shell，但消息的来源和表示不同。
+
+还有一些扩展记录只是内部状态，例如计数器或界面标记。普通 custom entry 默认不进入模型上下文；需要注入内容时，扩展使用另一种 custom message entry。甚至 `display: false` 也只是界面属性，不能据此推断模型看不到内容。
+
+这些转换都是普通 TypeScript 代码。恢复会话、切换分支或压缩时，Pi 会重建相应的消息视图；正常循环则在内存中追加消息，并在每次模型请求前进行转换。排查“模型为什么没看到某条信息”时，需要沿着这条路径检查，仅仅在 session 文件里找到它还不够。[三层视图与消息转换例子](04-context-memory-compaction.md)
+
+消息到达模型 API 后，还要经过模型服务的编码。Pi 适配器先把 system prompt、消息和工具定义组织成请求字段；服务端再按模型的对话模板加入角色边界、工具说明和生成前缀，随后转成 token 输入。Qwen3.8-27B 与 DeepSeek V4 Flash 的公开实现使用不同的标记和工具调用格式。模型生成的调用经过解析回到 Pi，真正的文件读取仍由 Pi 执行。这个交接解释了为什么同一份 messages 可以对应不同的模型输入。[从 API 请求到模型输入的完整例子](18-model-input-encoding.md)
+
+## 对话太长时，摘要怎样接上后续工作
+
+排查启动问题的时间一长，配置文件、命令输出和修改记录会不断进入对话。Pi 会把较早内容总结成摘要，保留一段近期消息，让后续请求继续容纳新的工作。
+
+哪些原文留下，先由代码按预算和消息结构决定。当前默认 `keepRecentTokens` 是 20000：程序从最新消息往前累计估算 token，找到保留近期片段的切分位置。它按体积选择连续片段，不会先让模型给每条消息打重要性分数；工具结果也不能成为保留片段的第一条，以免失去对应的工具调用。
+
+假设这次选中了最近约两万 token 的消息，之前的内容就交给模型总结。摘要提示词要求记录用户目标和约束、工作进度、关键决定、下一步，以及继续任务需要的文件路径和错误信息。若一次排查本身就很长，切分位置落在任务中途，Pi 还会为被切掉的任务前半段生成摘要，交代原始要求和早期进展，让留下来的后半段有上下文可接。
+
+下面用一个教学例子表示压缩后的对话；消息编号和体积只用于说明过程：
 
 ```text
-CLI args / stdin
-  -> main()
-  -> SessionManager + cwd-bound services
-  -> AgentSessionRuntime
-  -> AgentSession
-  -> interactive | print/json | rpc adapter
+原来：消息 1～80 + 消息 81～100
+之后：前面工作的摘要 + 保留原文的消息 81～100
 ```
 
-关键源码：`packages/coding-agent/src/main.ts:650-857`、`packages/coding-agent/src/core/agent-session-runtime.ts:67-353`。
+摘要成功后，`AgentSession` 保存带有摘要和保留起点的压缩记录，再重建当前上下文。旧消息仍可留在会话文件中。较早的重要要求要靠摘要传递，近期细节则继续保有原文；摘要是否遗漏关键约束，需要检查内容，不能只看“压缩完成”事件。[切分边界与摘要生成](04-context-memory-compaction.md#哪些消息保留原文哪些送去总结)
 
-## 生命周期
-
-1. 选择/创建/恢复 `SessionManager`。
-2. 以 effective cwd 创建 settings、auth、model registry、resource loader。
-3. 解析 project trust 后装载最终 extension/resource 集合。
-4. 创建 `AgentSession`，绑定目标 mode 的 extension UI/context。
-5. prompt 后进入共享 loop；JSON/RPC 只是转发结构化 event。
-6. session switch/new/fork/import 会先发 `session_shutdown`，再重建 cwd-bound runtime，而不是只替换 message array。[S: S-014]
-
-## 模式差异
-
-- Interactive 有 trust prompt 和完整 TUI。
-- Print 输出最终 assistant text；JSON 输出每个 session event。
-- RPC 用 LF-delimited JSON 收命令、回 response，并并行输出 agent events 与 extension UI request。
-- 非交互模式没有 project trust UI；default `ask` 在无既有决策时等价于不信任项目资源。[S: S-006]
-
-本轮真实运行覆盖 JSON mode；TUI 与 RPC 源码已检查但未端到端启动。
-
-## 对象与结束边界
-
-| 对象/层 | 谁创建或拥有 | 生命周期 | Durable 内容 | 结束时发生什么 |
-|---|---|---|---|---|
-| CLI mode adapter | `main()` 按 interactive/print/JSON/RPC 选择 | 单进程 UI/transport 生命周期 | 自身不持久化 conversation | 断开 adapter 不等于删除 session 文件 |
-| `AgentSessionRuntime` | main 的 cwd-bound runtime factory | 当前 cwd/session 组合 | settings/auth/resource decisions 由各自 store 持久 | session switch/new/fork/import 时先 shutdown，再重建服务 |
-| `AgentSession` | 当前 Coding Agent 产品路径 | 可处理多次 prompt，直到 switch/shutdown | message/compaction 等通过 `SessionManager` 追加 JSONL | `agent_end` 后仍可能 retry/compact/queue；`agent_settled` 才是产品空闲 |
-| Low-level `Agent` / `runAgentLoop` | `AgentSession` 每次 prompt 驱动 | 一次 agent run，可含多次 turn | transcript 由上层 session 选择是否保存 | 无工具、steering、follow-up 后发 `agent_end` |
-| Session tree | `SessionManager` | 跨 prompt、进程、branch/fork | JSONL v3 header + parent-linked entries | resume 重建 active branch，不重建旧 workspace |
-"""
-
-REPORTS["03-core-loop.md"] = r"""# 03 核心循环与编排
-
-![Observed runtime turn](../diagrams/generated/pi-observed-turn.png)
-
-> 图 2（gpt-image-2 读者插图）：严格复现 `R-SCENARIO-002` 的两次模型迭代、`314159` tool result 回填，以及 `agent_end` 与 `agent_settled` 的分离；没有混入未发生的写入、审批、压缩或恢复路径。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；事件顺序来自 `R-SCENARIO-002`、[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `S-001`, `S-002`, `S-008`, `S-009`, `S-010`, `R-002`, `R-003`, `R-004`, `X-003`。
-
-## 贯穿案例中的循环
-
-第一次 provider response 产生 `read` toolUse；工具结果 `314159` 进入 context 后触发第二次 provider request；第二个 response 没有 toolUse，low-level loop 发出 `agent_end`，随后产品层发出 `agent_settled`。这把“模型停止”和“产品真正 settled”区分为两个生命周期概念。[R: R-002]
-
-## Low-level loop
-
-`runAgentLoop()` 维护外层 follow-up loop 和内层 tool/steering loop。每次 assistant message：
-
-1. `transformContext`，再 `convertToLlm`；
-2. 调 provider stream，转发 text/thinking/toolcall delta；
-3. error/aborted 立即 `turn_end -> agent_end`；
-4. toolUse 执行工具并把 toolResult 追加到 context；
-5. `prepareNextTurn` 可刷新 context/model/thinking；
-6. 注入 steering；没有工具和 steering 后检查 follow-up；
-7. 全部为空则 `agent_end`。[S: S-001]
-
-| 顺序 | 阶段 | 输入/状态 | 产出或分支 | 所属边界 |
-|---:|---|---|---|---|
-| 1 | context transform | 当前 transcript、system prompt、model | extension `transformContext` 后转成 provider messages | 每次 model request |
-| 2 | provider stream | model、converted context、tool schemas | text/thinking/toolUse deltas 或 error/abort | low-level turn |
-| 3 | tool preflight | 完整 assistant toolUse list | 参数 validation、hook block、sequential 判定 | 同一 tool batch |
-| 4 | tool execution | 允许执行的 calls | completion-order events；结果暂存在原 call index | tool runtime |
-| 5 | transcript append | assistant message + ordered toolResults | 下一次 model request 可见的新 context | 同一 agent run |
-| 6 | steering | loop 运行中排入的高优先输入 | 立即形成下一 turn | 内层 tool/steering loop |
-| 7 | follow-up | 当前 run 即将结束时排入的后续输入 | 外层 loop 再启动 turn | 外层 follow-up loop |
-| 8 | settle handoff | low-level `agent_end` | `AgentSession` 可继续 retry/compact/queue，最终发 `agent_settled` | 产品编排层 |
-
-`stopReason=length` 是特殊失败路径：即使 salvage 后参数能解析，Pi 也不会执行可能被截断的 tool call，而是为每个 call 生成 error result。[C: C-020]
-
-## Tool batch 语义
-
-默认 parallel。preflight/validation 顺序进行，允许的工具并发执行，`tool_execution_end` 按完成顺序出现，最终 toolResult message 按原始 tool call 顺序写入；任一工具为 sequential 则整批串行。[C: C-015] [X: X-001]
-
-| 批次条件 | 实际启动语义 | Event 顺序 | 写入 transcript 的顺序 | 为什么重要 |
-|---|---|---|---|---|
-| 所有 call 允许 parallel | validation 后并发执行 | `tool_execution_end` 可按实际完成先后交错 | `Promise.all` 返回值按原 call index 对齐，再按模型 call 顺序追加 | UI 可以先展示快工具完成，但模型下轮看到稳定顺序 |
-| 任一 call 标记 sequential | 整批按模型 call 顺序串行 | start/end 与 call 顺序一致 | 同一 call 顺序 | sequential 是 batch-level 降级，不只是该工具单独排队 |
-| call validation/hook block | 被拒 call 不进入 execute | 产生对应失败结束/结果事件 | 仍占原 call 的结果位置 | 后续 toolResult 必须与原 toolUse 一一对应 |
-| `stopReason=length` | 批次中的截断 call 全部拒绝执行 | 产生 error results，不产生真实副作用 execution | error toolResults 按 call 顺序进入 context | 能解析出 JSON 不代表参数完整或可安全执行 |
-
-## 产品级编排
-
-Coding Agent `AgentSession` 在 loop 外处理 prompt expansion、extension input、auth、auto retry、auto compaction、session event 和 settled。`_runAgentPrompt()` 在一次 `agent.prompt()` 后继续处理 retry/compaction/queued continuation，直到真正 settled。[S: S-002, S-009, S-010]
-
-新 `AgentHarness` 也直接调用 `runAgentLoop()`，但用显式 phase、turn snapshot、pending session writes 和 save point 取代部分 `AgentSession` 机制。两者不是叠加调用关系，而是共享 low-level loop 的当前产品实现与迁移目标。[D: D-003, D-008] [S: S-011]
-"""
-
-REPORTS["04-context-memory-compaction.md"] = r"""# 04 上下文、记忆与压缩
-
-![Context lifecycle](../diagrams/generated/pi-context-lifecycle-v2.png)
-
-> 图 3（gpt-image-2 读者插图）：startup/lazy、carry-forward 和 runtime 三类来源先汇入同一入口，再依次经过 `transformContext -> convertToLlm -> Per-request context -> Model request`；compaction 是虚线条件回路。第一版因错误画出 tool result 直达 model 而被拒绝，本图为修正并复审后的 v2。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；context 数据流来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `S-001`, `S-002`, `S-004`, `S-005`, `S-008`, `S-009`, `R-001`, `R-002`, `R-004`, `X-003`。
-
-## Context 来源
-
-| 来源 | 首次装载/刷新时机 | 信任与持久性 | 进入模型的精确方式 | 本轮动态覆盖 |
-|---|---|---|---|---|
-| 默认/自定义 system prompt | startup；model/resource refresh 后重建 | 配置/CLI 来源；不作为 session message entry | `buildSystemPrompt()` 形成每次 request 的 system instructions | 最小 system prompt 路径运行；未做 source diff |
-| AGENTS.md / CLAUDE.md | startup/reload，可用 flag 禁用 | context file；**不受 project trust gate** | 包装为 `<project_instructions>` 并入 system prompt | 真实场景显式 `--no-context-files`，仅静态确认 |
-| `.pi/SYSTEM.md` / append prompt | trusted project resources 加载或 reload | 未信任项目时不加载 | resource loader 合并到 system prompt | 真实场景禁用，未动态加载 |
-| Skills metadata | resource load/reload | global/project skill；project 部分受 trust | 有 read tool 时在 system prompt 列出可用 skill | 真实场景禁用 |
-| `/skill:name` full body | 用户显式调用时 lazy expansion | body 在调用 turn 进入 transcript | 展开成 user-side invocation text | 未运行 skill invocation |
-| Active session branch | open/resume/branch/fork 后重建 | JSONL v3 durable parent chain | `buildSessionContext()` 选择 active path/messages/summary | R-003/004 验证跨进程恢复 |
-| ToolResult | 每个 tool batch 完成后 | 作为 message entry 可被 session 保存 | 先追加 transcript，再经 transform/convert 进入下一 request | R-002 直接观察 `314159` 回填 |
-| Extension message/system override | 每个 prompt 开始 | extension 与 host 同权限；是否 durable 取决于 message API | `before_agent_start` 可加 custom message 或替换本轮 system prompt | X-001 hooks；真实 extensions 禁用 |
-| Context hook transform | **每次 provider request** | transient，默认不回写原 session tree | `transformContext` 后再 `convertToLlm` | X-001 覆盖 hook contract；未做真实 payload diff |
-
-[C: C-003] 的置信度为 medium，因为本轮没有部署 request proxy 做全部 source 的差分；真实场景只验证了最小路径和 toolResult 回填。
-
-## Durable memory
-
-Pi 没有独立向量 memory 层。核心 durable memory 是 session tree：message、model/thinking change、custom entry、compaction、branch summary 等都在 JSONL 中；active branch 通过 parent chain 与 leaf 计算。workspace 文件是另一条独立持久层，不会自动与 session rollback 保持一致。[S: S-008]
-
-## Compaction
-
-Coding Agent 分两类：
-
-- **Overflow**：错误或 usage 超过当前 model window；删除 live context 中的 error，生成 summary，最多 compact-and-retry 一次。
-- **Threshold**：接近窗口时压缩，但不自动重新回答已完成的 assistant turn。
-
-Compaction entry 保存 summary、`firstKeptEntryId`、`tokensBefore` 和 details；随后重建 active context。[S: S-009] [X: X-003]
-
-新 `AgentHarness.compact()` 已有手动结构操作和 compaction helpers，但 auto-compaction decision 尚未实现。[D: D-008]
-
-| 路径 | 触发条件 | 操作顺序 | 是否自动重答 | Durable 结果 | 未验证边界 |
-|---|---|---|---|---|---|
-| Overflow compaction | provider 报 context overflow，或 usage 超出当前 model window | 从 live context 移除 error -> 生成 summary -> 追加 compaction entry -> 重建 active context -> 最多 retry 一次 | 是，最多一次 compact-and-retry | error 仍可留在 session；summary/firstKept/tokens 写入 JSONL | 真实超长 SiFlow request 未运行 |
-| Threshold compaction | token usage 接近阈值，但当前 assistant turn 已正常完成 | 计算 summary -> 追加 compaction entry -> 重建后续 context | 否，不重新回答已完成 turn | compaction 成为 active branch 的一等 entry | summary 信息损失未做质量评估 |
-| Manual `AgentHarness.compact()` | host 显式调用 helper | 在 phase/save-point 约束下准备并提交结构变更 | 由 host 决定后续 prompt | helper/session tests 验证 ordering | auto decision、产品迁移和半持久恢复尚未实现 |
-"""
-
-REPORTS["05-models-tools-extensions.md"] = r"""# 05 模型、工具与扩展
-
-![Tool and extension surface](../diagrams/generated/pi-extension-surface.png)
-
-> 图 4（gpt-image-2 读者插图）：三列分别回答模型看到什么、能调用什么、action 如何运行；默认 host path 与可选 gate/container 明确分离。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；三类控制点来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `D-002`, `D-004`, `D-007`, `S-001`, `S-002`, `S-003`, `S-007`, `S-015`, `S-017`, `R-002`。
-
-## Model boundary
-
-`pi-ai` 的运行时单位是 Provider：id/name/base URL、auth、model catalog、`stream` 和 `streamSimple`。`ModelsImpl` 在每次请求前解析 provider auth，合并 base URL/header/env，再把 model/context 分派给拥有该 model 的 provider。[S: S-012]
-
-本轮用隔离 `models.json` 注册 `siflow/qwen3.6-35ba3b`：`--list-models` 成功，随后真实 text/read 场景都通过相同 provider abstraction。[R: R-005, R-001, R-002]
-
-## Tool registry
-
-`AgentSession._refreshToolRegistry()` 合并：
-
-- built-in tool definitions；
-- extension `registerTool()`；
-- SDK custom tools；
-- CLI/settings allowlist 与 denylist。
-
-extension/custom tool 同名时按 load/order 进入最终 map；resource loader 会产生 conflict diagnostic，但机制仍允许扩展覆盖/替换能力。[S: S-003]
-
-## 固定版本的内置工具清单
-
-Pi `v0.80.7` 的 Coding Agent 内置 registry 明确定义 **7 个名称**：`read`、`bash`、`edit`、`write`、`grep`、`find`、`ls`。新 session 未传 `--tools`/`--no-tools` 时，默认 active set 只有前四个；后三个已注册但默认不发给模型，可通过 `--tools` 或 SDK 显式启用。[源码：registry](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/tools/index.ts#L83) [源码：默认 active set](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/sdk.ts#L245) [C: `C-004`]
-
-| 工具 | Registry | 默认 active | 作用与关键边界 |
-|---|---|---|---|
-| `read` | 内置 | 默认启用（新 session） | 按 path 读取文本或图片；支持 offset/limit 和输出截断。它是观察工具，但仍以 Pi 进程的 filesystem 权限访问。 |
-| `bash` | 内置 | 默认启用（新 session） | 在当前 cwd 启动 shell，默认继承进程环境；timeout 可选且无默认值，abort/timeout 尝试终止进程树。[C: `C-007`] |
-| `edit` | 内置 | 默认启用（新 session） | 用精确 old/new text replacement 修改已有文件；通过 mutation queue 协调文件写操作。 |
-| `write` | 内置 | 默认启用（新 session） | 创建或覆盖文件，并在需要时创建父目录；不是 append-only session write。 |
-| `grep` | 内置 | 默认不启用（需显式选择） | 在文件内容中搜索 pattern，并执行匹配数/输出长度截断；适合显式 read-only tool set。 |
-| `find` | 内置 | 默认不启用（需显式选择） | 按 glob/pattern 枚举匹配路径；结果受 cwd、ignore 和截断设置限制。 |
-| `ls` | 内置 | 默认不启用（需显式选择） | 列出目录内容；同样只拥有启动 Pi 的 OS user 可访问范围。 |
-
-这里的三层必须分开：**registry** 是 7 个可配置定义，**active tools** 是本轮放进 `agent.state.tools` 的子集，**extension/SDK tools** 是随后按 name 合并的外部定义。Extension 或 SDK 同名定义会覆盖最终 definition/registry entry，因此“`read` 在 registry 中”仍不能证明当前执行目标必然是原始 built-in。`--no-tools` 清空全部 active tools，`--no-builtin-tools` 只移除 built-ins，`--exclude-tools`/`--tools` 再提供显式过滤。
-
-## Hook 注入点
-
-| 注入点 | 发生时机 | 能改变什么 | 失败/阻断语义 | 权限边界 |
-|---|---|---|---|---|
-| `input` | 用户输入进入产品层时 | 标记 handled，或变换输入 | handled 可短路普通 prompt；错误由 extension runtime 报告 | host 进程内 |
-| `before_agent_start` | 每次 prompt 调 low-level loop 前 | 加 custom messages，或替换本轮 system prompt | 可改变该 run 的初始 context | host 进程内 |
-| `context` | 每次 provider request 前 | 变换将要发送的 messages | 影响 request，不必改写 durable session | host 进程内 |
-| `tool_call` | 参数 validation 后、`execute` 前 | block 调用并返回理由 | 可阻止该 tool handler；不是不可绕过的全局 gate | host 进程内、可选 |
-| `tool_result` | handler 返回后 | 改 content、details、`isError` | 模型下一 request 看到变换后的结果 | host 进程内 |
-| provider hooks | request/payload/response 边界 | 观察或修改 provider 交互 | 可能改变兼容性、日志和 redaction | host 进程内 |
-| session/tree hooks | switch/fork/compact/tree 操作前后 | 观察、阻止或附加生命周期行为 | 部分 post-commit failure 不能回滚已提交状态 | host 进程内 |
-
-这些 hooks 是控制面，不是被隔离的 plugin VM；extension TypeScript 与主进程同权限。`tool_call` block 只覆盖经过该 registry/hook pipeline 的调用，extension 自己直接访问 filesystem/process/network 不受它约束。[D: D-002]
-
-## 不内置的协议
-
-核心明确不内置 MCP。要么把 CLI + README 暴露成 skill，要么 extension 自行注册 MCP tool。因而 HIR 中没有把 MCPServer 画成现存核心组件。[D: D-004]
-"""
-
-REPORTS["06-permissions-sandbox-workspace.md"] = r"""# 06 权限、Sandbox 与 Workspace
-
-![Permission pipeline](../diagrams/generated/pi-permission-boundaries.png)
-
-> 图 5（gpt-image-2 读者插图）：中心实线是默认 side-effect path；startup-only project trust、可选 extension gate、外部 container/VM 和 custom-tool host path 被空间分离，不能读成全局强制审批。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；边界结论来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `D-002`, `D-004`, `D-007`, `S-003`, `S-006`, `S-007`, `S-017`, `R-002`, `X-001`。
-
-## 三个容易混淆的边界
-
-1. **Project trust**：启动资源加载 gate。它防止仓库在未确认时加载 `.pi/settings.json`、extensions、skills、SYSTEM 等。它不限制模型之后调用 read/bash/write。[C: C-006]
-2. **Tool hook**：可选 application policy。extension 可在 `tool_call` 返回 block；`protected-paths.ts` 是示例，不是默认策略。[C: C-017]
-3. **Sandbox**：OS/container/VM 边界。Pi 默认没有；需要 whole-process Docker/OpenShell，或用 Gondolin extension 路由 built-in tools。[C: C-005]
-
-## 边界对照
-
-| 边界 | 默认启用 | 保护对象 | 不保护/可绕行面 | 合理部署用途 |
-|---|---|---|---|---|
-| Project trust | interactive 有 prompt；headless `ask` 无既有决策时不加载项目资源 | `.pi/settings.json`、project extensions/skills/SYSTEM 等 startup resources | AGENTS/CLAUDE context；之后的 read/write/edit/bash；extension 直接副作用 | 防止打开未知仓库时静默装载可执行扩展和配置 |
-| `tool_call` hook / protected paths extension | 默认关闭；需用户安装并配置 | 经过 tool registry 的命名调用和参数 | extension 直接 fs/process/network；`!` command；未被路由的 custom backend | 交互确认、路径规则、组织策略原型 |
-| Gondolin tool routing example | 默认关闭；需安装并启用该 extension | 被该 extension 覆盖的 built-ins 与 `!` command | 未 delegate 的 arbitrary extension tools；host resource loader/package install | 把选定 tool backend 放入隔离 guest |
-| Whole-process Docker/OpenShell/VM | 否，由部署层提供 | Pi、extensions、shell、language server 等整个进程树 | bind mount 仍可写 host；挂载 agent dir 会暴露 session/settings/auth | unattended/untrusted workload 的主要隔离层 |
-| Host OS user/ACL | 是，取决于启动用户 | 用户权限不允许访问的资源 | 该用户本来可读写的 workspace、credentials、network | 所有模式的最终基础边界 |
-
-## 默认 side-effect path
-
-内置 bash 在 cwd 启动 shell，默认继承进程环境；timeout 参数可选且无默认值。Unix 使用 detached process group，abort/timeout 会 kill tree。extension 代码、package install、language server 与 shell 子进程都处于同一用户权限边界。[C: C-007]
-
-## 外部隔离的绕行风险
-
-Gondolin example 覆盖内置 tools 与 `!` command，但其他 custom extension tools 仍在 host，除非自己 delegate。Whole-process container 更完整，但 bind-mounted workspace 仍会写回 host；挂载 host agent dir 还会暴露 sessions/settings/auth。[D: D-007]
-
-## 本轮没有做什么
-
-没有触发 bash/write/edit，也没有声称验证了 deny 后“零副作用”。这是安全限制，不是系统具备 deny gate 的证据。要验证部署安全，需要在 disposable VM 中跑 tool/extension/`!`/subagent 的 side-effect matrix。
-"""
-
-REPORTS["07-subagents-delegation.md"] = r"""# 07 Subagent 与 Delegation
-
-![Subagent topology](../diagrams/generated/pi-subagent-topology.png)
-
-> 图 6（gpt-image-2 读者插图）：核心默认无 subagent；可选 subagent extension 与 experimental orchestrator 是两条不同条件路径。Child 隔离 context/process 但共享 cwd/workspace，orchestrator 不是 loop delegation。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；topology 结论来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `D-004`, `D-006`, `D-010`, `S-015`, `S-016`。
-
-## 默认核心
-
-Coding Agent README 明确写出 “No sub-agents”。默认 tool registry 不会自动出现 delegation，也没有父子 context/session 协议。[C: C-013]
-
-## 示例 extension
-
-`examples/extensions/subagent` 注册一个 `subagent` tool：
-
-- single、parallel（最多 8 task、并发 4）和 chain；
-- 每个 child 为独立 `pi --mode json -p --no-session` 进程；
-- system prompt 写入 mode `0600` 临时文件并 append；
-- child 默认 cwd 与 parent 相同，可覆盖；
-- 解析 child JSON events，聚合 usage/tool calls/final output；
-- abort 先 SIGTERM，5 秒后尝试 SIGKILL；
-- parallel 返回每 task 最多 50KB 到 parent context，完整值留在 details。
-
-因此隔离的是 **context/process**，不是 workspace 或权限。child 默认继承进程环境，工具能力由 agent definition 的 model/tools 字段控制。[S: S-015]
-
-| 属性 | Parent -> example child 的默认关系 | 可配置点 | 安全含义 |
-|---|---|---|---|
-| Process | 独立 `pi --mode json -p --no-session` 子进程 | agent definition 可改 model/tools/cwd | process crash/context 隔离；仍通常是同一 OS user |
-| Context/history | child 新建 transcript，不继承 parent 全量 history | system prompt 临时文件、task/chain 前序输出显式传入 | parent 中间 history 不自动泄漏；传入文本仍可能含敏感信息 |
-| Session | `--no-session`，child 不写普通 durable session | 示例实现固定 | child 结果靠 parent toolResult 回收；无法靠 child session resume |
-| Cwd/workspace | 默认与 parent 相同 | agent definition 可覆盖 cwd | 并行 child 可竞争同一文件；context 隔离不等于 workspace 隔离 |
-| Environment/credentials | 继承启动进程环境 | 需由容器或 spawn env 显式收窄 | child 可能拥有与 parent 相同 provider key 和主机能力 |
-| Tool surface | agent definition 的 `tools` allowlist | 每个 agent 可不同 | 限制模型可调用的命名工具，但不构成 OS sandbox |
-| Concurrency | parallel 最多 8 tasks、并发 4 | 示例常量/模式 | 控制资源量，不解决共享文件冲突 |
-| Cancellation | abort -> SIGTERM；5 秒后尝试 SIGKILL | 固定示例行为 | 可清理进程树，但未证明所有 child 副作用可回滚 |
-| Return to parent | final/tool usage/details；parallel 每 task context 最多 50KB | 完整结果保留在 details | 控制 parent context 体积，不等于 durable artifact store |
-
-Project-local agent prompt 是 repo-controlled；interactive mode 可确认，但 headless 退化路径本轮未验证。
-
-## Experimental orchestrator
-
-`OrchestratorSupervisor` 创建一个 RPC Pi child per instance，复用 events/UI request，持久化 instance/session metadata，并在意外退出时标 error/清理 Radius presence。restart recovery 只是把原 online/starting 记录标 stopped，没有恢复 in-flight child。[C: C-018]
-
-它更像 multi-session process supervisor，不是 agent loop 中的 parent/child delegation primitive。
-"""
-
-REPORTS["08-sessions-persistence-recovery.md"] = r"""# 08 Session、持久化与恢复
-
-![Persistence lifecycle](../diagrams/generated/pi-persistence-lifecycle.png)
-
-> 图 7（gpt-image-2 读者插图）：主轴展示 live branch 的 append、JSONL persistence、resume 和 context rebuild；compaction 是条件路径，workspace 明确不随 session branch 回滚。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；持久化关系来自[Harness IR](../hir.json)和下列 Evidence IDs。`R-SCENARIO-003/004` 观察到 create/persist/restore；compaction/retry 来自定向 tests。Evidence: `S-008`, `S-009`, `S-010`, `S-014`, `R-003`, `R-004`, `X-003`。
-
-## JSONL v3
-
-首行是 session header：version、session id、timestamp、cwd、可选 parentSession。后续每个 entry 有短 id、parentId、timestamp；append 作为 current leaf 的 child 并推进 leaf。类型包括 message、model/thinking/tool changes、custom、compaction、branch summary、label、session info 等。[S: S-008]
-
-读取时 Pi 流式解析 JSONL，单个 malformed line 会被跳过；非空文件如果最终没有合法 Pi header 则拒绝打开。v1/v2 会迁移到 v3并重写文件。中间 entry 损坏是否造成可接受但错误的 branch 仍是开放风险。
-
-| 状态 | Live owner | Durable 表示 | Resume/fork 行为 | 不随 session 恢复的内容 |
-|---|---|---|---|---|
-| Active conversation branch | `AgentSession` + `SessionManager` current leaf | JSONL entry 的 `id/parentId` tree 与 leaf | resume 选择 active leaf；branch navigation/fork 选择或复制 path | workspace 文件、外部进程、网络服务状态 |
-| Model/thinking choice | session runtime | model/thinking change entries | `buildSessionContext()` 重放到 active path 的有效配置 | provider 端连接/stream |
-| Message/tool transcript | low-level Agent context | message entries，包括 assistant toolUse 与 toolResult | 重建为下一 request 的 carry-forward context | tool 已造成的副作用不会重放或撤销 |
-| Compaction | Coding Agent orchestration | summary、`firstKeptEntryId`、`tokensBefore`、details | active context 用 summary + kept suffix 重建 | 被 summary 丢失的细节不能从有效 context 自动恢复 |
-| Retry/error | `AgentSession` recovery state | provider error 可留 session；live context 可移除 | reopen 可看到 durable entry，但不会恢复中断的 provider stream | backoff timer、in-flight HTTP stream |
-| Workspace | OS/filesystem | Pi session 外部的目录现实状态 | resume/fork 继续看到当前磁盘 | 没有 conversation leaf 对应的自动 snapshot/rollback |
-
-## Resume 与 fork
-
-- Resume/open：加载 entries、迁移、重建 index/leaf，再 `buildSessionContext()`。
-- Branch navigation：移动 leaf，可对离开的 branch 生成 summary。
-- Fork：新 header 指向 `parentSession`，复制 selected history 或 active path，并为目标 cwd 重建 runtime services。
-
-## 跨进程实验
-
-进程 A 使用 `session-id=analysis-resume-001` 收到“记住 `PI_RESUME_2718`”，返回 ACK 并退出。进程 B 只要求返回前一进程 token，成功返回 `PI_RESUME_2718`。raw session copy 位于 `traces/raw/R-004-session-state.jsonl`，normalized traces 不含 prompt/thinking。[R: R-003, R-004]
-
-## Recovery 分层
-
-- provider retryable error：指数退避、maxRetries 有界；error 留 durable session，从 live context 移除。
-- context overflow：compaction path，不进入普通 retry；最多一次 compact-and-retry。
-- length-truncated tool call：不执行，返回错误让模型重发。
-- abort：low-level signal 传入 model/tool；Coding Agent 还负责清理 tracked detached children。
-- 新 AgentHarness：半持久恢复尚在设计；provider stream 不可恢复，unfinished tool 是否可重试需要 idempotency 声明。[C: C-020]
-"""
-
-REPORTS["09-observability.md"] = r"""# 09 可观测性
-
-## 已实现
-
-Agent event vocabulary 包含：
-
-- `agent_start`, `agent_end`, `agent_settled`；
-- `turn_start`, `turn_end`；
-- `message_start/update/end`；
-- `tool_execution_start/update/end`；
-- `queue_update`；
-- `compaction_start/end`；
-- `auto_retry_start/end`。
-
-JSON mode 把 header + events 写到 stdout；RPC 在 command response 之外转发同一事件，并提供 extension UI request/response。[D: D-005] [R: R-001, R-002]
-
-| 表面 | 面向谁 | 关联键/顺序 | 包含内容 | 缺口与敏感性 |
-|---|---|---|---|---|
-| In-process agent events | `AgentSession`、extensions、UI adapter | 单次 runtime 的 event sequence、message/tool 对象 | run/turn/message/tool/queue/compaction/retry/settled lifecycle | 默认没有全局 trace/span parent；payload 可含 prompt/tool data |
-| JSON mode stdout | 自动化消费者、分析脚本 | header + 发出顺序 | 同一 session events 的结构化序列 | 原始输出含 assistant thinking、args/results；需要 redaction |
-| RPC stream | 外部 host/UI | command response id + 并行 agent events | session control、events、extension UI request/response | command 与 event 因果关系需 host 自行维护 |
-| JSONL session | resume/branch/fork | entry `id/parentId`、timestamp、file order | durable message/config/compaction/tree state | 不是低开销 telemetry；不包含完整内部 timing/span |
-| OTel/Sentry adapter notes | 未来外部 adapter | 设计目标是 stable vendor-neutral event mapping | 文档化方向，不是默认 exporter | 本版本不能声明 collector delivery 或 trace propagation |
-| 本分析 normalized trace | 复核者 | scenario id + sequence | role/type/length/model/usage/stop/tool lifecycle | 是分析产物，不是 Pi 产品 API；主动删除文本、thinking、args/results |
-
-`R-SCENARIO-002` 归一化后可重建：
+假如摘要正在生成，你补充一句：“生产环境设置了 PORT=8080，接下来检查 Docker 配置。”终端会先把这句话放进压缩期间的输入队列。正在进行的摘要调用继续处理之前准备好的材料，新要求等压缩结束再提交。下一次处理任务的模型请求就可以看到：
 
 ```text
-session
-  -> run.started
-  -> turn.started
-  -> user message
-  -> assistant toolUse
-  -> tool.started(read)
-  -> tool.completed(read)
-  -> toolResult
-  -> turn.completed
-  -> turn.started
-  -> assistant stop
-  -> run.completed
-  -> run.settled
+压缩摘要 + 保留的近期消息 + “PORT=8080，请检查 Docker 配置”
 ```
 
-## 未实现为默认核心的部分
+如果上一轮已经完成，这条输入可以启动后续工作；如果正在为溢出错误做恢复，它会按提交时的 steering / follow-up 类型进入相应队列，由恢复后的循环消费。接收输入和开始处理输入发生在不同时间。[压缩期间的队列时间线](04-context-memory-compaction.md#压缩期间提交的新输入怎样接上来)
 
-当前 event 没有统一 `traceId/spanId/parentSpanId`，也没有默认 OTel exporter。`packages/agent/docs/observability.md` 是 design notes：目标是 Pi 自己产 stable vendor-neutral events，外部 adapter 再映射到 OTel/Sentry。[D: D-009]
+Pi 还区分接近阈值时的预防性压缩，以及上下文溢出后的恢复。阈值检查发生在特定运行边界，检查之后仍可能加入大段输入或工具输出，估算也可能与实际用量有差异，所以提前压缩不能排除所有溢出。已完成的回答不会因为阈值压缩而重新生成；需要恢复的溢出响应才按规则尝试压缩后续跑。[为什么仍然需要溢出恢复](04-context-memory-compaction.md#已经有阈值检查为什么还会溢出)
 
-因此本分析通过 scenario id + sequence 做归一化 correlation，而没有把 JSON events 宣称成完整 distributed trace。[C: C-014]
+## 关掉进程之后，对话怎样继续
 
-## 数据敏感性
+要让这段工作延续到下次启动，Pi 用 `SessionManager` 管理会话记录。记录以 JSONL 保存，也就是每行一个 JSON 对象；其中的 `id` 和 `parentId` 把历史连接成树，当前的 `leaf` 表示继续对话的位置。
 
-原始 JSON mode 会包含 prompt、assistant text/thinking、tool args/result。报告使用的 normalized trace 只保留角色、内容类型/长度、provider/model、usage、stop reason、tool name 与 lifecycle。生产接入应默认执行同类 redaction。
+这使得尝试另一种思路时，不必删掉原来的路径。比如，你先尝试修改配置，随后回到共同历史，改为检查启动参数。两条路径都可以留在会话树中，模型沿当前选中的分支继续。切换时还可以附带支线摘要，把有用的信息带回来。Armin 的使用记录把这种能力用于临时探索：先解决支线问题，再回到主线。[会话分支与使用案例](08-sessions-persistence-recovery.md#会话树怎样支持临时探索)
+
+会话分支管理的是对话。支线里如果已经修改了文件，回到旧 leaf 后，文件仍然是修改后的内容；工作区版本需要用 Git 等方式另行管理。这个区别在尝试不同修复方案时尤其重要。
+
+文件的创建时机也有一个细节：新建且尚未写过的持久会话，通常先把 user 和配置 entry 留在内存，直到首条 assistant entry 出现后才创建文件并写入已有记录，之后再逐条追加。
+
+![Pi 新会话从内存记录到首次写入文件的过程](../diagrams/generated/pi-session-first-write-v3.png)
+
+*图示新建、尚未写过文件的会话。已有空文件初始化和格式迁移有另外的处理路径。*
+
+重新打开会话时，Pi 根据记录重建当前分支、模型设置和压缩后的消息视图。历史实验中，两个独立进程通过同一 session 恢复了之前保存的合成信息。这验证了正常保存后的恢复路径；它没有替代进程崩溃、半写入文件或工作区漂移的故障检查。[持久化与恢复细节](08-sessions-persistence-recovery.md)
+
+## 工作流需要改变时，扩展接在哪里
+
+读到这里，Pi 的运行主线已经比较清楚：准备请求、调用模型、执行工具、处理结果，再管理继续和结束。Extensions 可以在这些交接位置参与处理。
+
+例如，项目需要限制某类文件修改，可以在工具执行前检查调用并阻断；需要给下一次请求补充项目状态，可以调整请求消息；工具返回了丰富的结构化数据，也可以分别安排模型看到的内容和界面显示的数据。扩展因此能改动运行行为，而不只是增加一个菜单命令。
+
+这种能力依赖明确的生命周期。`AgentSession.reload()` 会刷新设置和资源、重建 extension runner 与工具注册表，再按条件发送重新启动通知。扩展若需要跨 reload 保留状态，可以利用会话记录；旧的内存 closure 不会因此自动变成持久状态。[扩展状态与 reload](05-models-tools-extensions.md#扩展怎样形成可迭代的工作流)
+
+运行权限也需要放在同一张图景里理解。Pi 默认工具和 extensions 使用启动进程的权限。Project trust 管的是项目启动资源加载，工具 hook 管的是经过它的调用，实际文件和网络隔离则由部署环境提供。一个确认对话框并不会自动覆盖扩展自己发起的所有副作用。[信任与执行边界](06-permissions-sandbox-workspace.md)
+
+Mario 的设计回顾强调对上下文和交互过程的控制。对应到当前代码，这个方向体现为请求、工具、状态和生命周期上的多个可调整入口。它能解释为什么读 Pi 时，除了看循环本身，还需要看这些交接位置由谁持有、何时更新。
+
+## 把这些机制放回最初的请求
+
+现在再看“读取配置，告诉我端口”这件事，可以把职责放回源码中的几个对象。
+
+`AgentSession` 接收并准备输入，组织 extensions 和产品级收尾。`Agent` 保存当前消息、工具配置和队列，由 `runAgentLoop` 推进一轮轮模型与工具处理。模型请求经过 `ModelRegistry` 和兼容适配入口，消息记录则交给 `SessionManager` 管理。
+
+![Pi 当前 AgentSession 路径的整体职责](../diagrams/generated/pi-system-overview-session-only.png)
+
+*循环分别请求模型和调度工具，再接收各自的结果；会话管理保存记录。图中聚合了职责，具体事件和落盘时机在前文展开。*
+
+如果请求成功，一次用户输入可以经过多个 turn 后结束；如果遇到可重试错误，产品层可能启动另一段低层运行；如果历史太长，后续请求会改用摘要与保留片段。最终看到的回答，来自模型选择动作与程序维护这些状态和边界的共同过程。
+
+## 继续阅读与查证
+
+正文以读取配置等例子串起机制。另有一条保留的真实 read 轨迹：模型读取合成文件中的 `314159` 后，在第二轮给出答案。网络失败和配置修改等叙述用于说明源码规则，未拼接进这条真实轨迹。
+
+分析固定于 `v0.80.7 / 818d674` 的当前产品路径。历史真实模型记录与本地受控测试支持的范围不同，详见下列资料；本次只是重组文章，没有新增运行实验。
+
+- [专题阅读与查证索引](reading-guide.md)：按问题进入源码、消息示例和实现细节。
+- [真实请求轨迹](00-task-walkthrough.md)、[实验记录](11-runtime-experiments.md)与[复现方法](13-coverage-reproducibility.md)：查看实际验证过什么。
+- [外部解读与源码对照](17-external-perspectives.md)：查看作者、使用者文章及其版本边界。
+- [结论与证据索引](14-source-claim-index.md)、[术语表](16-glossary.md)：查找具体字段、事件和源码位置。
+
+文中插图沿用同一组已复核的机制说明。[图像元数据](../diagrams/generated/metadata.json)保留对应证据、生成参数和审核记录。
 """
 
-REPORTS["10-design-decisions.md"] = r"""# 10 设计决策与权衡
+REPORTS['00-task-walkthrough.md'] = r"""# 一次请求的运行过程
 
-本节把“实现了什么”和“作者为什么这样做”分开。文档明确的产品立场使用 D evidence；源码可见机制使用 S evidence；右侧收益和代价是根据边界与实验形成的分析综合，不自动等价于作者动机。
+![Pi read 场景的两轮模型与工具处理](../diagrams/generated/pi-observed-turn.png)
 
-![Pi design space](../diagrams/generated/pi-design-space.png)
+图按时间顺序展示历史 R-002：第一次响应请求 read，工具结果进入第二次模型请求，随后依次结束低层运行和产品收尾。AgentSession 是产品编排层，toolResult 是工具返回的消息。证据：S-001、S-002、R-002；图中未加入该场景没有触发的压缩或重试。图片经本次复核后继续使用，[提示词与审核记录](../diagrams/generated/metadata.json)。
 
-> 图 8（gpt-image-2 读者插图）：四行分别从 documented stance 映射到 recovered mechanism，再以橙色点线连接 analyst-synthesized tradeoff；右列不表示作者声明。图像 provenance 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；设计映射来自[story spec](../diagrams/story-specs.json)和下列 Evidence IDs。Evidence: D-001, D-002, D-003, D-004, D-007, D-008, S-001, S-003, S-007, S-008, S-011, S-017, R-004, X-002。
+这里用历史 `R-SCENARIO-002` 串起当前 Coding Agent 的主路径。场景只开放 `read`，要求读取合成文件并返回其中的 `314159`。归一化轨迹记录了两轮模型处理、一次工具调用和最终 settled；源码补充轨迹中看不到的状态所有权。[R: R-002]
 
-## 决策记录
+## 从输入到第一次模型请求
 
-| 决策 | 当前机制 | 适用条件 | Documented intent | 收益 | 代价/风险 | Evidence / 置信度 | 最小反证 |
-|---|---|---|---|---|---|---|---|
-| 薄 low-level loop | `runAgentLoop` + callbacks | 所有使用 agent-core contract 的 host | agent-core 通用 runtime | 易嵌入、可用 faux provider 精确测试 | 产品 retry/session/settled 落到上层，形成两代 orchestration | `S-001`, `D-003`；高 | 找到产品主路径绕过它的独立 model/tool loop |
-| 工具默认并行 | batch 并发；任一 sequential tool 使整批串行 | 同一 assistant message 的 toolUse batch | 文档/源码明确 | 降低互不依赖工具的 latency | completion event 与 transcript 顺序不同，错误分类会改变整批吞吐 | `S-001`, `X-001`；高 | 并发测试中 toolResults 按完成顺序而非原 call 顺序进入 context |
-| 扩展优先而非内置工作流 | extensions/skills/packages + hooks | Coding Agent resource loader 启用相应资源时 | README 明确 aggressively extensible | core 小、用户可定制 MCP/subagent/policy | 行为和治理不统一；extension 与 host 同权限 | `D-004`, `S-003`；高 | 默认 registry 强制提供统一 MCP/subagent/policy contract |
-| 无内置 sandbox/permission popup | 进程权限 + 外部隔离 | 默认 built-ins 与 extension runtime | security 文档明确 intentional | 直接使用本地 toolchain，不制造虚假边界 | unattended/untrusted 任务必须由部署层治理 | `D-002`, `D-007`；高 | 默认配置存在覆盖所有副作用 backend 的不可绕过 gate |
-| Project trust 只守启动资源 | path-based persisted decision | project-local settings/extensions/skills/SYSTEM | security 文档明确 | 防止 repo 静默加载可执行扩展/配置 | AGENTS context 仍可注入 prompt；运行期 tools 不受限 | `D-002`, `S-006`；高 | 未信任项目时 read/bash 被 runtime policy 自动阻止 |
-| Session 用 append-only tree | JSONL `id/parentId/leaf` | persistent session，非 `--no-session` | session 文档和实现 | branch/fork/compaction 保留历史 | workspace 不随 branch 回滚；中段损坏可造成错误 branch | `S-008`, `R-004`；高 | resume 不依赖 tree/leaf，或 fork 自动恢复旧文件状态 |
-| Compaction 是一等 entry | summary + first kept + token metadata | Coding Agent overflow/threshold path | 机制明确；作者选择理由未单独记录 | 可重建 active context并保留压缩事件 | summary 有信息损失，增加模型调用和失败面 | `S-009`, `X-003`；高 | compact 后没有 durable entry 或 context 不经 summary 重建 |
-| 新 Harness 用 snapshot/save point | in-flight immutable；next safe point refresh | 迁移中的 generic `AgentHarness`，非当前 Coding Agent 默认 | lifecycle 文档明确 | 热更新不污染当前 request，持久顺序明确 | phase/reentrancy/settled/auto recovery 仍在硬化 | `D-003`, `S-011`, `X-002`；中 | 当前 request 中途读到 next-state 配置，或 pending write 越过 save point |
-| Provider owns auth + stream | `Models` runtime collection | 注册 provider/model 与 custom endpoint | 源码 contract | 多 provider 共用 loop | “compatible” endpoint 的 body/stream 方言仍泄漏，如 thinking flag | `S-012`, `R-005`；高 | provider 选择/auth 在 loop 内按 provider id 硬编码 |
-| Event-first observability | structured lifecycle events | JSON/RPC/in-process consumers | design notes 明确不绑定 vendor | UI/host 易消费，可由 adapter 映射 | 缺默认 trace/span correlation、redaction 和 exporter | `D-005`, `D-009`；中 | 本版本默认发出完整 OTel spans 并传播 parent context |
+CLI 创建或打开 session 后，print/JSON 模式调用 `AgentSession.prompt()`。产品层依次处理 extension command、`input` hook、skill/template 展开；若已有运行，则把新输入交给指定队列。普通空闲路径检查模型和鉴权，必要时处理旧上下文，然后构造 user message，追加待发送的消息和 `before_agent_start` 返回的内容。[S: S-002]
 
-## 跨决策张力
+`AgentSession._runAgentPrompt()` 调用 `Agent.prompt()`。后者建立当前 context/config 快照，交给 `runAgentLoop()`。每次模型请求前，消息先经过 `transformContext`，再经 `convertToLlm` 转为 provider 支持的消息；system prompt 和 active tools 一并传入模型适配层。[S: S-001, S-022, S-024]
 
-### 通用核心与产品一致性
+本场景关闭了 skills、extensions、prompt templates 和 context files。上面这些入口是源码中的完整输入路径，真实轨迹实际经过的是其中的最小配置。
 
-薄 loop 让 agent-core 易嵌入，但 compaction、retry、session ordering 和 settled semantics 必须由上层拥有。新 AgentHarness 的出现说明可复用性问题已经从“能否调用 loop”转成“不同 orchestration 是否行为等价”。最有区分度的下一步不是更多单元测试，而是 AgentSession 与 AgentHarness 的 differential scenario suite。[C: C-010, C-016]
+## 模型请求读取文件之后
 
-### 扩展自由与统一治理
+模型第一轮返回 assistant message，其中包含 `read` 调用。低层循环等这条 assistant message 完成后才组织工具批次。
 
-registry/hooks 能把 subagent、MCP、permission UI 和自定义工具留给用户，但同样意味着不存在一个不可绕过的 application-level policy plane。若部署目标从本地交互式工具转向 unattended service，合理替代不是再加一个示例 hook，而是 whole-process isolation 或可证明覆盖所有 side-effect backend 的统一 capability boundary。[C: C-005, C-017]
+1. 发出 `tool_execution_start`，按名称查找工具并校验参数。
+2. 执行可选的 `beforeToolCall`；在产品层，它对应 extension 的 `tool_call` hook。
+3. 调用 `read.execute`，获得文件内容，之后应用可选的 result hook。
+4. 发出执行结束事件，构造对应的 `toolResult`，把它交回消息处理和上下文。
+5. 进入下一轮模型请求。此时模型能看到前一条工具调用和它的结果。[S: S-001, S-003, S-018]
 
-### 可审计 session 与不可回滚 workspace
+`Agent` 在 `message_end` 时更新内存消息。`AgentSession` 等待 extension 的消息处理后把消息交给 `SessionManager`。本场景使用 `--no-session`，因此有内存消息处理而没有普通会话文件写入。[S: S-019; R: R-002]
 
-JSONL tree 完整保存 branch、compaction 和 resume 历史，却不为文件系统提供相同事务语义。用户可以回到旧 conversation leaf，但 workspace 仍是新状态。这不是 session bug，而是两个 durable subsystem 没有共同 checkpoint protocol 的结构性结果。[C: C-008, C-012]
+## 第二次请求为何会发生
 
-没有文档化的作者动机不在表中伪装成事实。例如“为什么 JSONL 而非数据库”未找到直接说明，报告只陈述可观察 tradeoff。
+工具批次完成后，低层循环把 `toolResult` 加入 context，并检查是否还需继续。这个 read 场景继续请求模型，第二条 assistant message 给出最终文本。没有新的工具调用或排队输入后，低层循环发出 `agent_end`；产品层处理完后续工作，再发出 `agent_settled`。[R: R-002; S: S-001, S-002]
+
+| 轨迹中的步骤 | 消息或状态变化 |
+|---|---|
+| 用户输入 | user message 进入本次运行 |
+| 第一次 assistant 完成 | 历史中增加带 `read` 调用的 assistant message |
+| read 结束 | 增加包含合成文件值的 toolResult |
+| 第二次 assistant 完成 | 增加最终回答 |
+| `agent_end` / `agent_settled` | 低层运行结束，再完成产品层收尾 |
+
+完整事件见[归一化轨迹](../traces/normalized/R-002-read-tool.normalized.jsonl)。归一化文件保留事件类型和统计字段；合成文本及工具结果位于对应 raw 记录。它没有捕获完整 HTTP 请求包，因此“请求怎样构造”同时依据源码解释。
+
+## 接下来需要分开的路径
+
+压缩、重试、动态工具更新和分支恢复在其他章节单独解释。该 read 场景没有触发这些行为。新的本地 mock/faux 测试进一步检查了并行结果顺序、异步事件处理、压缩后续行为和会话树重建，见[实验记录](11-runtime-experiments.md)。
 """
 
-REPORTS["11-runtime-experiments.md"] = r"""# 11 运行实验
+REPORTS['01-scope-method.md'] = r"""# 范围与方法
 
-完整命令和结果见 [runtime-tests.md](../runtime-tests.md)，场景机器可读记录见 [catalog.json](../scenarios/catalog.json)。
+本报告分析 `earendil-works/pi` 的 `v0.80.7`，commit 为 `818d67457cdd6b60bce6b121d16b23141c252dd8`。2026-10-20 复核时，本地 checkout 与该 commit 一致，工作区干净。本轮聚焦当前 Coding Agent 的 `AgentSession → Agent → runAgentLoop` 路径，以及直接支撑它的模型、工具、上下文和会话服务。
 
-| 场景组 | 执行对象 | 预声明断言 | 结果 | 主要 artifact | 解释边界 |
-|---|---|---|---|---|---|
-| R-001 | 真实 SiFlow text-only | 1 turn、0 tool、最终 settled | 通过，`PI_TEXT_OK` | `traces/normalized/R-001-text-only.normalized.jsonl` | 仅最短 JSON-mode 路径 |
-| R-002 | 真实 SiFlow + read fixture | 必须先 toolUse，再带 toolResult 二次请求 | 通过，2 turns、1 tool、`314159` | `traces/normalized/R-002-read-tool.normalized.jsonl` | 只读；未覆盖 permission/sandbox |
-| R-003/004 | 两个独立 Pi 进程 | 第二次 prompt 不重发 token仍可恢复 | 通过，`PI_RESUME_2718` | `traces/raw/R-004-session-state.jsonl` + normalized traces | 正常 JSONL 尾部；无 corruption |
-| X-001 | agent-core faux provider | loop、双顺序、hooks、queue、length-stop contract | 39/39 passed | 固定 test files 见 `X-001` | 不评价真实模型行为 |
-| X-002 | 新 `AgentHarness` | snapshot/save point、pending writes、helpers | 61/61 passed | 固定 test files 见 `X-002` | 不代表 Coding Agent 已迁移 |
-| X-003 | Coding Agent recovery | compaction/retry/context rebuild 分层 | 31/31 passed | 固定 test files 见 `X-003` | 未注入 OS crash/真实长上下文 |
+## 本次做了什么
 
-## R-SCENARIO-001：最短文本路径
+重新跟踪了 `AgentSession → Agent → runAgentLoop`，检查工具 preflight/执行/回填、消息事件与持久化的顺序、模型兼容入口、动态配置刷新、压缩条件，以及 session 文件创建和分支重建。随后在固定源码的临时副本中执行定向测试，产物保存到 `traces/checks/`。其中 mock/faux 用确定性的测试响应替代真实模型，以便触发指定分支；preflight 指执行工具前的查找、参数校验和 hook 判断。
 
-- 配置：JSON mode、no session、no tools、禁 extensions/skills/templates/context files。
-- 预期：一次 turn，无 tool event，最终 settled。
-- 结果：通过，最终 `PI_TEXT_OK`；1 turn、0 tool。
-- 证据：`R-001`；normalized trace `traces/normalized/R-001-text-only.normalized.jsonl`。
+历史报告中的真实 SiFlow 文本、read 和跨进程 resume 场景继续保留。本次没有重新调用外部模型。`manifest.execution` 描述历史运行配置，`manifest.review` 描述本次复核，二者的证据时间和验证范围分别记录。
 
-## R-SCENARIO-002：真实 read tool loop
+## 证据怎样阅读
 
-- Fixture：`fixture.txt` 含合成未知值 `PI_FIXTURE_VALUE=314159`。
-- 配置：只开放 `read`。
-- 预期：模型必须 toolUse，result 回填后再次调用模型。
-- 结果：通过；2 turn、1 tool start/end、最终 `314159`。
-- 证据：`R-002`。
+| 标记 | 来源 | 阅读方式 |
+|---|---|---|
+| D | 目标仓库文档 | 支持公开说明的行为或产品立场 |
+| S | 固定版本源码 | 支持实现路径、数据结构与触发条件 |
+| R | 历史真实模型运行 | 支持指定配置中实际出现的路径 |
+| X | mock/faux、定向或故障测试 | 支持执行过的具体断言 |
+| I | 分析推断 | 与实现事实分开陈述 |
 
-## R-SCENARIO-003/004：跨进程 resume
+`C-xxx` 是结论编号，链接到支持它的证据。`runtime_verified` 表示相应路径有运行证据，并不表示组件的全部配置都经过测试。报告以机制解释为主，设计评价留给后续分析。
 
-- 进程 A：持久 session `analysis-resume-001`，记忆合成 token。
-- 进程 B：相同 session-id，不在 prompt 重复 token。
-- 结果：A 返回 ACK，B 返回 `PI_RESUME_2718`。
-- 证据：`R-003`, `R-004`。
+## 对旧分析的实质修订
 
-## X-SCENARIO-001：agent-core faux provider
+模型入口分别说明 `ModelRegistry/compat` 及其内置模型分派。`compat` 自身还会在内置模型路径中使用 `Models`，因此两者的关系需要按分派条件解释，详见[模型接口](05-models-tools-extensions.md)。这一处已同步修正 C-019、HIR 和[冲突记录](../evidence/conflicts.jsonl)。
 
-- Files：`agent-loop.test.ts`, `agent.test.ts`。
-- 结果：2 files，39 tests passed。
-- 覆盖：parallel/sequential、hooks、queue、termination、length stop、event settlement。
+压缩章节补上两种此前容易混淆的情况：成功 stop 响应 usage 越界时压缩但不重答；threshold 压缩后如果有排队输入，仍可继续处理。持久化章节补上首条 assistant 才触发新文件写入的条件。事件章节区分工具开始通知与 handler 真实执行。
 
-## X-SCENARIO-002：新 AgentHarness
+## 本次运行环境
 
-- Files：`agent-harness.test.ts`, `session.test.ts`, `compaction.test.ts`。
-- 结果：3 files，61 tests passed。
-- 覆盖：save point refresh、pending write ordering、hooks、abort、session/compaction helpers。
+使用官方 Node 22.19.0，并按官方 SHASUMS256 校验归档。测试复用本机已有依赖；源码由 `git archive` 导出到临时目录，缓存关闭，临时配置和测试数据分开保存。测试子进程没有继承模型凭据环境变量，选用 mock/faux；这里采用临时目录隔离，未配置 OS 网络沙箱。脚本及各组命令、返回码和结果见[复现方法](13-coverage-reproducibility.md)。
 
-## X-SCENARIO-003：Coding Agent recovery
+本次不覆盖跨平台 sandbox、真实长上下文质量、生产运行频率、subagent 文件竞争或实际进程崩溃恢复。这些问题保留在[待验证路径](12-failure-modes-open-questions.md)，不影响已查明的具体源码顺序。
 
-- Files：`agent-session-compaction.test.ts`, network retry regression, session build-context。
-- 结果：3 files，31 tests passed。
-- 覆盖：overflow/threshold compaction、bounded retry、active context rebuild。
+## 外部阅读的使用方式
 
-## 意外观察
+本次检索筛选 16 篇作者文章、使用记录和技术解读，阅读了其中 15 篇的相关正文；1 篇只取得元数据与搜索摘要。来源、日期、版本和采用方式记录在 [external-sources.json](../evidence/external-sources.json)。多篇文章转述同一作者，不计为相互独立的验证。
 
-自定义 model 声明 `reasoning:false` 且 `supportsReasoningEffort:false`，但 SiFlow 服务端仍流出 thinking block。此前直接 endpoint smoke test 通过 `chat_template_kwargs.enable_thinking=false` 可关闭；Pi 的 standard models.json path 本轮没有注入该 request body。该差异不否定 harness loop，但 raw trace 可能包含 reasoning，已在 normalized trace 中移除。
+作者关于自身设计目的的陈述记为 D；社区和使用者的解释记为署名观点或 I。实现细节仍以本地 `818d674` 的源码为依据。阅读促成了工具结果分流、reload 顺序和压缩预算的补充核查，新增 C-027 至 C-029；本轮没有新增运行实验或性能比较。
 """
 
-REPORTS["12-failure-modes-open-questions.md"] = r"""# 12 失败模式与开放问题
+REPORTS['02-interfaces-lifecycle.md'] = r"""# 入口、对象与生命周期
 
-## 已验证或源码明确的 failure path
+Pi 的 interactive、print/JSON 和 RPC 模式在 `main.ts` 分派，使用共同的 Coding Agent session 构建路径。模式层负责输入输出，`AgentSessionRuntime` 负责当前 session 及与 cwd 关联的服务，`createAgentSession()` 组合 `Agent`、`SessionManager`、设置、资源和模型注册表。[S: S-013, S-014, S-024]
 
-| 失败/触发 | 当前行为 | 状态影响范围 | 可恢复条件 | 尚未验证的边界 | Evidence |
-|---|---|---|---|---|---|
-| Provider retryable error | 指数退避，`maxRetries` 有界；live context 移除 error，session 保留 entry | 当前 provider request/产品 prompt | 后续 retry 成功或用户再次 prompt | 真实断网、rate-limit header、进程重启时 budget 是否保留 | `S-010`, `X-003` |
-| Context overflow | 生成 compaction；错误型 overflow 最多自动 retry 一次 | active context 与当前 prompt | summary 成功且 compact 后 request 可接受 | 真实长上下文、summary provider 失败、连续 model window 变化 | `S-009`, `X-003` |
-| Length-truncated tool call | 全部拒绝执行，为每个 call 生成 error result | 当前 tool batch | 模型下一 turn 重发完整参数 | 部分工具已先产生 delta 时是否有额外 side effect surface | `S-001`, `X-001` |
-| Tool exception | 转为 `isError` toolResult 并进入模型 context | 单个 call；batch 继续按 contract 汇总 | 模型可根据 error 自我修复 | extension 在抛错前已产生的主机副作用不能自动回滚 | `S-001`, `X-001` |
-| Bash timeout/abort | kill detached process group/tree；保留输出和状态 | shell process tree | handler 返回后 session 可继续 | orphan/grandchild、不可中断 I/O、Windows 行为 | `S-007` |
-| Session file 非空但无合法 header | 拒绝打开 | 整个 session file | 需人工修复/恢复合法 header | 中段 malformed line 被跳过后 branch 是否静默错误 | `S-008` |
-| New AgentHarness hook failure | 归一化 `AgentHarnessError`；部分 post-commit failure 不回滚 | 当前 phase/save point | host 根据错误和 committed state 决定继续 | reentrancy、settled 与半持久 turn 仍 provisional | `D-003`, `S-011` |
-| Orchestrator child exit | instance 标 error、reject pending、清理 resources | 单个 RPC Pi instance | supervisor 可新建/重启实例 | in-flight task、session 与外部副作用不能恢复 | `S-016` |
+## 对象怎样组合
 
-## 产品风险，不是分析器缺陷
+`AgentSessionRuntime` 面对的是打开、替换、fork 和导入 session 等产品操作。发生 session/cwd 切换时，它负责清理并重建相关服务。`AgentSession` 面对的是一个已建立的 session，负责其 prompt、extensions、工具配置和运行收尾。
 
-- 默认无 permission/sandbox，对 untrusted/unattended workload 风险高。
-- AGENTS/CLAUDE context 不受 project trust gate，prompt injection 是明确接受的本地 agent 风险。
-- optional tool-routing sandbox 不自动覆盖 arbitrary extension tools。
-- session branch 与 workspace filesystem 没有事务性一致性。
-- subagent child 默认共享 cwd 与环境，context 隔离不等于 capability 隔离。
+`Agent` 持有当前消息、model、tools、thinking level、输入队列和活动运行的取消信号。它把这些数据组成快照传给低层循环，并根据循环发出的事件更新自身状态。`SessionManager` 则持有记录树与文件索引；当前模型看到的消息是从树中选择和转换得到的视图。[S: S-008, S-019]
 
-## 分析限制
+源码入口：[main.ts](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/main.ts#L650)、[sdk.ts](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/sdk.ts#L301)、[Agent](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/agent.ts#L184)。
 
-- 未运行 write/edit/bash、Gondolin、Docker、OpenShell、subagent extension、orchestrator。
-- 未做 corrupted session、SIGINT、tool timeout、child crash、long-context real model。
-- 未获得 production feature flags、使用频率或 maintainer 访谈。
-- 新 AgentHarness lifecycle 文档自己标记 phase/settled/reentrancy 仍 provisional。
+## 输入不一定立即成为模型请求
 
-## 优先实验
+`AgentSession.prompt()` 先尝试执行 extension command；被处理后可直接返回。随后 `input` hook 可以处理或变换输入，skill/template 再展开文本。若 session 正在运行，调用方须指定 `steer` 或 `followUp`，输入进入对应队列；普通 prompt 不会同时启动第二套运行。这里按调用参数分流，不分析句子语义来猜队列。默认交互界面在运行中用 Enter 选择 steer、Alt+Enter 选择 followUp，详见[队列选择机制](03-core-loop.md#双队列对应两种交互意图)。[S: S-002, S-033]
 
-| 优先级 | 实验 | 要区分的假设 | 通过标准 | 仍不能推出 |
-|---|---|---|---|---|
-| P0 | `AgentSession` vs `AgentHarness` differential suite | 共享 low-level loop 是否足以保证产品行为等价 | 相同 scripted turns 对齐 messages、events、retry、compaction、writes 与 settled；差异有明确 contract | 单元场景一致不代表迁移已完成 |
-| P0 | Container/VM permission bypass matrix | 可选 gate/路由是否覆盖所有副作用 backend | built-in、`!`、custom tool、extension direct process、subagent 分别记录 host/guest 文件、进程、网络副作用 | 单一 container 配置不代表所有 bind mount/credential 策略 |
-| P1 | JSONL corruption matrix | parser 宽容跳行是否可能形成静默错误 branch | header/middle/tail/parent/compaction/leaf 注入后明确分类拒绝、修复或降级 | conversation 恢复不证明 workspace 一致 |
-| P1 | Provider proxy context differential | 九类 context source 的装载和 request 时机是否符合静态结论 | 每次 request 保存 redacted type/hash diff，并对 trust/reload/hook 条件逐项开关 | 一个 provider 方言不覆盖其他 adapter |
-| P2 | Orchestrator restart/crash | supervisor cleanup 与 durable session 能否恢复 in-flight child | crash 前后 instance/session/pending request/resource 状态可重放并有明确 terminal result | orchestrator 结果不能外推到 subagent extension |
+空闲路径检查模型和鉴权，检查是否需要发送前压缩，构造 user message，追加 `nextTurn` 消息，再处理 `before_agent_start` 返回的消息及 system prompt。最后进入 `_runAgentPrompt()`。此处的源码顺序解释了同一段用户文字为何可能先被命令或 extension 消费。[S: S-002]
 
-机器可读问题清单见 [questions.json](../questions.json)。
+## 三个结束时刻
+
+`turn_end` 结束一轮 assistant 响应及其工具处理。低层循环发出 `agent_end` 时，其事件流已到末尾；`Agent` 仍会等待监听者，再清理运行状态。`AgentSession` 随后检查重试、压缩和剩余队列，必要时再次调用 `Agent.continue()`，最后发出 `agent_settled`。[S: S-001, S-019; X: X-005]
+
+`agent_settled` 表示产品层暂时没有这次运行的后续工作。成功回答、不可恢复错误和取消都可能走到收尾，所以自动化消费者还须检查最后的响应、错误或任务产物。
+
+## 用一个读文件例子区分这些事件
+
+假设用户要求“读取 `config.json`，告诉我端口”。下面按源码规则示意一次正常执行；它是教学例子，历史真实 read 场景另见[请求过程](00-task-walkthrough.md)。
+
+```text
+用户提交一次请求
+│
+├─ turn 1
+│  模型回复：调用 read 读取 config.json
+│  Pi 执行 read，得到 {"port": 8080}
+│  工具结果进入上下文
+│  → turn_end
+│
+├─ turn 2
+│  模型看到结果，回复：服务监听 8080 端口
+│  没有新的工具调用或排队输入
+│  → turn_end
+│
+├─ agent_end：本次低层循环结束
+├─ AgentSession 检查重试、压缩及剩余队列
+└─ agent_settled：产品层完成收尾
+```
+
+这里是一条用户请求、两个 turn、一次低层运行。一轮 assistant 响应提出多个工具调用时，这些调用也可以属于同一个 turn。[S: S-001]
+
+| 事件 | 回答的问题 |
+|---|---|
+| turn_end | 这一轮模型响应及工具处理结束了吗？ |
+| agent_end | 这一次低层循环结束了吗？ |
+| agent_settled | 产品层的这次运行收尾了吗？ |
+
+产品层压缩可能单独调用模型生成摘要；这种辅助调用不直接计作上面低层循环的 turn。若重试次数耗尽，Pi 报错并收尾，也可以发出 `agent_settled`。这些事件说明运行阶段，端口答得对不对仍须检查回答与文件内容。[S: S-002, S-019, S-021]
+
+## 模式层的区别
+
+| 模式 | 输入与输出 |
+|---|---|
+| Interactive | TUI 输入、交互操作与 extension UI |
+| Print | 等待调用完成后输出最终内容 |
+| JSON | 在 stdout 输出 session header 与结构化事件 |
+| RPC | 消费命令并返回带 id 的响应，同时转发 session 事件 |
+
+历史真实运行覆盖 JSON 路径；其他入口的共享关系由源码确认。当前产品的运行状态与收尾顺序见 [AgentSession 的状态与运行收尾](10-implementation-details.md)。
 """
 
-REPORTS["13-coverage-reproducibility.md"] = r"""# 13 覆盖与复现
+REPORTS['03-core-loop.md'] = r"""# 核心循环与工具执行
 
-## 产物
+`runAgentLoop()` 接收本次输入、当前 context、模型及工具配置、事件接收函数和取消信号。它为消息数组建立本轮视图，发出起始事件，然后交给 `runLoop()`。`Agent` 是这个循环的状态包装，产品层的压缩和重试由 `AgentSession` 在其外部处理。[S: S-001, S-002, S-019]
 
-- 固定配置：[manifest.json](../manifest.json)
-- 仓库 inventory：[inventory.json](../inventory.json)
-- HIR：[hir.json](../hir.json)
-- Claims：[claims.jsonl](../evidence/claims.jsonl)
-- Evidence：[observations.jsonl](../evidence/observations.jsonl)
-- Coverage：[coverage.json](../evidence/coverage.json)
-- Scenarios：[catalog.json](../scenarios/catalog.json)
-- Raw traces：`traces/raw/`
-- Redacted normalized traces：`traces/normalized/`
-- Diagram source models/metadata：`diagrams/`
-- Narrative story spec：[story-specs.json](../diagrams/story-specs.json)
-- Reader PNG/prompt/review metadata：`diagrams/generated/`
+## 一轮模型处理的顺序
 
-## 结构化规模
+1. 把待注入的 steering/follow-up 消息加入当前 context。
+2. 先运行 `transformContext`，再运行 `convertToLlm`，与 system prompt 和 tools 组成请求。
+3. 消费 provider stream：开始时加入部分 assistant message，delta 更新它，结束时用最终 message 替换。
+4. 若 stop reason 是 `error` 或 `aborted`，结束本次低层运行。
+5. 从完整 assistant message 取出 `toolCall`，组织工具批次并生成 `toolResult`。
+6. 回填结果，发出 `turn_end`，调用 `prepareNextTurn` 刷新下一请求需要的配置。
+7. 检查 host 的停止条件及 steering；内层可结束时，再检查 follow-up 队列。[S: S-001]
 
-当前 bundle 包含 **29 个 HIR nodes、35 条 typed edges、20 个 supported claims 和 35 条 D/S/R/X evidence records**。这些计数描述可审计产物规模，不代表源码覆盖百分比或生产路径频率。
+源码：[runLoop](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/agent-loop.ts#L161)。这里的工具执行发生在 assistant response 完成之后；工具参数的流式增量本身不会立即触发 handler。
 
-## 14 模块覆盖矩阵
+## 工具处理包含准备和执行两个阶段
 
-`analyzed` 表示固定版本主机制和关键条件已静态恢复；`partial` 表示仍缺少会改变结论边界的平台、feature、真实 side effect 或故障注入。状态不是“读了多少行代码”。
+每个调用先发出 `tool_execution_start`，再查找名称、执行可选的 `prepareArguments`、校验 schema、调用 `beforeToolCall` 并检查 abort。未知工具、非法参数、hook block 或准备阶段异常可以直接生成错误结果，不进入 `execute`。[S: S-018]
 
-| 模块 | 状态 | 已恢复机制 | 动态边界 | 未解决问题 |
-|---|---|---|---|---|
-| `compaction` | analyzed | overflow、threshold 与 AgentHarness manual compaction helper | 31 Coding Agent tests + AgentHarness helper tests；无真实长上下文 | 未用真实模型触发 262K 上下文 overflow。 |
-| `context_assembly` | partial（关键运行或故障路径尚缺动态覆盖） | system/resources/session/toolResult/extensions/hooks 到 per-request context | 动态验证最小 prompt、toolResult、resume；资源/trust/hook payload 差分未跑 | 未代理捕获完整 provider request；未动态差分 skills/context files/extensions。 |
-| `core_loop` | analyzed | runAgentLoop 的 provider/tool/steering/follow-up/stop 双层循环 | R-001/002 + 39 tests 覆盖 stop、tool feedback、queue、双顺序 | 无额外模块级未知项；仍受全局运行配置限制 |
-| `interfaces` | analyzed | CLI interactive/print/JSON/RPC 收敛到 cwd-bound AgentSession runtime | 真实运行 JSON mode；TUI/RPC 仅静态检查 | 无额外模块级未知项；仍受全局运行配置限制 |
-| `model_abstraction` | analyzed | pi-ai provider/model/auth/base URL/stream runtime contract | SiFlow model discovery/text/read 成功；未比较其他 provider | SiFlow 服务端默认 thinking 与 Pi reasoning=false 存在兼容差异。 |
-| `observability` | partial（关键运行或故障路径尚缺动态覆盖） | agent events、JSON/RPC stream、session JSONL 与 adapter design notes | R-001/002 JSON events 可重建；无默认 OTel exporter | 默认没有 trace/span correlation IDs；OTel adapter 设计未实现。 |
-| `orchestration` | analyzed | 当前 AgentSession 产品编排与迁移中 AgentHarness snapshot/save point | 当前 AgentSession 真实运行；AgentHarness 61 tests，未做差分迁移 | Coding Agent 迁移到新 AgentHarness 尚未完成。 |
-| `permissions_safety` | analyzed | project trust、可选 tool gate、protected paths 与默认进程权限 | 只验证 trust/resource source；未运行 deny 或副作用工具 | 未执行破坏性 allow/deny side-effect 场景；结论主要来自明确文档与源码。 |
-| `recovery` | analyzed | retry、overflow、truncated call、abort、hook/orchestrator failures | 定向 tests 覆盖逻辑分支；无 SIGINT、timeout、crash、半持久 turn | 未执行真实 SIGINT、tool timeout、进程 crash 或半持久 turn recovery。 |
-| `sandbox_execution` | partial（关键运行或故障路径尚缺动态覆盖） | Gondolin selective routing 与 whole-process Docker/OpenShell/VM 边界 | Gondolin/Docker/OpenShell/VM 均未动态执行 | Gondolin 要求 Node >=23.6 与 QEMU，本轮 Node 22.19 环境未运行；Docker/OpenShell 未运行。 |
-| `sessions_persistence` | analyzed | JSONL v3 parent tree、leaf、branch/fork/resume/migration | R-003/004 验证正常跨进程恢复；无 corruption/fork 动态矩阵 | 未做 corrupted JSONL 注入与跨版本 migration 动态测试。 |
-| `subagents` | partial（关键运行或故障路径尚缺动态覆盖） | 默认无 subagent、示例 extension 子进程、experimental orchestrator | 示例和 orchestrator 仅源码；未创建 child | 核心无内置 subagent；可选 extension 与 experimental orchestrator 均未动态运行。 |
-| `tools_extensions` | analyzed | built-in/custom/extension registry 与 input/context/tool/provider/session hooks | hooks/registry 有定向 tests；真实 runs 禁用 extensions | 未动态运行自定义 extension tool。 |
-| `workspace` | analyzed | cwd、host filesystem、session branch 与共享 subagent workspace | 合成 read workspace 与 session resume；未测写入、branch drift、冲突 | 只验证只读 workspace；写/edit/bash 未动态执行。 |
+准备通过后，`execute` 获得 call id、校验后的参数、取消信号和进度回调。handler 抛出的异常被包装为错误结果；实际执行的调用随后进入 `afterToolCall`，允许调整 content、details、terminate 和 isError。最后发出结束事件并生成协议消息。
 
-## 关键复现命令
+因此 `tool_execution_start` 的准确含义是“开始处理这个调用”。判断命令或文件操作是否发生，要结合 execute 计数、实际输出或副作用记录。`length` 截断路径也会发出 start/end，同时返回“未执行”的错误内容。[C: C-021; S: S-018]
+
+## 并发完成与消息顺序
+
+![并行工具为何有执行完成顺序和回填顺序两种顺序？](../diagrams/generated/pi-tool-order-v2.png)
+
+A、B 是说明顺序的示例：B 可以先完成，但 toolResult 按模型调用次序 A、B 回填。时间条不表示实测耗时；tool_execution_start 只表示开始处理调用。证据：S-018、X-004。[提示词、生成参数与复核记录](../diagrams/generated/metadata.json)。
+
+默认并行路径先按调用顺序完成各项准备，再启动允许执行的函数。`tool_execution_end` 可按实际完成顺序出现；`Promise.all` 保存原调用位置，随后按位置生成 `toolResult` 消息。
+
+例如模型依次请求 A、B，B 先完成时，结束通知可以是 B、A，但下一轮模型看到的结果仍是 A、B。界面进度与模型上下文因此有不同的排序依据。本次 `X-004` 重新执行了相关定向测试。[C: C-015; S: S-018; X: X-004]
+
+若全局 `toolExecution` 为 sequential，或批次中任一命中工具声明 `executionMode=sequential`，整个批次进入串行路径。串行路径每次准备并执行一个调用，处理结果后再进入下一个。
+
+## 继续、终止与排队输入
+
+有工具调用通常会触发下一次模型请求。一个特殊条件是已处理批次中的所有结果都声明 `terminate=true`，这会关闭工具引起的 follow-up；它仍需结合 steering、follow-up 和 host 停止条件判断整个运行是否结束。普通工具错误通常作为 `isError` 结果回到模型，使其有机会继续处理。bash 内部命令的网络错误也走这条路径；产品层重试 LLM API 请求是另一层处理，见[具体例子](10-implementation-details.md#bash-联网失败和模型-api-失败分别怎么处理)。[S: S-018, S-034]
+
+steering 在当前 assistant 及其工具批次完成后的边界注入；它不会仅因入队就打断正在执行的工具。follow-up 在工具与 steering 都耗尽后取出。`Agent.continue()` 若发现最后一条是 assistant，会先尝试消费队列；没有可消费输入才拒绝从该状态继续。[S: S-001; X: X-004]
+
+## 双队列对应两种交互意图
+
+[Haochuan 的源码解读](https://blog.haochuanz.net/posts/agent-harness-04-pi)把两类队列理解为用户控制运行节奏的接口。[I: I-002]
+
+在当前默认交互界面中，队列由提交动作选择；在 SDK/RPC 中，则由调用方指定。默认路径没有按消息语义调用 LLM 分类这一步。以下说明普通文本输入，extension command 或 input hook 可以提前处理输入。[S: S-002, S-033]
+
+| Pi 正在运行时的默认操作 | 界面传入的参数 | 入队结果 |
+|---|---|---|
+| Enter 提交 | streamingBehavior: "steer" | steering 队列，在当前 turn 边界后注入 |
+| Alt+Enter 提交 | streamingBehavior: "followUp" | follow-up 队列，在工具与 steering 耗尽时消费 |
+
+对应的两种调用形式是：
+
+```ts
+session.prompt(text, { streamingBehavior: "steer" })
+session.prompt(text, { streamingBehavior: "followUp" })
+```
+
+`AgentSession.prompt()` 检查 `isStreaming` 后，按 `options.streamingBehavior` 选择 `_queueSteer()` 或 `_queueFollowUp()`。运行中的普通 prompt 没有提供这个参数时会报错。SDK 也提供 `session.steer()`、`session.followUp()`，RPC 提供 `steer`、`follow_up` 命令。[S: S-033]
+
+### 同一句话可以进入不同队列
+
+以“忙完之后，再检查文档”为例：按 Enter 会进入 steering，消息可能在下一次模型请求中就出现；模型收到后是否按文字要求推迟执行，是模型的行动选择。按 Alt+Enter 则进入 follow-up，程序把消息本身延后递交。
+
+因此，程序控制“何时让模型看到消息”，模型在看到消息后判断“如何回应和行动”。即使文字写着“立即改变方向”，用 follow-up 方式提交也会先按该队列的时机等待。[S: S-001, S-033]
+
+### 空闲、压缩与可配置键位
+
+这些按键是默认绑定，可以通过 keybindings 调整。空闲时，Alt+Enter 会调用普通提交入口，开始处理新请求。压缩期间，交互层先保存消息及其 steer/followUp 模式，之后再按该模式递交；类型仍来自用户的提交动作。[S: S-033]
+
+队列的消费时机由低层 loop 控制：steering 不自动撤销已经执行的动作，follow-up 也不必等到产品层 `agent_settled` 才被消费。它可以在同一低层运行发出 `agent_end` 前进入下一轮。[S: S-001; X: X-004]
+
+源码：[Enter 的运行中提交](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L2800)、[handleFollowUp](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L3669)、[AgentSession 分流](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L1120)。
+
+## 消息如何同步到 session
+
+`Agent.processEvents()` 先把最终消息放入 live state，再逐个等待监听者。`AgentSession` 先等待 extension 的 `message_end`，必要时就地替换同一个消息对象，再通知外部监听者并追加 session entry。这样低层循环、产品层和持久化可以处理同一最终消息。[S: S-019]
+
+本次异步 hook 回归测试检查了 assistant/toolResult 记录顺序，以及 `tool_call` hook 运行时 assistant 消息已进入会话分支。外部 session listener 则在 append 前被通知，不能仅凭回调开始就判断磁盘已经更新。[C: C-022; X: X-005]
+"""
+
+REPORTS['04-context-memory-compaction.md'] = r"""# 上下文、消息转换与压缩
+
+Pi 同时维护持久会话记录、当前分支的应用消息和本次模型请求的消息视图。它们之间通过选路、hook 和类型转换连接。理解这几个阶段，才能判断一条信息何时进入模型、何时留在文件中。[S: S-008, S-022]
+
+## 持久历史、当前分支与本次请求
+
+Pi 需要管理会话记录、恢复状态和显示过程；模型每次请求只接收经过选择与转换的内容。同一条信息在这些层次中的表示和用途可能不同。
+
+| 层次 | 包含什么 | 回答的问题 |
+|---|---|---|
+| 持久历史 | 已保存的消息、不同分支、模型切换、压缩记录和扩展数据等 entry | 之前记录了什么？ |
+| 当前分支 | 从当前 leaf 沿 parentId 选出的一条路径；运行时还会追加新的内存记录 | 现在沿哪段对话继续？ |
+| 本次请求视图 | 按压缩边界选出的消息，经过扩展处理和类型转换，再与 system prompt、tools 组装 | 这一次模型实际收到什么？ |
+
+例如，你先尝试方案 A，随后回到共同历史，改试方案 B。下面是教学示意：
+
+```text
+共同历史：分析登录问题
+    ├─ 方案 A
+    │   ├─ 阅读相关文件
+    │   └─ 得到一大段失败日志
+    │
+    └─ 方案 B
+        └─ 继续分析 ← 当前 leaf
+```
+
+完整历史可以保留两条分支。沿 B 继续时，重建路径通常选择“共同历史 + B 分支”，不会因为 A 的日志仍在文件中，就自动把它们全部加入本次请求。如果切换时生成分支摘要，一部分信息可以通过摘要带回。[S: S-008]
+
+同一分支还可能经过压缩。例如，较早消息已经被总结，近期片段被保留：
+
+```text
+保存的记录：早期消息 + 近期消息 + compaction entry
+请求用消息：压缩摘要 + 保留的近期消息 + 之后的新消息
+```
+
+旧消息可以继续保存在会话文件中，当前请求用摘要代表其中一部分。`buildSessionContext()` 负责结合分支和压缩边界构建应用消息，后面才进行消息变换与类型转换。[S: S-008, S-022]
+
+这是数据视图之间的关系。恢复会话、切换分支或压缩时会重建相应上下文；正常 loop 在内存中追加消息，每次模型请求再转换当前消息列表。它不要求每次请求都从磁盘重读完整 session。文件首次创建和追加时机见[会话持久化](08-sessions-persistence-recovery.md)。
+
+## 为什么先看上下文控制面
+
+[Mario 的设计回顾](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/)把可检查、可控制的模型上下文列为开发 Pi 的动机。[D: D-011]
+
+这个角度适合用来阅读 `AgentSession`：先找信息在哪个阶段进入，再看谁能改写它。`before_agent_start`、`context`、active tools 和会话分支分别作用于不同位置；“系统提示短”只描述其中一部分，不能代表安装扩展后的整次请求有多大。[S: S-002, S-004, S-008, S-023]
+
+## 信息从哪里进入
+
+system prompt 由 `buildSystemPrompt()` 组合默认或自定义提示、工具说明、project instructions、skills 索引和 cwd。skills 索引在有 read 工具时加入；`/skill:name` 在输入处理时读取正文并展开成用户侧文本。AGENTS/CLAUDE 项目指令与受 project trust 控制的 `.pi` 启动资源有不同的加载边界，见[信任与执行](06-permissions-sandbox-workspace.md)。[S: S-002, S-004, S-005, S-006]
+
+当前分支由 `SessionManager.buildSessionContext()` 生成。工具结果进入后续消息，extension 的 `before_agent_start` 可追加 custom messages 或覆盖本次 system prompt；`context` hook 则在每次 provider 请求前处理消息视图。[S: S-001, S-003, S-008]
+
+## 应用消息怎样变成 provider messages
+
+![持久历史怎样变成本次模型请求，system prompt 和 tools 在哪里加入？](../diagrams/generated/pi-context-views-v3.png)
+
+会话记录先选出当前分支，有压缩记录时组合最新摘要与保留消息，再经过消息变换和类型转换；system prompt 与 active tools 在请求组装处单独加入。图示源码中的视图转换，不表示压缩触发频率。证据：S-001、S-004、S-008、S-022。[提示词、生成参数与复核记录](../diagrams/generated/metadata.json)。
+
+低层循环依次调用 `transformContext → convertToLlm`。前者允许 extension 调整请求用的消息；后者通过普通 TypeScript 分支转换类型、整理字段和过滤消息，不调用 LLM。转换结果是 pi-ai 的 `Message[]`，provider 适配器之后才将其变成具体 API 的请求格式。system prompt 和 active tools 在消息转换后单独加入请求 context。[S: S-001, S-022]
+
+| 应用消息 | `convertToLlm` 的处理 |
+|---|---|
+| user / assistant / toolResult | 保留 pi-ai 标准消息，之后由 provider 适配器继续转换 |
+| custom | 将内容包装成 user message |
+| bashExecution | 把命令、输出和状态组织成 user 文本；excludeFromContext 为 true 时过滤 |
+| compactionSummary | 给已有摘要加上说明与 summary 标签，再包装为 user message |
+| branchSummary | 给分支摘要加上相应说明，再包装为 user message |
+
+以下例子省略时间戳等字段，用于说明转换过程，不是新增运行轨迹。
+
+### 扩展消息：界面隐藏与模型可见是两个属性
+
+扩展可以注入这样一条应用消息：
+
+```json
+{
+  "role": "custom",
+  "customType": "project-rule",
+  "content": "不要修改公共 API。",
+  "display": false,
+  "details": {"source": "project-settings"}
+}
+```
+
+转换后，消息正文成为：
+
+```json
+{
+  "role": "user",
+  "content": [{"type": "text", "text": "不要修改公共 API。"}]
+}
+```
+
+`display: false` 控制 TUI 显示，不能据此判断模型看不到内容。`customType`、`display` 和 `details` 没有被自动展开到这条 user 消息中。转换后的 `role: "user"` 表示模型消息格式中的位置，内容也可能来自扩展，而不一定由人刚刚输入。[S: S-022]
+
+还要分清持久记录的 `type` 和应用消息的 `role`：
+
+| 持久记录 | 重建与发送路径 |
+|---|---|
+| `type: "custom"` 的 CustomEntry | 保存扩展状态，例如计数器；默认不参与模型上下文 |
+| `type: "custom_message"` 的 CustomMessageEntry | 先重建为 `role: "custom"` 的应用消息，再由 convertToLlm 转为 user message |
+
+扩展因此可以保存内部状态，也可以显式注入给模型看的内容，两种记录有不同的入口。[S: S-008, S-022]
+
+### Bash 执行记录：用户命令与模型工具调用分别表示
+
+用户直接输入 `!npm test` 时，可以产生这种内部记录：
+
+```json
+{
+  "role": "bashExecution",
+  "command": "npm test",
+  "output": "1 test failed",
+  "exitCode": 1,
+  "cancelled": false,
+  "truncated": false
+}
+```
+
+转换函数将命令、输出和退出状态整理成 user 文本。例如，下面用 JSON 转义表示换行，代码围栏也是正文的一部分：
+
+```json
+{
+  "role": "user",
+  "content": [{
+    "type": "text",
+    "text": "Ran `npm test`\n```\n1 test failed\n```\n\nCommand exited with code 1"
+  }]
+}
+```
+
+若记录带 `excludeFromContext: true`，例如 `!!` 命令对应的排除语义，`convertToLlm` 会过滤这条消息。记录仍可供应用管理，但不通过这条转换路径进入请求。
+
+模型主动请求 bash 工具时，返回的是与 tool call 关联的 `toolResult`；上面的 `bashExecution` 描述用户直接执行命令的记录。不能把所有 Bash 输出都当作转换后的 user message。[S: S-022]
+
+### 压缩摘要：包装已有文本，而不是再次总结
+
+应用消息可以用专门的类型保存摘要：
+
+```json
+{
+  "role": "compactionSummary",
+  "summary": "正在修复登录问题，已排除数据库连接故障。",
+  "tokensBefore": 80000
+}
+```
+
+`convertToLlm` 把 summary 包装成一条 user message，其文本类似：
+
+```text
+The conversation history before this point was compacted into the following summary:
+
+<summary>
+正在修复登录问题，已排除数据库连接故障。
+</summary>
+```
+
+`tokensBefore` 用于程序记录压缩前状态，不会自动成为摘要正文。摘要文字在更早的压缩步骤中生成；这里仅添加说明和标签。`branchSummary` 也采用相似的文本包装方式。[S: S-022]
+
+源码：[消息定义与转换](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/messages.ts#L33)、[会话记录到应用消息](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/session-manager.ts#L375)、[请求组装](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/agent-loop.ts#L282)。[C: C-025]
+
+## 排查模型为什么没看到一条信息
+
+沿数据经过的位置依次检查：
+
+1. 信息是否已经进入会话记录，还是只在界面或扩展内部？
+2. 记录是否属于当前 leaf 选出的分支？
+3. 原始消息是否已被压缩摘要代表？
+4. `transformContext` 是否过滤、替换或追加了消息？
+5. `convertToLlm` 保留了哪些字段，是否过滤了整条消息？
+6. provider 适配器最终怎样组织实际请求？
+
+确认“文件里有这条记录”只回答了第一个阶段的一部分。请求视图还经过分支选择、摘要与消息转换；需要对照这些阶段或捕获的请求，判断模型实际收到的内容。[S: S-001, S-008, S-022, S-026]
+
+## 压缩前先判断响应与历史边界
+
+`AgentSession._checkCompaction()` 在低层运行结束后和发送新 prompt 前调用。它先检查开关和 abort 条件，再检查模型是否相同、assistant 响应是否早于最新 compaction boundary。旧模型的 overflow 和压缩边界之前的 usage 不能直接用于触发当前上下文的同一条恢复分支。[S: S-021]
+
+接下来分两类处理：
+
+- Overflow：当前模型报告上下文越界或 usage 超过窗口。若响应已经以 `stop` 完成，则压缩但不重答。需要恢复的错误响应最多进行一次 compact-and-retry，避免同一次恢复无限循环。
+- Threshold：上下文接近配置阈值时压缩。已完成回答不会因此重新生成；如果压缩期间有输入入队，产品层仍可继续消费这些输入。
+
+发生错误或 usage 为零时，代码会从最后有效的 usage 估算上下文，并检查估算来源是否已经被此前压缩淘汰。本次 `X-008` 执行了 15 项 faux/controller 用例；`X-005` 另覆盖压缩后队列续跑。[C: C-024]
+
+## 已经有阈值检查，为什么还会溢出
+
+Threshold 根据已有用量或估算，在接近窗口上限时预先腾空间；Overflow 则处理已经收到的越界信号。提前检查仍有时间和信息上的边界。
+
+当前默认路径主要在发送新 prompt 前、一次低层运行结束后检查压缩。发送新 prompt 前的检查发生在构造并加入这次新用户消息之前；一次低层运行内部可以连续处理多个工具批次，默认的逐轮刷新 hook 也没有在每次工具结果返回后执行相同的压缩检查。因此，上一次检查之后，新的输入或工具输出仍可能让下一次请求突然变大。[S: S-021]
+
+例如，假设窗口是 100,000 token，预留 16,384，触发阈值就是 83,616。检查时用量为 75,000，尚未触发；后续加入约 30,000 token 的材料，下一次请求就可能越过窗口。这个数值例子只说明检查间隙的增长，不是测得的 Pi 运行轨迹。用量估算与 provider 实际计数的差异，也会让预防性判断存在误差。
+
+源码中的 overflow 分支还包含“响应已经成功 stop，但报告的输入用量超过本地配置窗口”的情况。这时只压缩、不重答；需要恢复的溢出响应才使用一次 compact-and-retry 的限额。因此，两条分支分别处理提前腾空间和收到越界信号后的状态，不能把所有 overflow 都理解成 API 已经拒绝请求。[S: S-021]
+
+## 两个压缩预算各控制什么
+
+当前设置中 `reserveTokens` 默认 16384，`keepRecentTokens` 默认 20000。前者进入 `contextTokens > contextWindow - reserveTokens` 的触发判定；后者用于向后估算需要保留的近期片段。改变预留预算不等于改变同样数量的保留消息。[C: C-029; S: S-028, S-029]
+
+`findCutPoint()` 使用逐条消息的 `estimateTokens()` 累计保留片段的估算体积。触发检查使用的 `estimateContextTokens()` 则会优先利用最近有效 assistant usage，并估算后续新增消息；两处估算服务于不同阶段。切分还受合法消息边界约束，保留量不是 provider tokenizer 的精确测量。[S: S-021, S-029]
+
+这两类预算在部分解读中被混称为 reserve。对照配置 getter 和切点函数，可以把“什么时候压缩”与“保留哪段历史”分开验证，详见[外部来源核对](17-external-perspectives.md)。
+
+## 哪些消息保留原文，哪些送去总结
+
+默认路径先由代码选出近期连续片段，再由 LLM 提炼较早消息的内容。以下示例沿用“排查启动问题”的任务，数字与切点用于解释源码，不代表新增实验。[S: S-029, S-035]
+
+假设当前分支积累了约 80,000 token 的对话。`findCutPoint()` 从最新 entry 往前走，把其中上下文可见消息的估算体积逐项相加，达到 `keepRecentTokens` 后选择合法切点。默认预算是 20,000，因此可以先把结果理解成：
+
+```text
+较早的连续消息，约 60,000 token │ 最近的连续消息，约 20,000 token
+          交给模型生成摘要     │          保留原文
+```
+
+这里按 token 体积选择，而不是固定保留多少条消息。`estimateTokens()` 对文本主要采用字符数除以 4 的启发式估算，图片等内容另有估算处理；再加上边界调整，实际保留量不保证恰好等于预算。较早的重要要求也可能落进摘要区域，其后续可见性依赖摘要是否准确保留它。[S: S-029]
+
+### 工具调用与结果不能从中间拆开
+
+假设某段消息是：
+
+```text
+assistant：调用 read("config.ts")
+toolResult：文件内容……
+assistant：根据配置，接下来检查启动脚本……
+```
+
+代码不允许把 `toolResult` 当作保留片段的第一条消息。找到预算位置后，它会选择该位置或更靠后的合法切点：若从包含工具调用的 assistant 消息开始保留，后续结果也保留；若切到后面的 assistant 消息，前面那组调用和结果一起进入待压缩部分。这样不会只留下一个失去对应调用的工具结果。[S: S-029]
+
+### 一次任务太长时，给保留的后半段补上来由
+
+合法切点可以是 assistant 消息，所以一次用户要求产生的长执行过程，也可能被分成两段：
+
+```text
+更早的对话
+用户：帮我修复启动问题
+assistant：读取配置、修改启动脚本
+toolResult：修改完成
+                           ← 从这里开始保留原文
+assistant：执行测试
+toolResult：端口冲突
+assistant：继续排查……
+```
+
+这时 `prepareCompaction()` 找到该段交互的起始输入，将“更早的对话”和“本次任务被切掉的前半段”分别准备。常规压缩路径为前者生成历史摘要，再为后者生成专门的前缀摘要，交代原始要求、早期进展，以及理解后半段需要的信息。两份摘要合并到同一条 compaction 记录中，后面接保留的原文。[S: S-035]
+
+```text
+历史摘要 + 本次任务前半段摘要 + 本次任务后半段原始消息
+```
+
+源码称这种情况为 `split turn`。压缩模块在这里按 user、Bash 执行记录或其他用户侧消息寻找交互起点；它与低层循环中“一次模型响应及其工具处理”的 turn 不是同一个计数单位。一次用户任务可以跨过多个低层 turn。
+
+### 模型负责把旧内容写成什么摘要
+
+普通历史摘要的提示词要求覆盖目标、用户约束与偏好、已完成和进行中的工作、阻碍、关键决定、下一步及必要上下文，并要求保留准确的路径、函数名和错误信息。长任务的前缀摘要则侧重原始要求与后半段需要的背景。代码还会从工具调用中提取读过、修改过的文件路径并附到摘要中。[S: S-035]
+
+已有压缩记录时，准备阶段取出上次摘要与之前保留的起点；历史摘要更新路径会把旧摘要和本次需要总结的消息一起交给模型。后续压缩通常是在已有摘要上继续整理，不需要每次重读所有已被摘要代表的原始消息。摘要是有损的信息整理，提示词要求保留某项内容，并不等于它一定完整保留了该项内容。
+
+以上描述默认摘要生成路径。扩展可以在 `session_before_compact` 中取消或提供压缩结果，具体配置需要沿扩展路径另查。[S: S-021]
+
+源码：[切点与消息体积](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/compaction/compaction.ts#L240)、[摘要提示词](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/compaction/compaction.ts#L441)、[压缩准备与分段摘要](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/compaction/compaction.ts#L633)。
+
+## 摘要怎样替换当前消息
+
+`_runAutoCompaction()` 从当前 branch 准备压缩。`session_before_compact` 可以取消或提供摘要；常规路径则调用模型生成 summary。成功后按以下顺序处理：
+
+1. 追加带 `summary`、`firstKeptEntryId`、`tokensBefore` 的 compaction entry。
+2. 从当前会话树重建 context。
+3. 用重建结果替换 `agent.state.messages`。
+4. 发出压缩完成通知，并按恢复标记或剩余队列决定是否继续。[S: S-021]
+
+重建结果包含最新摘要、从 `firstKeptEntryId` 开始保留的旧消息，以及压缩 entry 之后的新消息。旧记录仍在 session 文件中；当前请求使用的是选出的有效视图。错误响应也可能保留在历史中，但在重试前从 live context 移除。[S: S-008, S-010]
+
+## 压缩后的消息列表长什么样
+
+压缩成功后，Pi 把最新摘要放在消息列表前面，接上从 `firstKeptEntryId` 开始保留的消息，再接压缩记录之后加入的消息。近期消息分别保留角色、内容和调用关联关系。摘要内部可以合并历史总结与长任务前半段总结，但整段会话仍是一个消息数组。[S: S-008, S-022, S-035]
+
+例如，较早的排查过程已经总结；近期原文保留了读启动脚本的调用、结果和回答；之后你又要求检查 Docker 配置。省略时间戳和 usage 等字段，内部列表可以表示为：
+
+```js
+[
+  {
+    role: "compactionSummary",
+    summary: "正在排查启动端口，之前已检查项目配置……"
+  },
+  {
+    role: "assistant",
+    content: [{
+      type: "toolCall", id: "call_1", name: "read",
+      arguments: { path: "scripts/start.sh" }
+    }]
+  },
+  {
+    role: "toolResult", toolCallId: "call_1", toolName: "read",
+    content: [{ type: "text", text: "启动脚本内容……" }]
+  },
+  {
+    role: "assistant",
+    content: [{ type: "text", text: "启动脚本会读取 PORT 环境变量。" }]
+  },
+  {
+    role: "user",
+    content: [{ type: "text", text: "生产环境 PORT=8080，请检查 Docker 配置。" }]
+  }
+]
+```
+
+发送前，`convertToLlm` 将第一条摘要包装成带说明和 `<summary>` 标签的 user 消息；普通 assistant、toolResult 和 user 继续保留对应类型。system prompt 与工具定义在统一请求 context 中单独加入：[S: S-001, S-022]
+
+```text
+systemPrompt：当前系统提示
+messages：摘要 user → 保留的 assistant / toolResult 等消息 → 后续新消息
+tools：当前启用的工具定义
+```
+
+立即压缩完成时，尚未消费的队列输入还不在这份列表中，之后才会加入。到了 provider 适配器，system prompt 又可能成为 API messages 中的 system/developer 消息；模型服务还会把角色和工具定义编码为具体模型的输入。完整过程见[请求编码与两种模型示例](18-model-input-encoding.md)。
+
+## 压缩期间提交的新输入怎样接上来
+
+假设 Pi 已完成一轮排查，正在做阈值压缩：把消息 1～80 总结成摘要，保留消息 81～100。此时你在终端提交：“生产环境设置了 PORT=8080，接下来检查 Docker 配置。”这些消息编号只用来说明先后关系。
+
+摘要调用使用开始时准备好的历史材料。终端编辑框继续接收输入，普通文本先存入 `compactionQueuedMessages`，并显示等待压缩完成的提示。新要求不会被临时加入已经进行中的摘要调用，也不会在摘要生成的同时启动相应的任务处理。[S: S-036]
+
+```text
+开始压缩：准备旧历史，调用模型生成摘要
+用户补充：新要求暂存在输入队列
+摘要完成：保存 compaction entry，重建为“摘要 + 保留消息”
+继续处理：提交队列输入，模型看到“摘要 + 保留消息 + 新要求”
+```
+
+`compaction_end` 通知终端调用 `flushCompactionQueue()`。具体怎样续跑，取决于是否还有待恢复的运行：[S: S-036]
+
+- 没有待恢复重试时，第一条排队的普通输入通过 `session.prompt()` 提交；其余输入按记录的 steering / follow-up 类型进入相应队列。上一轮已经完成的回答不会因此重答。
+- 有待恢复重试时，输入按原类型通过 `session.steer()` 或 `session.followUp()` 入队，由恢复后的循环在相应边界消费。follow-up 仍需等待当前工作与 steering 处理完。
+
+终端的压缩暂存队列和 Agent 本身的 steering / follow-up 队列是两处状态。其他入口或扩展已经放入 Agent 队列的消息，则由 `AgentSession` 的续跑检查衔接：自动压缩成功后，没有恢复重试要求时，`_runAutoCompaction()` 返回 `agent.hasQueuedMessages()` 的结果，由外层运行流程决定是否调用 `Agent.continue()`。这个压缩方法本身并不直接调用 continue。[S: S-021, X: X-005]
+
+本例描述压缩成功后的普通输入路径。已注册的扩展命令在终端有单独入口，不能据此推断所有命令都必须等待压缩。终端发送排队消息失败时会恢复暂存队列并显示错误。[S: S-036]
+
+源码：[压缩期间提交](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L2783)、[压缩结束通知](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L3059)、[队列转交](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L3990)。
+"""
+
+REPORTS['05-models-tools-extensions.md'] = r"""# 模型接口、工具与扩展
+
+当前 Coding Agent 的模型入口由 `ModelRegistry` 和 `pi-ai/compat` 连接；工具则由 registry 保存定义，active set 决定本次模型可见的能力。Extensions 可以在输入、消息、工具和 provider 边界参与处理。[S: S-003, S-023, S-024]
+
+## 当前模型请求怎样分派
+
+`createAgentSession()` 为 `Agent` 安装 stream wrapper。每次请求先通过 `ModelRegistry.getApiKeyAndHeaders()` 解析鉴权，合并环境、headers、timeout 和 provider retry 配置，再调用从 `pi-ai/compat` 导入的 `streamSimple()`。[S: S-024]
+
+compat 内部有两个分支：模型匹配内置 catalog，且对应 API 没有被覆盖时，转给 `compatModels.streamSimple()`；否则按 `model.api` 从 API registry 取出实现再调用。自定义 `models.json` 和 extension 的 provider 注册由这套产品配置路径接入。
+
+`Models` 在这里是 compat 内置分支使用的 provider/model 集合。产品层的注册、鉴权与 compat 分派共同构成当前 CLI 的模型路径。历史 SiFlow 场景证明指定自定义端点曾成功接入，并未遍历全部分派分支。[C: C-019; S: S-012, S-024; R: R-001, R-005]
+
+定位：[sdk.ts](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/sdk.ts#L301)、[compat.streamSimple](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/ai/src/compat.ts#L265)。
+
+模型分派选定调用实现后，provider 适配器负责 API 字段，服务端负责模型对应的序列编码。system、messages 和 tools 怎样在这两层转换，以及 Qwen3.8-27B 与 DeepSeek V4 Flash 的格式差异，见[从 Pi 的请求到模型输入](18-model-input-encoding.md)。
+
+## Registry、active set 和工具说明
+
+内置工具定义有 `read`、`bash`、`edit`、`write`、`grep`、`find`、`ls` 七个名称。新 session 的默认 active set 是前四个；CLI/SDK 选项可以调整可用集合。Extension 和 SDK custom tools 按名称加入注册表，同名定义可能替换当前实现。[S: S-003; C: C-004]
+
+| 工具 | 默认新 session | 基本作用 |
+|---|---|---|
+| read | active | 读取文本或图片，处理分页与输出限制 |
+| bash | active | 在 cwd 启动 shell，支持 timeout 与 abort |
+| edit | active | 按 old/new 文本修改文件 |
+| write | active | 创建或覆盖文件 |
+| grep | 需显式启用 | 搜索文件内容 |
+| find | 需显式启用 | 按 pattern 查找路径 |
+| ls | 需显式启用 | 列出目录内容 |
+
+工具 schema 来自 `agent.state.tools`。system prompt 中的工具摘要还取决于相应 `promptSnippet`；说明文字与真实 tool schema 是两个输出位置。`setActiveToolsByName()` 更新 active set 并重建基础提示；产品层的 `prepareNextTurn` 把当前工具、system prompt、model 和 thinking level 接到下一请求。[S: S-004, S-023]
+
+本次动态工具测试验证了注册后的 registry、active set、来源元数据及 prompt 更新。完整的请求中途配置差分仍需独立测试。[C: C-026; X: X-005]
+
+## 工具输出有模型与应用两个消费方
+
+工具返回的 `content` 提供文本或图片，`details` 保存供日志或界面使用的结构化数据。`createToolResultMessage()` 把两者保留在应用消息中，TUI 的 result renderer 也能拿到两者。已经检查的 OpenAI Completions 和 Anthropic 序列化路径从 `content` 构造模型结果，没有自动把 `details` 展开成正文。[C: C-027; S: S-025, S-026]
+
+例如，搜索工具可以把摘要放在 content，把界面需要的结构化命中项放在 details。这个例子说明如何使用接口，不代表当前 built-in 的具体返回格式。是否把 details 进一步暴露给模型仍取决于 extension 和 provider 实现，不能把这个字段当成保密区。
+
+## Hook 在哪些位置生效
+
+| Hook | 所在位置 | 对行为的作用 |
+|---|---|---|
+| input | skill/template 展开之前 | 处理输入或变换内容 |
+| before_agent_start | 普通 prompt 进入 Agent 之前 | 追加 custom messages 或覆盖该次 system prompt |
+| context | 每次模型请求的消息转换之前 | 变换请求消息视图 |
+| message_end | 产品层处理最终消息时 | 可替换最终消息，随后进入监听通知和持久化 |
+| tool_call | 参数校验之后、execute 之前 | 可阻断该调用并返回理由 |
+| tool_result | 实际 handler 结束之后 | 调整 content、details 和错误标记 |
+| provider hooks | header、payload、response 边界 | 调整请求或观察响应 |
+| session hooks | compact、switch、fork 等操作周围 | 参与会话生命周期 |
+
+`AgentSession` 安装的工具 hook 在执行时读取当前 extension runner，reload 因而可以换用新 runner。Extensions 与主进程拥有相同运行权限；工具 hook 的 block 约束经过该入口的调用，extension 自己的文件或进程操作另有执行路径。[S: S-003, S-019; D: D-002]
+
+Skills 提供可发现、可加载的任务指令。MCP 和 subagent 在这个版本的默认核心中没有对应的内置工作流，可由 extension 接入。分析具体环境时，要检查实际加载的扩展和 active tools。[D: D-004]
+
+
+## 扩展怎样形成可迭代的工作流
+
+[Armin 的使用记录](https://lucumr.pocoo.org/2026/1/31/pi/)把持久扩展状态和热重载视为持续修改工具的基础。[I: I-001]
+
+当前代码中，`appendEntry()` 把扩展数据写成 custom entry，`buildSessionContext()` 不会自动把这种 entry 送给模型。调用 `AgentSession.reload()` 时，方法先通知 shutdown，再刷新 settings、provider registry 和 resources，重建 runner 与 tool registry；存在相应 bindings 时，再发出 reload 原因的 `session_start`。扩展需要自己从会话记录恢复所需状态，不能假定旧 closure 或 UI 对象自动保持有效。[C: C-028; S: S-008, S-027]
+
+[Julian Prokay](https://jprokay.com/post/018-pi-coding-agent)的任务管理实践将 CLI/SQLite 状态与 Pi 界面扩展分工。它提供了一个使用案例：业务状态可以由应用维护，Pi extension 负责把操作接入会话。[B-11，见来源目录]
+
+## CLI、Skills 和命名工具怎样分工
+
+[Mario 的浏览器工具文章](https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/)展示了按需读取说明、再组合脚本的做法。[D: D-012]
+
+对应本版本，read/bash 提供读取说明和执行程序的入口；skill 负责指令的发现与加载，命名工具还提供 schema 校验和结构化回填。额外能力可以存在于工作区程序中，而不必每项都变成初始 tool schema。应检查实际 active set、加载内容和执行后端，而不是用“四个默认工具”推断能力上限。[S: S-001, S-002, S-003]
+
+这也不构成 CLI 普遍优于 MCP 的证据。作者较早的[终端工具实验](https://mariozechner.at/posts/2025-08-15-mcp-vs-cli/)使用 Claude Code，结果随任务与接口形式而变化；其数字不属于本报告的 Pi 实验。
+"""
+
+REPORTS['06-permissions-sandbox-workspace.md'] = r"""# 项目信任、执行权限与工作区
+
+Pi 的默认工具和 extensions 以启动进程的 OS 权限运行。Project trust 控制项目启动资源的加载；逐工具确认或路径保护由可选 extension 实现。容器、VM 或其他 OS policy 才提供相应的执行隔离。[D: D-002, D-007; S: S-006, S-007, S-017]
+
+## Project trust 怎样决策
+
+`resolveProjectTrusted()` 依次处理显式 override、是否存在需要信任的项目资源、extension 的 trust 决策、已保存的 trust 记录，以及 default policy。`ask` 模式在没有 UI 且没有前序决策时返回 false；有 UI 时让用户选择并按选项保存记录。[S: S-006]
+
+`DefaultResourceLoader` 先用不信任项目的状态加载 bootstrap extensions，再解析 trust 并加载最终资源集合。受控对象包括 `.pi` 项目配置和相应资源。AGENTS/CLAUDE context 文件有自己的加载路径，不能用“未信任项目”推断所有项目文本均未进入 prompt。[S: S-005; D: D-002]
+
+## 一次工具调用经过什么边界
+
+工具进入 registry 后先校验参数，再经过可选 `tool_call` hook。hook 返回 block 会生成错误结果并跳过 handler。默认配置没有全局逐工具审批弹窗；`protected-paths.ts` 展示的是可选 hook 如何拦截 write/edit。[S: S-003, S-017, S-018]
+
+内置 bash 在指定 cwd 启动 shell并继承进程环境；timeout 参数可选。Unix 分支使用进程组处理，abort/timeout 走终止进程树的逻辑。这里描述内置 bash backend；subagent 示例自己的 `spawn/kill` 行为应单独检查。[S: S-007]
+
+| 边界 | 控制对象 | 阅读时需要保留的范围 |
+|---|---|---|
+| Project trust | 项目配置、包和 extensions 等启动资源 | 不构成后续 read/bash/write 的权限决策 |
+| tool_call hook | 经过工具调用入口的命名 handler | extension 的直接 fs/process/network 操作不必经过它 |
+| 工具路由到 guest | 被配置为委托执行的 backend | 未委托的 custom tool 仍可能在 host 执行 |
+| whole-process container/VM | Pi 及其子进程的部署边界 | 挂载目录和网络配置决定实际可访问范围 |
+
+工作区是工具访问的真实文件系统。切换会话分支会改变模型上下文，但没有为文件内容创建对应的事务式回滚。[C: C-008]
+
+本次通过 mock/faux 检查部分工具阻断和事件逻辑，未部署容器/VM，也未运行完整的 extension 副作用矩阵。源码与官方安全说明见 [security.md](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/docs/security.md#L3)。
+
+## 怎样理解外部文章中的安全评价
+
+Haochuan 将这种职责划分评价为[明确的安全边界](https://blog.haochuanz.net/posts/agent-harness-04-pi)。本报告采用可检查的机制区分：trust 约束资源加载，hook 约束经过它的调用，OS/container/VM 约束实际执行权限。文章的评价不替代部署测试，也不能推出其他权限系统都无效。[D: D-002, D-007; S: S-006, S-017]
+"""
+
+REPORTS['07-subagents-delegation.md'] = r"""# 子代理与多进程编排
+
+![Pi 的可选 subagent extension 与实验性 orchestrator](../diagrams/generated/pi-subagent-topology.png)
+
+图展示源码中的两条可选路径：subagent extension 启动独立 child 并默认共享 cwd；orchestrator 管理独立 RPC Pi 实例。OPT 表示可选扩展，EXP 表示实验性实现，RPC 是进程间命令与事件通道。本次未运行这两条路径；证据：D-004、D-006、D-010、S-015、S-016。图片经本次复核后继续使用，[提示词与审核记录](../diagrams/generated/metadata.json)。
+
+Pi v0.80.7 的默认 Coding Agent 不提供内置 subagent 工具。仓库另有 subagent extension 示例和实验性 orchestrator：前者让模型通过一个工具委托任务，后者管理多个 RPC Pi 实例。[D: D-004, D-006, D-010]
+
+## Subagent extension 怎样启动任务
+
+父代理调用 extension 注册的 `subagent` 工具后，示例按 agent name 找到定义，把任务交给一个独立 Pi 子进程。参数包括 `--mode json -p --no-session`；定义中的 model/tools 可进入子进程参数，system prompt 通过临时文件追加。
+
+`getPiInvocation()` 尝试复用当前脚本与 runtime，或使用打包后的可执行文件，最后回退到 PATH 中的 `pi`。子进程 cwd 由任务参数指定，未指定时使用 parent 的默认 cwd。`spawn` 没有设置独立 env，因此通常继承父进程环境。[S: S-015]
+
+源码：[runSingleAgent](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/examples/extensions/subagent/index.ts#L268)。
+
+## 隔离和共享分别发生在哪里
+
+| 维度 | 示例中的行为 |
+|---|---|
+| 进程 | 每个任务启动独立 Pi 子进程 |
+| 模型上下文 | 新建 child 消息，不自动复制 parent 全部 history；task 和 chain 的前序输出显式传入 |
+| 会话文件 | `--no-session`，通过父工具结果回收输出 |
+| 工作区 | 默认共享 cwd，也可由单项任务覆盖 |
+| 权限与环境 | 通常同一 OS user，继承进程环境；工具名单不构成 OS sandbox |
+| 返回通道 | 解析 JSON 事件，收集 assistant 消息、usage、工具调用和最终结果 |
+
+示例支持 single、parallel 和 chain。parallel 的任务数与并发数由示例常量限制；chain 逐项把前序结果传给下一项。它们改变任务组织方式，没有自动为共享文件建立冲突管理。
+
+取消时示例向直接 child 发送 SIGTERM，五秒后按 `proc.killed` 条件尝试 SIGKILL。该标记与进程是否真正退出不是同一个判断；这里没有运行挂起进程测试，因此不把这一逻辑写成保证清理整个进程树。[S: S-015]
+
+## Orchestrator 管理的是实例
+
+`OrchestratorSupervisor` 为每个 instance 创建 RPC Pi 进程，转发事件和 UI 请求，维护 instance/session 元数据并处理进程退出。启动恢复会把先前处于 online/starting 的记录标为 stopped；这不恢复子进程当时的在途模型请求。[S: S-016]
+
+这两条路径本次均为静态复核，未启动 child 或 orchestrator。它们的入口、context、工作区和恢复语义与默认单 session 路径分开记录。
+"""
+
+REPORTS['08-sessions-persistence-recovery.md'] = r"""# 会话、持久化与恢复
+
+`SessionManager` 把会话存为带 `id/parentId` 的 JSONL entry 树。新 entry 以当前 leaf 为 parent，再把 leaf 移到自己。模型使用的是当前分支投影出的消息；文件保留的历史可能包含其他分支、旧错误、摘要及配置记录。[S: S-008]
+
+## 内存记录何时写成文件
+
+![新会话什么时候真正创建文件，之后如何追加？](../diagrams/generated/pi-session-first-write-v3.png)
+
+对新建且尚未写过文件的持久会话，user/配置 entry 先留在内存，首条 assistant entry 触发创建文件并写入已有记录，之后逐条追加。已有空文件、格式迁移与分支副本另有条件路径。证据：S-020、X-006。[提示词、生成参数与复核记录](../diagrams/generated/metadata.json)。
+
+`newSession()` 先生成 header、session id 和文件路径，初始化内存索引。每次 append 都先更新 `fileEntries`、`byId` 和 leaf，再调用 `_persist()`。
+
+对尚未写过文件的新会话，`_persist()` 检查历史中是否已有 assistant entry。只有 user 或初始配置记录时先留在内存；首条 assistant entry 出现后，以排他创建模式写入当前全部记录。之后新 entry 逐条追加。[C: C-023; S: S-020]
+
+因此 `getSessionFile()` 返回路径、`message_end` 已发生和数据已落盘是不同观察点。fork 的路径若只有 user 消息，也会延迟到 assistant 出现后写文件。本次 tree-traversal 测试覆盖了这个条件。[X: X-006]
+
+普通新增历史采用追加方式；格式迁移、初始化已有空文件及创建含已有 assistant 的分支副本有明确重写路径。“append-only tree”描述普通历史追加和分支语义，不应理解为文件永远不重写。源码也未在这些写入步骤中提供与 workspace 共同提交的事务。[S: S-020]
+
+## Branch 与 fork
+
+`branch(entryId)` 在当前 manager 中移动 leaf，下一条 append 成为该点的子节点，已有历史保持不变。`createBranchedSession()` 则提取 root 到指定 leaf 的路径，创建新的 session id 和文件，并重建保留项的 parent 链及标签。[S: S-008]
+
+`branch()` 更新当前 manager 的内存 leaf；随后新增 entry 的 parentId 记录分支关系。重新打开文件时，索引从已有记录重建。[S: S-008]
+
+这些操作都改变会话视图，workspace 文件仍保持现实状态。恢复旧上下文后，工具下一次读取到的可能是后来修改过的文件。
+
+## 会话树怎样支持临时探索
+
+Armin 用[分支处理临时任务后回到主线](https://lucumr.pocoo.org/2026/1/31/pi/)说明会话树的用途。它为“为什么需要 branch，而不只有线性历史”提供了具体工作流。[I: I-001]
+
+在本版本中，可以从已有 entry 开始一条支线，处理工具或调查问题，再选择回到较早 leaf；`branchWithSummary()` 可以追加支线摘要。原支线记录仍保留，下一次请求使用重新选出的分支。如果支线修改了文件，回到旧 leaf 后文件仍是修改后的状态。会话树控制对话视图，文件版本仍需独立管理。[S: S-008]
+
+## Resume 怎样构建上下文
+
+读取 JSONL 后，`buildSessionContext()` 从 leaf 沿 parent 链向上找到分支，恢复 model/thinking 设置。若有 compaction，选取最新摘要、保留片段和之后的消息，再把 entries 映射为应用消息。普通扩展 custom entry 不进入模型上下文。[S: S-008, S-022]
+
+历史 `R-003/R-004` 在两个独立进程中创建并恢复同一 session，第二个进程在未重发 token 的提示中返回 `PI_RESUME_2718`。本次 `X-006` 另外验证会话树和 compaction-aware context 的进程内构建。[R: R-003, R-004; X: X-006]
+
+## 非法文件如何处理
+
+解析器跳过不能解析的行，再检查 session header。打开非空且不构成有效 session 的文件时，manager 抛出错误并保留内容；打开空文件时，可以写入新的 header。这些是具体的加载规则，不能推出任意中段损坏都能正确恢复 parent chain。[S: S-008, S-020]
+
+本次 `X-009` 的五项进程内用例通过。CLI 用例首次因临时副本缺少 tsx 加载配置而在模块解析阶段失败；补上开发入口对应的加载方式后，`X-010` 验证友好报错与原文件保持不变。[X: X-009, X-010]
+
+源码：[SessionManager](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/session-manager.ts#L788)、[_persist](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/session-manager.ts#L946)。
+"""
+
+REPORTS['09-observability.md'] = r"""# 事件与可观测性
+
+Pi 的事件同时服务界面、extension 和产品状态处理。JSON 模式将 session header 与这些事件写到 stdout，RPC 除命令响应外也转发事件。当前核心提供生命周期事件，默认没有完整的 OpenTelemetry trace/span 关联模型。[D: D-005, D-009; R: R-001, R-002]
+
+## 事件表示哪个阶段
+
+| 事件 | 可确认的阶段 | 需要另外检查的内容 |
+|---|---|---|
+| message_start / update | 消息开始或流式内容变化 | 尚不是最终消息，也不等于落盘 |
+| message_end | 最终消息进入状态/监听处理路径 | 当前监听位置、是否持久化、文件是否首次创建 |
+| tool_execution_start | 开始处理一次工具调用 | handler 可能被校验、block 或截断保护跳过 |
+| tool_execution_end | 该调用的结果处理完成 | 结果可能是执行错误或准备阶段拒绝 |
+| turn_end | 一轮 assistant 及工具批次结束 | 后续可能有下一轮模型请求 |
+| agent_end | 一次低层循环结束 | 产品层可能重试、压缩或消费队列 |
+| agent_settled | 产品层本次运行收尾完成 | 最终结果是否成功仍要看任务或错误 |
+
+这张表依据 `Agent.processEvents()`、`AgentSession._handleAgentEvent()` 和工具批次实现。外部监听者与内部持久化有明确先后，事件名本身不足以推断磁盘或 OS 副作用。[S: S-018, S-019]
+
+## 执行事件与持久历史
+
+工具批次的结束事件可以按完成顺序到达，而持久消息按模型调用顺序形成。Session JSONL 记录可恢复的会话内容和配置，不保存每一次内部回调耗时。要分析延迟，需要额外关联请求、工具和时间信息。
+
+历史 read 轨迹归一化后呈现 `run.started → turn.started → assistant(toolUse) → tool.started/completed → toolResult → turn.completed → 下一 turn → run.completed → run.settled`。其中 `tool.started` 是分析脚本对 Pi 事件的映射，含义仍受上述阶段边界约束。[R: R-002]
+
+## 轨迹保留什么
+
+原始 JSON 输出可含用户输入、模型文本/thinking、工具参数和结果。当前 normalized trace 去掉这些内容，保留事件序号、角色、类型、长度、usage 和工具关联信息。本次 Vitest JSON 则保留断言名称、状态、耗时及失败信息，可从[实验章节](11-runtime-experiments.md)定位。
+
+OTel/Sentry adapter 在这个固定版本的相关文档中属于设计方向。本报告按 scenario 和事件序号关联记录，未验证 exporter 或 collector 端链路。[C: C-014]
+
+## 运行完成和任务答对需要分别观测
+
+[Scott 的 my-pi 实践](https://scottspence.com/posts/building-my-pi-claude-code-alternative-with-pi)区分运行故障与完成后的错误回答。[Kahtaf 的领域 Agent 记录](https://kahtaf.com/blog/lessons-from-building-a-domain-agent/)则按路由、工具、证据和回答层定位问题。[I: I-003]
+
+当前 Pi 的 event stream 能帮助还原请求和工具经过了哪些阶段，任务产物是否符合要求仍需要单独的验收。`agent_settled` 也会在错误或取消收尾后出现。本报告的 controller 测试因此只支持所断言的机制，不当作真实任务成功率；外部项目加入的 telemetry、脱敏和评测组件也不记为默认 Pi 能力。[S: S-019]
+"""
+
+REPORTS['10-implementation-details.md'] = r"""# AgentSession 的状态与运行收尾
+
+`AgentSession` 把输入准备、extension、模型配置和会话存储接到 `Agent` 上。`Agent` 驱动低层循环并维护消息；产品层在循环结束后判断是否还有重试、压缩或排队输入需要处理。[S: S-002, S-019]
+
+## 状态分别由谁持有
+
+| 所有者 | 关键状态 | 何时使用 |
+|---|---|---|
+| AgentSession | `_isAgentRunActive`、`_lastAssistantMessage`、重试与 overflow 恢复标记 | 判断产品运行是否仍在继续，以及最后响应应走哪条恢复路径 |
+| Agent | live messages、model、tools、thinking level、输入队列、取消信号 | 构造模型请求、执行工具、推进低层循环 |
+| SessionManager | entries、`byId`、`leafId`、session 文件与 flushed 状态 | 追加历史、选择分支、重建上下文和写入文件 |
+| ResourceLoader / ModelRegistry | 当前资源、工具来源、模型配置与请求鉴权 | 准备输入和每次请求需要的配置 |
+
+同一条消息可以同时有内存对象和持久 entry。`Agent` 在 `message_end` 时先更新消息状态，`AgentSession` 再处理 extension、监听通知和 session append；这条顺序使工具处理能使用已完成的 assistant 消息。[S: S-019]
+
+## 配置怎样进入下一轮
+
+`setActiveToolsByName()` 根据 registry 更新 active tools，并重建基础 system prompt。`AgentSession` 安装的 `prepareNextTurn` 在 turn 边界读取当前 system prompt、tools、model 和 thinking level，返回下一次请求使用的 context/config。
+
+因此要查“工具变了以后模型什么时候看到”，需要同时追踪 registry 更新和下一轮快照刷新。动态工具测试验证了注册表、active set 和 prompt 的更新；完整的请求中途配置差分仍是单独的检查项。[S: S-023; X: X-005]
+
+## 低层结束后为什么还会继续
+
+`_runAgentPrompt()` 先把产品运行标记设为 active，再调用 `agent.prompt()`。之后循环调用 `_handlePostAgentRun()`；后者返回 true 时，再调用 `agent.continue()`。[S: S-002]
+
+`_handlePostAgentRun()` 取出最后一条 assistant 响应，按源码顺序处理：
+
+1. 检查普通可重试错误，并在重试次数允许时准备退避和 continuation。
+2. 对已经尝试重试但仍失败的响应发出相应结束通知，重置重试计数。
+3. 检查压缩条件；错误 overflow 的恢复与已完成响应的压缩具有不同的续跑规则。
+4. 检查低层结束事件处理期间新进入的队列，有输入时继续运行。
+
+详细实现位于 [agent-session.ts](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L1023)。压缩条件见[上下文与压缩](04-context-memory-compaction.md)，消息排序见[核心循环](03-core-loop.md)。
+
+## 自动重试由代码规则触发
+
+`AgentSession` 的普通自动重试由错误分类和配置规则决定。低层运行结束后，`_handlePostAgentRun()` 读取最后的 assistant message，调用 `_isRetryableError()`；这里的 `stopReason`、`errorMessage` 可以是适配层封装的请求失败状态，不意味着模型已经判断应该重试。[S: S-002, S-010, S-031]
+
+```text
+低层运行结束
+  → 读取最后一条 assistant message
+  → 上下文溢出交给压缩分支
+  → 检查 stopReason=error 且有 errorMessage
+  → 排除配额/账单限制，匹配可重试错误文本
+  → 检查 retry.enabled 和 maxRetries
+  → 等待可取消的退避时间
+  → Agent.continue() 重新请求模型
+```
+
+错误分类函数使用正则表达式匹配错误文本，不会再请求一个 LLM 判断是否值得重试。配额限制的排除规则先于临时错误匹配，因此错误中即使含有 `429`，也不一定重试。[S: S-031]
+
+| 错误信息或状态 | 规则的处理 |
+|---|---|
+| overloaded、rate limit、部分 5xx 等临时服务错误 | 可进入普通自动重试，再受开关和次数约束 |
+| connection lost、fetch failed、timeout 等传输错误 | 可进入同一重试路径 |
+| insufficient_quota、billing、部分订阅额度限制 | 从普通自动重试中排除 |
+| context overflow | 由 `_checkCompaction()` 处理，沿压缩恢复规则决定后续动作 |
+| 普通回答没有完成任务或内容有误 | 不触发这个错误分类器的重试；它不评价答案质量 |
+
+默认配置开启重试，`maxRetries=3`、`baseDelayMs=2000`。连续失败时，等待时间按 `baseDelayMs × 2^(attempt−1)` 计算，即 2、4、8 秒。收到非 error 的 assistant 消息时，产品层重置重试计数；这不是整条长任务一生只能重试三次的总预算。[S: S-010, S-019, S-032]
+
+例如 Pi 请求 LLM 服务时返回 `503 Service Unavailable`，规则判定可重试，首次等待 2 秒。准备重试时，末尾失败响应从 live context 移除，但保留在 session 历史中，再由 `Agent.continue()` 重新发起请求。等待也可被取消。[S: S-010]
+
+```text
+同一次用户请求
+├─ 第一次低层运行：LLM API 请求报可重试错误
+│  → turn_end → agent_end
+├─ AgentSession：检查规则，等待，再调用 continue
+├─ 第二次低层运行：模型调用工具并给出回答
+│  → agent_end
+└─ 没有其他后续工作 → agent_settled
+```
+
+这是基于源码的重试示意，不是对历史 read 轨迹补造一次失败。用户没有重新提交请求，但同一次产品运行可以出现多次 `agent_end`，最后才 `agent_settled`。
+
+## Bash 联网失败和模型 API 失败分别怎么处理
+
+在未取消整体运行、也没有 extension 覆盖行为的默认 bash 工具路径中，命令自身的网络错误先成为工具结果。`AgentSession` 的自动重试分类器检查的则是最后一条 assistant 消息的错误状态。[S: S-010, S-031, S-034]
+
+假设用户要求“下载这个文件，再分析内容”，模型提出：
 
 ```bash
-# 归一化 synthetic traces
-python3 reproduce/normalize_pi_trace.py   traces/raw/R-002-read-tool.jsonl   traces/normalized/R-002-read-tool.normalized.jsonl   --scenario-id R-SCENARIO-002
-
-# 重建 structured evidence/HIR
-python3 reproduce/compile_analysis.py
-
-# 严格校验
-python3 ../../harness-analysis-skill/scripts/validate_analysis.py . --strict
-
-# gpt-image-2 prompts 和发布图位于 diagrams/generated/；metadata 固定 prompt/output hash
-
-# 重写报告
-python3 reproduce/compile_report.py
-
-# 检查 Markdown links、8 张正文 PNG、hash 与 semantic review metadata
-python3 ../../harness-analysis-skill/scripts/audit_outputs.py . --strict
+curl --fail --max-time 5 https://example.com/data.json
 ```
 
-## 验证结果
+若 curl 下载超时，以非零退出码结束，bash handler 会抛出包含输出和退出状态的异常。低层工具执行器捕获它，构造 `isError: true` 的 `toolResult`，把结果加入后续模型请求。接下来由模型决定换一种方式、报告失败，或提出一个新的等待后重试命令，例如：
 
-- Analysis validator：`0 errors, 0 warnings`
-- PNG decode/hash：8/8 reader figures valid
-- Output audit：Markdown links、8 张 report-facing PNG、prompt/output hash 与 semantic review metadata 通过 strict
-- Diagram density：overview 16 nodes；turn 11；context 9；permission 11；subagent 10；persistence 7
-- Narrative density：system 12 nodes；observed turn 12；context 8；extension 11；design space 12
-- Tests：39 + 61 + 31 = 131 passed
-- Target `git status --short`：clean（依赖目录被 gitignore，不改变固定源码）
+```bash
+sleep 10 && curl --fail --max-time 5 https://example.com/data.json
+```
 
-## Coverage statement
+这里的等待和再次下载是模型提出的新工具调用，既不保证一定发生，也不使用产品层默认的 2/4/8 秒退避。上面的命令是教学示例，未在本轮实际运行。[S: S-018, S-034]
 
-源码 inventory 共 1021 files，未达到 file/size scan limit。14 模块均有记录；partial 模块与 unresolved 条目不会被“未发现”等价成“不存在”。Runtime coverage 只代表 Linux/Node/JSON-mode/SiFlow 与命名 faux-provider tests。
+| 失败或重试发生在哪里 | Pi 看到的状态 | 谁决定后续动作 |
+|---|---|---|
+| curl、npm 等命令内部自行重试 | bash 调用仍在运行，最终结果尚未返回 | 命令自己的配置和实现 |
+| bash 中的命令结束并返回网络错误 | 错误 toolResult 被交给模型 | LLM 决定下一次工具调用或回答 |
+| Pi 请求 LLM 服务失败 | assistant 消息带 stopReason: "error" 和 errorMessage | AgentSession 按错误规则、次数与退避配置重试模型请求 |
+
+所以，工具输出即使出现 `503` 或 `network error`，也不会仅凭这段文字触发产品层自动重试。分类器的输入必须先是相应的 assistant 错误消息。[S: S-031]
+
+两层失败也可能连续发生：
+
+```text
+curl 下载失败
+  → Pi 得到错误 toolResult
+  → Pi 请求模型，让它决定下一步
+  → 这次 LLM API 请求又失败
+  → AgentSession 按规则重试 LLM API 请求
+  → 模型恢复响应，决定是否再调用 bash
+```
+
+`Agent.continue()` 重试的是从现有上下文继续请求模型，不会直接重放上一批已执行的 shell 命令，也不回滚文件或从头执行整个用户任务。模型若随后再次要求执行同一命令，那是一次新的模型决策。
+
+定位：[bash 非零退出处理](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/tools/bash.ts#L398)、[工具异常包装](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/agent-loop.ts#L669)、[产品层运行后检查](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L1038)。
+
+## 自动重发与模型重新尝试工具的区别
+
+| 情况 | 谁决定下一步 | 处在哪条路径 |
+|---|---|---|
+| 模型请求因网络或临时服务错误失败后重发 | Harness 的错误匹配、次数和退避规则 | AgentSession 产品层自动重试 |
+| 测试命令失败，模型读到 toolResult 后改代码再运行 | LLM 根据上下文生成新的工具调用 | 正常模型—工具循环 |
+| 上下文越界后生成摘要并继续 | 产品层选择压缩与续跑分支；模型承担摘要生成 | 压缩恢复路径 |
+
+Provider SDK/适配器内部还可能有自己的请求重试配置。它与这里低层运行结束后的产品层重试是两层控制，不能简单把 `maxRetries=3` 当作全部 HTTP 尝试的上限。[S: S-024, S-032]
+
+源码定位：[错误文本分类](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/ai/src/utils/retry.ts#L96)、[产品层重试准备](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L2587)、[默认设置](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/settings-manager.ts#L813)。
+
+## 最后怎样收尾
+
+`_runAgentPrompt()` 的 finally 清除本次 system prompt override、处理 pending Bash messages，再调用 `_emitAgentSettled()`。后者更新产品运行标记，通知 extension 和订阅者，并处理 idle 等待者。[S: S-002, S-019]
+
+由此可以区分低层 `agent_end` 和产品层 `agent_settled`：前者到来后，重试、压缩或队列仍可能延长这次产品运行。自动化调用方需要按所需边界等待，并另外检查最终响应和任务产物。[X: X-005, X-008]
+
+## 从外部解读回到状态所有权
+
+把扩展理解成“可以改工作流”，落实到代码后仍要回答：数据由谁持有、何时重建、哪些内容进入模型。当前路径中，Agent 管消息与队列，SessionManager 管历史记录，AgentSession 组织两者与 extensions 的生命周期。新增的工具输出分流与 reload 核查分别见 C-027、C-028；外部文章的用途解释和版本边界见[来源对照](17-external-perspectives.md)。
 """
 
-REPORTS["14-source-claim-index.md"] = r"""# 源码与 Claim 索引
+REPORTS['11-runtime-experiments.md'] = r"""# 实验记录
 
-本页把 20 条 supported claims 映射到固定 commit 的源码/文档锚点和命名运行场景。`S/D` 表示静态或文档约束，`R/X` 表示指定配置中的运行观察；两者都不表示生产频率。
+本报告保留两批证据：2026 年 7 月的真实 SiFlow 场景和首次定向测试，以及 2026-10-20 的源码复核与本地 mock/faux 检查。本次没有调用外部模型。
 
-| Claim | 可证伪结论 | 固定源码/文档锚点 | 动态证据 | Scope / 置信度 | 反证实验 |
-|---|---|---|---|---|---|
-| `C-001` | Pi 的产品入口由同一 Coding Agent runtime 支撑交互式 TUI、print/JSON 与 RPC 模式，底层能力拆分为 ai、agent、coding-agent、tui 等包。 | [D-001: README.md:13-33](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/README.md#L13)<br>[S-012: packages/ai/src/models.ts:24-369](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/ai/src/models.ts#L24)<br>[S-013: packages/coding-agent/src/main.ts:650-857](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/main.ts#L650)<br>[S-014: packages/coding-agent/src/core/agent-session-runtime.ts:67-353](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session-runtime.ts#L67) | 未做专项动态验证；当前由固定源码/文档支持 | v0.80.7 monorepo and CLI; `high`; `supported` | 从任一模式入口追踪到不同的核心循环实现；本轮源码检查和 JSON 模式运行均未发现。 |
-| `C-002` | 通用 runAgentLoop 是 Pi 的核心模型-工具循环：模型响应后执行工具、追加 toolResult，再决定继续、注入 steering/follow-up 或退出。 | [S-001: packages/agent/src/agent-loop.ts:95-755](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/agent-loop.ts#L95) | `R-001`: [traces/normalized/R-001-text-only.normalized.jsonl](../traces/normalized/R-001-text-only.normalized.jsonl)<br>`R-002`: [traces/normalized/R-002-read-tool.normalized.jsonl](../traces/normalized/R-002-read-tool.normalized.jsonl)<br>`X-001`: [runtime-tests.md](../runtime-tests.md) | agent-core low-level loop; `high`; `supported` | 构造一次 toolUse 响应并检查是否不经过 runAgentLoop 的工具回填路径；真实轨迹与 faux-provider 测试均支持该循环。 |
-| `C-003` | Coding Agent 的模型上下文由持久化分支消息、system prompt、项目指令、skills、工具清单及 extension hook 注入共同形成，并在模型边界前转换。 | [S-002: packages/coding-agent/src/core/agent-session.ts:1023-1223](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L1023)<br>[S-004: packages/coding-agent/src/core/system-prompt.ts:27-161](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/system-prompt.ts#L27)<br>[S-005: packages/coding-agent/src/core/resource-loader.ts:330-413](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/resource-loader.ts#L330) | `R-001`: [traces/normalized/R-001-text-only.normalized.jsonl](../traces/normalized/R-001-text-only.normalized.jsonl) | coding-agent default runtime; `medium`; `supported` | 分别禁用 context files、skills、extensions 并比较 provider request；本轮禁用配置验证了最小上下文路径，完整差分仍未执行。 |
-| `C-004` | 内置、扩展与 SDK 工具被合并为运行时 registry；tool_call/tool_result hooks 位于实际 execute 前后，可阻断或改写结果。 | [S-003: packages/coding-agent/src/core/agent-session.ts:415-493](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L415)<br>[S-017: packages/coding-agent/examples/extensions/protected-paths.ts:1-29](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/examples/extensions/protected-paths.ts#L1) | `R-002`: [traces/normalized/R-002-read-tool.normalized.jsonl](../traces/normalized/R-002-read-tool.normalized.jsonl)<br>`X-001`: [runtime-tests.md](../runtime-tests.md) | coding-agent tool system; `high`; `supported` | 注册同名工具或让 hook 返回 block=false/true，检查最终执行目标和副作用；定向测试覆盖了 hook 与排序语义。 |
-| `C-005` | Pi 没有默认的逐工具权限审批管线；permission popup 与路径保护属于可选 extension，默认工具直接以进程权限执行。 | [D-002: packages/coding-agent/docs/security.md:3-41](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/docs/security.md#L3)<br>[D-004: packages/coding-agent/README.md:489-503](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/README.md#L489)<br>[S-003: packages/coding-agent/src/core/agent-session.ts:415-493](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L415)<br>[S-017: packages/coding-agent/examples/extensions/protected-paths.ts:1-29](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/examples/extensions/protected-paths.ts#L1) | 未做专项动态验证；当前由固定源码/文档支持 | default coding-agent configuration; `high`; `supported` | 在无 extensions 的默认 CLI 中触发 bash/write 并寻找强制 ask/allow/deny 决策；源码未发现，官方文档明确否定。 |
-| `C-006` | Project trust 只控制项目 settings/resources/extensions 的加载，不是工具权限或执行 sandbox；非交互模式无 UI 时默认 ask 会落到不信任。 | [D-002: packages/coding-agent/docs/security.md:3-41](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/docs/security.md#L3)<br>[S-005: packages/coding-agent/src/core/resource-loader.ts:330-413](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/resource-loader.ts#L330)<br>[S-006: packages/coding-agent/src/core/project-trust.ts:46-95](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/project-trust.ts#L46) | 未做专项动态验证；当前由固定源码/文档支持 | project resource bootstrap; `high`; `supported` | 在未信任项目放置 extension 与 AGENTS.md，验证 extension 被跳过而 context file 仍可加载；本轮以源码和文档确证，未执行含恶意资源的动态场景。 |
-| `C-007` | 默认 bash backend 在当前 cwd 以继承环境启动本地 shell；timeout 是可选且无默认值，abort/timeout 会终止进程树。 | [D-002: packages/coding-agent/docs/security.md:3-41](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/docs/security.md#L3)<br>[D-007: packages/coding-agent/docs/containerization.md:3-43](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/docs/containerization.md#L3)<br>[S-007: packages/coding-agent/src/core/tools/bash.ts:27-148](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/tools/bash.ts#L27) | 未做专项动态验证；当前由固定源码/文档支持 | built-in bash tool; `high`; `supported` | 运行无 timeout 的长命令并观察是否存在隐藏上限，再发送 abort 检查子进程树；本轮因安全边界未执行 shell 动态场景。 |
-| `C-008` | Coding Agent session 是版本化 append-only JSONL 树，id/parentId 与 leaf 表示分支；恢复时重建 compaction-aware active context。 | [S-008: packages/coding-agent/src/core/session-manager.ts:457-1540](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/session-manager.ts#L457)<br>[S-014: packages/coding-agent/src/core/agent-session-runtime.ts:67-353](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session-runtime.ts#L67) | `R-003`: [traces/normalized/R-003-session-create.normalized.jsonl](../traces/normalized/R-003-session-create.normalized.jsonl)<br>`R-004`: [traces/normalized/R-004-session-resume.normalized.jsonl](../traces/normalized/R-004-session-resume.normalized.jsonl)<br>`X-003`: [runtime-tests.md](../runtime-tests.md) | coding-agent sessions v3; `high`; `supported` | 跨进程恢复同一 session-id 并要求回忆前一进程 token；R-003/R-004 已通过。 |
-| `C-009` | 当前 Coding Agent AgentSession 实现自动 compaction 与有限自动 retry：overflow 最多 compact-and-retry 一次，普通可重试错误指数退避且受 maxRetries 限制。 | [S-009: packages/coding-agent/src/core/agent-session.ts:1890-2161](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L1890)<br>[S-010: packages/coding-agent/src/core/agent-session.ts:2573-2637](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L2573) | `X-003`: [runtime-tests.md](../runtime-tests.md) | coding-agent AgentSession; `high`; `supported` | 使用 faux provider 连续返回 overflow 或网络错误，验证上限、事件与上下文保留；定向测试通过。 |
-| `C-010` | 新 packages/agent AgentHarness 是低层 loop 之上的通用编排层，但 v0.80.7 尚未替代 Coding Agent AgentSession，且自身自动 compaction、retry、完整 hooks 与半持久恢复仍未完成。 | [D-003: packages/agent/docs/agent-harness.md:1-218](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/docs/agent-harness.md#L1)<br>[D-008: packages/agent/docs/agent-harness.md:291-411](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/docs/agent-harness.md#L291)<br>[S-011: packages/agent/src/harness/agent-harness.ts:314-616](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/harness/agent-harness.ts#L314) | `X-002`: [runtime-tests.md](../runtime-tests.md) | new AgentHarness migration state; `high`; `supported` | 检查 Coding Agent 创建路径是否实例化 AgentHarness，或 AgentHarness 是否包含 auto-compaction/retry decision；均未发现。 |
-| `C-011` | 真实 SiFlow 场景观察到 read 工具形成两轮 turn：模型 toolUse、read 执行、toolResult 回填、第二次模型调用、最终退出。 | 没有独立源码锚点；结论限于列出的动态/推断证据 | `R-002`: [traces/normalized/R-002-read-tool.normalized.jsonl](../traces/normalized/R-002-read-tool.normalized.jsonl) | R-SCENARIO-002; `high`; `supported` | 将 fixture 值改为未知随机值并要求必须读取；本轮使用合成未知值 314159 且 trace 显示 read start/end。 |
-| `C-012` | 持久化 session 能跨独立 Pi 进程恢复对话上下文。 | [S-008: packages/coding-agent/src/core/session-manager.ts:457-1540](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/session-manager.ts#L457) | `R-003`: [traces/normalized/R-003-session-create.normalized.jsonl](../traces/normalized/R-003-session-create.normalized.jsonl)<br>`R-004`: [traces/normalized/R-004-session-resume.normalized.jsonl](../traces/normalized/R-004-session-resume.normalized.jsonl) | R-SCENARIO-003 and R-SCENARIO-004; `high`; `supported` | 第二个进程不提供前一 token，仅恢复 session 后要求返回；已返回 PI_RESUME_2718。 |
-| `C-013` | 核心 Coding Agent 不内置 MCP 或 subagent；仓库提供的 subagent 是可选 extension，通过独立 pi --mode json --no-session 子进程隔离上下文，并共享指定 cwd。 | [D-004: packages/coding-agent/README.md:489-503](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/README.md#L489)<br>[D-006: packages/coding-agent/examples/extensions/subagent/README.md:1-175](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/examples/extensions/subagent/README.md#L1)<br>[S-015: packages/coding-agent/examples/extensions/subagent/index.ts:239-698](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/examples/extensions/subagent/index.ts#L239) | 未做专项动态验证；当前由固定源码/文档支持 | default core plus example extension; `high`; `supported` | 默认启动后检查 tool registry 是否出现 MCP/subagent；源码与产品文档否定，extension 场景未动态执行。 |
-| `C-014` | Pi 已提供稳定的 agent/message/tool/compaction/retry 事件及 JSON/RPC 输出，但 OTel 风格 trace/span 仍是设计稿，不是 v0.80.7 的默认核心实现。 | [D-005: packages/coding-agent/docs/json.md:1-76](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/docs/json.md#L1)<br>[D-009: packages/agent/docs/observability.md:3-169](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/docs/observability.md#L3) | `R-001`: [traces/normalized/R-001-text-only.normalized.jsonl](../traces/normalized/R-001-text-only.normalized.jsonl)<br>`R-002`: [traces/normalized/R-002-read-tool.normalized.jsonl](../traces/normalized/R-002-read-tool.normalized.jsonl) | observability surfaces; `medium`; `supported` | 搜索并运行默认 instrumentation，检查是否生成 traceId/spanId 或 exporter 调用；JSON trace 未包含，源码只发现设计说明。 |
-| `C-015` | 工具批次默认并行执行；全局 sequential 或任一工具声明 executionMode=sequential 会使整批串行，同时最终 toolResult 按模型源码顺序持久化。 | [S-001: packages/agent/src/agent-loop.ts:95-755](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/agent-loop.ts#L95) | `X-001`: [runtime-tests.md](../runtime-tests.md) | agent-core tool execution; `high`; `supported` | 脚本化两个不同延迟工具并比较完成事件与持久化结果顺序；定向 agent-loop 测试已通过。 |
-| `C-016` | 新 AgentHarness 通过 turn snapshot 与 save point 隔离在途 provider request：运行时配置变化只在下一个安全点刷新，pending session writes 按序落盘。 | [D-003: packages/agent/docs/agent-harness.md:1-218](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/docs/agent-harness.md#L1)<br>[S-011: packages/agent/src/harness/agent-harness.ts:314-616](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/harness/agent-harness.ts#L314) | `X-002`: [runtime-tests.md](../runtime-tests.md) | new AgentHarness; `high`; `supported` | 在 tool hook 中切换 model/tools 并检查当前 request 与下一 request；AgentHarness 定向测试覆盖该语义。 |
-| `C-017` | 扩展可以实现工具阻断，但此控制点是应用可选 hook，不是不可绕过的全局安全边界。 | [S-003: packages/coding-agent/src/core/agent-session.ts:415-493](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L415)<br>[S-017: packages/coding-agent/examples/extensions/protected-paths.ts:1-29](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/examples/extensions/protected-paths.ts#L1)<br>[D-002: packages/coding-agent/docs/security.md:3-41](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/docs/security.md#L3) | 未做专项动态验证；当前由固定源码/文档支持 | extension tool hooks; `high`; `supported` | 枚举 built-in tools、user ! bash、extension custom tools 与直接进程调用，确认是否全部经过同一 hook；源码表明 extension 自身代码不受该 gate 约束。 |
-| `C-018` | orchestrator 是实验性的多 Pi RPC 进程 supervisor，负责 spawn、事件复用、session 元数据和退出清理；它不是默认 Coding Agent 内的 subagent 机制。 | [D-010: packages/orchestrator/README.md:1-5](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/orchestrator/README.md#L1)<br>[S-016: packages/orchestrator/src/supervisor.ts:63-318](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/orchestrator/src/supervisor.ts#L63) | 未做专项动态验证；当前由固定源码/文档支持 | packages/orchestrator; `medium`; `supported` | 从默认 pi CLI 追踪是否自动创建 OrchestratorSupervisor；未发现，orchestrator 包明确标记 experimental。 |
-| `C-019` | 模型抽象以 provider-owned model catalog、auth resolution 和 stream/streamSimple 为边界；自定义 models.json 可把 OpenAI-compatible endpoint 接入同一循环。 | [S-012: packages/ai/src/models.ts:24-369](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/ai/src/models.ts#L24) | `R-005`: [runtime-tests.md](../runtime-tests.md)<br>`R-001`: [traces/normalized/R-001-text-only.normalized.jsonl](../traces/normalized/R-001-text-only.normalized.jsonl) | pi-ai and coding-agent model registry; `high`; `supported` | 通过 models.json 注册 SiFlow 并运行 --list-models 与文本请求；两者均成功。 |
-| `C-020` | 恢复策略按错误类型分层：context overflow 走 compaction，其他 retryable provider error 走指数退避，truncated tool-call 参数则拒绝执行并回送错误。 | [S-001: packages/agent/src/agent-loop.ts:95-755](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/agent-loop.ts#L95)<br>[S-009: packages/coding-agent/src/core/agent-session.ts:1890-2161](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L1890)<br>[S-010: packages/coding-agent/src/core/agent-session.ts:2573-2637](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/agent-session.ts#L2573) | `X-001`: [runtime-tests.md](../runtime-tests.md)<br>`X-003`: [runtime-tests.md](../runtime-tests.md) | coding-agent and agent-core failure paths; `high`; `supported` | 分别注入 length stop、overflow 与网络错误；定向测试覆盖三类分支。 |
+## 历史真实模型场景
 
-## 使用边界
+| 场景 | 实际观察 | 记录 |
+|---|---|---|
+| R-001 文本 | 一轮 assistant，无工具，最终 settled | [normalized trace](../traces/normalized/R-001-text-only.normalized.jsonl) |
+| R-002 read | 两轮模型处理，一次 read，最终返回合成值 314159 | [normalized trace](../traces/normalized/R-002-read-tool.normalized.jsonl) |
+| R-003 创建会话 | 记录合成 token 并写入 session | [normalized trace](../traces/normalized/R-003-session-create.normalized.jsonl) |
+| R-004 恢复会话 | 独立新进程在未重发 token 时返回 PI_RESUME_2718 | [normalized trace](../traces/normalized/R-004-session-resume.normalized.jsonl) |
 
-- 点击源码链接时应核对固定 commit，不要用当前默认分支替代版本事实。
-- `R` 场景使用真实 SiFlow；`X` 使用 faux provider/定向 tests。`passed` 只表示预声明断言成立。
-- 完整 conditions、counterevidence、coverage refs 和 record schema 以 [`claims.jsonl`](../evidence/claims.jsonl) 与 [`observations.jsonl`](../evidence/observations.jsonl) 为准。
+另有 R-005 的模型发现记录，以及当前路径的旧 X-001/X-003 的 39、31 项定向测试。原命令与环境摘要保存在 [runtime-tests.md](../runtime-tests.md)。这些数字属于历史执行，不合并成此次新测试的通过数。
+
+## 本次定向检查
+
+下表直接对应保存的 Vitest 结果。通过、失败和跳过分别列出；只用执行通过的具体断言支持行为结论。
+
+| 检查 | 通过 | 失败 | 跳过 | 内容与产物 |
+|---|---:|---:|---:|---|
+| X-004 | 39 | 0 | 0 | [Agent 与低层 loop](../traces/checks/20261020/X-004.vitest.json) |
+| X-005 | 12 | 0 | 5 | [产品事件、动态工具、重试、压缩后队列](../traces/checks/20261020/X-005.vitest.json) |
+| X-006 | 46 | 1 | 0 | [session context/tree 与首次 CLI 尝试](../traces/checks/20261020/X-006.vitest.json) |
+| X-008 | 15 | 0 | 0 | [faux compaction 与发送前压缩](../traces/checks/20261020-followup/X-008.vitest.json) |
+| X-009 | 5 | 0 | 16 | [setSessionFile 名称筛选](../traces/checks/20261020-followup/X-009.vitest.json) |
+| X-010 | 1 | 0 | 0 | [CLI + tsx 对照](../traces/checks/20261020-cli/X-010.vitest.json) |
+
+核心循环组重新验证 loop、工具排序、hook 和队列。产品层组检查异步 `message_end` 的记录顺序、动态工具、重试和压缩后队列。持久化组检查 context projection 与分支树。补充组检查当前产品压缩条件、非法文件处理与 CLI 错误呈现。
+
+## 一次失败怎样定位
+
+X-006 中的 46 项进程内检查通过，CLI 用例在子进程解析模块时退出，尚未进入被测的 session 文件校验路径。该测试直接以 Node 启动 `cli.ts`，临时运行环境最初没有配上 Pi 开发入口使用的 tsx/tsconfig 加载方式。
+
+X-009 先单独验证 `SessionManager.setSessionFile`：空文件初始化、非法非空文件拒绝与内容保留均通过。X-010 再给 CLI 用例补上 tsx 加载环境，验证友好错误和原文件不变，结果通过。原 X-006 记录保持失败状态，后续成功记录没有覆盖它。
+
+## 跳过项与运行边界
+
+X-005 的五项真实模型 compaction e2e 因没有凭据而跳过，不能算作压缩验证；相应 controller 行为使用 X-008 的 faux 测试补充。X-009 通过名称筛选只运行五项文件校验用例，其余十六项未选用。
+
+当前范围选用 118 个 passed、1 个 failed、21 个 skipped 的测试条目，其中 CLI 的同一断言先失败后单独通过。这里统计的是当前路径的执行记录。范围外的历史测试仍保存在原始结果与 [runtime-tests.md](../runtime-tests.md)，不计入本表。摘要信息保存在各批次的 `summary.json`，执行脚本见[复现方法](13-coverage-reproducibility.md)。
 """
 
-REPORTS["16-glossary.md"] = r"""# 全局术语表
+REPORTS['12-failure-modes-open-questions.md'] = r"""# 失败处理与待验证路径
 
-本表定义的是 **Pi v0.80.7 本报告中的用法**。Pi 的 package、产品层和迁移中 API 有同名近义对象，必须结合“谁拥有生命周期”和“是否 durable”来区分。
+Pi 的失败处理分布在工具、低层循环、产品编排和 session 存储四处。先定位失败发生在哪一层，再判断后续状态和事件。[S: S-001, S-008, S-010, S-018, S-021]
 
-| 术语 | 精确定义 | 容易混淆但不等价的概念 | 主要证据 |
-|---|---|---|---|
-| Pi / Coding Agent | 面向用户的 coding agent 产品，组合 `pi-ai`、`agent-core`、session/resource/extension/UI 层。 | 不是单指 low-level `Agent` class，也不是模型本身。 | `D-001`, `S-012`, `S-013` |
-| `pi-ai` Provider | 拥有 provider id、auth、base URL/header、model catalog 和 stream 实现的模型适配边界。 | “OpenAI-compatible”不保证 request body、thinking flag 或 stream 细节完全相同。 | `S-012`, `R-005` |
-| Model | provider catalog 中带 id、context window、capability 等元数据的可选模型记录。 | 不等于 Provider；多个 model 可由同一 provider 运行。 | `S-012` |
-| Low-level `Agent` | 持有 context/model/tools/queues 并调用 `runAgentLoop()` 的通用运行对象。 | 不是 Coding Agent 的 `AgentSession`，不拥有完整产品 session/retry/resource lifecycle。 | `S-001` |
-| `runAgentLoop()` | provider sampling、tool batch、steering、follow-up 和 stop 的 canonical low-level 双层循环。 | 不内置 planner，也不负责 Coding Agent 全部 compaction/retry/session persistence。 | `S-001`, `R-002` |
-| Agent run | 一次 low-level loop 从 `agent_start` 到 `agent_end` 的执行，可含多次 turn。 | `agent_end` 不必表示产品已 settled。 | `S-001`, `S-002` |
-| Turn | 一次 provider request/assistant message 及其 tool batch 的循环单位，以 `turn_start/end` 表达。 | 一个用户 prompt 可因 tool feedback、steering、retry 等包含多个 turn。 | `S-001`, `R-002` |
-| `agent_settled` | Coding Agent 产品层确认没有 pending retry、compaction 或 queued continuation 后的空闲事件。 | 不等于低层 `agent_end`；后者之后产品层仍可继续编排。 | `S-002`, `R-001`, `R-002` |
-| Steering | agent run 尚在进行时排入、在内层 loop 中优先形成下一 turn 的输入。 | 不等于 follow-up；follow-up 在当前 run 本可结束时由外层 loop 消费。 | `S-001` |
-| Follow-up | 当前 tool/steering loop 已空后，由外层 loop 消费并启动下一 turn 的排队输入。 | 不等于新建 session，也不等于产品 retry。 | `S-001` |
-| `AgentSession` | v0.80.7 Coding Agent 当前产品路径，拥有 prompt expansion、extensions、auto retry/compaction、JSONL session events 和 settled。 | 不等于迁移中的 generic `AgentHarness`。 | `S-002`, `S-009`, `S-010` |
-| `AgentHarness` | 正在开发的通用 orchestration 层，直接调用相同 low-level loop，以 phase、turn snapshot、pending writes 和 save point 管理状态。 | 本版本尚未替代 Coding Agent；auto-compaction/retry/migration 不完整。 | `D-003`, `D-008`, `S-011` |
-| Turn snapshot | `AgentHarness` 在一次 in-flight turn 中固定使用的配置/状态视图。 | 不是 durable session checkpoint；next-state 只在安全点应用。 | `D-003`, `S-011` |
-| Save point | `AgentHarness` 可以提交 pending session writes、刷新 next-state 的确定性阶段边界。 | 不表示 workspace 或 provider stream 可恢复。 | `D-003`, `X-002` |
-| `AgentSessionRuntime` | 由 main 创建的 cwd-bound 产品 runtime，组合 settings、auth、model registry、resource loader 和 `AgentSession`。 | 不等于 durable session file；switch/fork 时会重建。 | `S-013`, `S-014` |
-| `SessionManager` | 管理 JSONL v3 header/entries、current leaf、branch/fork/open/migration 和 context rebuild 的持久化组件。 | 不管理 workspace snapshot。 | `S-008`, `R-004` |
-| JSONL v3 session | 首行 header，后续用 `id/parentId` 形成 tree 的 append-oriented durable 文件。 | 不是平铺 chat log，也不是数据库事务或 OTel trace。 | `S-008` |
-| Entry / parentId | message、model/thinking change、custom、compaction、branch summary 等 durable record及其父边。 | 文件行顺序不单独定义 active conversation；需结合 parent chain/leaf。 | `S-008` |
-| Leaf / active branch | 当前选中的 tree 末端和从 header/root 到该 leaf 的 parent path。 | 切换 leaf 不会把 workspace 回滚到该 branch 当时状态。 | `S-008` |
-| Resume | 重新打开 JSONL，迁移/索引 entries，选择 leaf 并用 `buildSessionContext()` 重建上下文。 | 不恢复旧进程、in-flight provider stream 或文件系统 checkpoint。 | `S-008`, `R-003`, `R-004` |
-| Fork | 创建新 session header，记录 `parentSession`，复制 selected history/active path并为目标 cwd 重建 runtime。 | 不等于在原 session 内移动 leaf，也不自动复制 workspace。 | `S-008`, `S-014` |
-| Context | 每次 provider request 可见的 system prompt、active transcript 和经过 extension transform 的消息。 | 不等于 JSONL 全量 entries，也不等于 workspace 内容。 | `S-001`, `S-004`, `S-005` |
-| Context file | AGENTS.md/CLAUDE.md 等被 resource loader 加到 project instructions 的文件。 | AGENTS/CLAUDE 不受 project trust；`.pi/SYSTEM.md` 等项目资源受 trust。 | `S-004`, `S-006` |
-| Skill | 以 metadata 暴露、在 `/skill:name` 时 lazy 展开 full body 的资源。 | 不是 extension executable，也不是内置 MCP。 | `S-004` |
-| `transformContext` / `convertToLlm` | 每次 request 前先允许 context hook 变换，再把 AgentMessage 转成 provider message。 | toolResult 不能绕过这两步直接调用模型。 | `S-001`, `S-005` |
-| Tool registry | 合并 built-in、extension、SDK custom tool 和 allow/deny 配置后的 name -> definition map。 | 注册不等于有 sandbox；同名 conflict/override 受加载顺序影响。 | `S-003` |
-| toolUse / toolResult | assistant 提出的命名调用及 handler 执行/拒绝后回填的模型可见结果。 | `tool_execution_end` event 的完成顺序可与 toolResult transcript 顺序不同。 | `S-001`, `R-002` |
-| Parallel / sequential batch | 默认批次并发；任一 tool 的 `executionMode=sequential` 会使整个 batch 串行。 | sequential 不是只让该一个 call 排队；并发结果仍按原 call index 写回。 | `S-001`, `X-001` |
-| Extension | 在 host Node 进程内注册 tools、commands、hooks、UI 和 provider/session 行为的 TypeScript 能力。 | 不是隔离 plugin VM；与 Pi 进程拥有相同 OS 权限。 | `D-002`, `S-003` |
-| Hook | input/context/tool/provider/session 等生命周期注入点，可观察、变换或在局部阶段 block。 | 可选 `tool_call` hook 不是不可绕过的全局 permission plane。 | `S-003`, `S-003`, `S-017` |
-| Project trust | 对 project-local settings/extensions/skills/SYSTEM 等启动资源的 persisted path decision。 | 不限制运行期 read/write/edit/bash；AGENTS/CLAUDE 仍可进入 context。 | `D-002`, `S-006` |
-| Protected paths | 示例 extension 通过 `tool_call` hook 拦截特定路径的可选策略。 | 不是默认核心功能，也不覆盖 extension 直接 fs/process/network。 | `S-017` |
-| Sandbox | OS/container/VM 对整个或部分执行面的能力隔离。Pi 默认内置工具不自动进入 sandbox。 | 不等于 project trust 或 tool confirmation UI。 | `D-002`, `D-007` |
-| Gondolin routing | 示例 extension 把选定 built-ins 和 `!` command 路由到 guest 的选择性隔离。 | 未被 delegate 的 custom extension tool 仍可在 host 执行。 | `D-007` |
-| Whole-process isolation | 在 Docker/OpenShell/VM 中运行 Pi 整个进程树，覆盖 extensions、shell、language servers 等。 | bind-mounted workspace/agent dir 仍按挂载权限影响 host。 | `D-007` |
-| `--no-session` | 不建立普通 durable session 的运行模式，用于一次性 print/JSON 或示例 child。 | 不表示没有 live transcript，也不提供更强权限隔离。 | `S-015`, `R-001`, `R-002` |
-| Compaction | 用 summary + kept suffix 替换后续有效 context，并把 summary/firstKept/tokens 记录为一等 session entry。 | 不等于删除 JSONL 历史，也不恢复 workspace。 | `S-009`, `X-003` |
-| Overflow / threshold compaction | overflow 在错误/窗口超限时可 compact-and-retry 一次；threshold 在接近窗口时压缩但不重答已完成 turn。 | 两者触发和重答语义不同，不能合写成统一 retry。 | `S-009`, `X-003` |
-| Faux provider | 测试中按脚本返回 message/tool/error 的可控 provider，用于区分 controller 分支。 | 不是真实模型质量评估。 | `X-001`–`X-003` |
-| JSON mode / RPC mode | JSON 把 header/events 输出到 stdout；RPC 以 LF-delimited commands/responses 加并行 events/UI request 交互。 | 两者是 adapter，不是独立 agent loop。 | `D-005`, `S-013` |
-| Agent events | run/turn/message/tool/queue/compaction/retry/settled 的结构化生命周期事件。 | 默认没有统一 traceId/spanId，也未自动 redaction。 | `D-005`, `R-001`, `R-002` |
-| OTel/Sentry adapter notes | 仓库对 stable vendor-neutral events 映射到外部观测系统的设计文档。 | 不是 v0.80.7 默认 exporter 实现。 | `D-009` |
-| Subagent extension | 示例 `subagent` tool，以独立 `pi --mode json --no-session` 子进程运行任务并回收结果。 | 不是默认核心 delegation primitive；默认共享 cwd/env。 | `D-006`, `S-015` |
-| Orchestrator | experimental supervisor，为每个 instance 管理独立 RPC Pi process、events/UI 和 metadata。 | 它是多 session process supervisor，不是 `runAgentLoop` 内的 parent/child tool protocol。 | `D-010`, `S-016` |
-| HIR | Harness Intermediate Representation：把入口、loop、context、tool、安全、session 等恢复为 typed nodes/edges。 | 是证据约束的分析模型，不是源码 AST 或 runtime trace。 | [`hir.json`](../hir.json) |
+| 触发条件 | 当前处理 | 证据 |
+|---|---|---|
+| 未知工具、参数非法或 hook block | 返回错误 toolResult；相应 handler 不执行 | S-018，X-004 |
+| assistant 以 length 截断且含工具调用 | 所有调用返回截断错误，模型可重新提出完整调用 | S-018，X-004 |
+| bash 中命令联网失败并以非零退出结束 | 包装为错误 toolResult，由模型决定下一步 | S-018，S-034 |
+| 普通可重试 provider 错误 | AgentSession 有界退避，错误保留在历史但从 live context 移除 | S-010，X-005 |
+| 当前模型 context overflow | 按 stop reason 决定压缩后是否恢复；错误恢复有一次限制 | S-021，X-008 |
+| 压缩过程中出现排队消息 | 压缩完成后可继续消费队列 | S-021，X-005 |
+| 非空文件不是有效 session | 拒绝打开并保留文件内容 | S-020，X-009/X-010 |
+| 取消运行 | 沿 AbortSignal 和各 backend 的取消逻辑处理，最终进入相应收尾 | S-001、S-007、S-015；具体 backend 的动态覆盖不同 |
+
+普通 tool error 会回到模型，模型可以据此改变下一次工具调用；provider error 的普通自动重试由 `AgentSession` 的代码规则触发。错误分类与默认退避见[自动重试机制](10-implementation-details.md#自动重试由代码规则触发)，命令内部重试、工具失败和模型服务失败的区别见[三层重试示例](10-implementation-details.md#bash-联网失败和模型-api-失败分别怎么处理)。自动重试也不表示已经执行的外部动作可以安全重复，尤其是请求超时前副作用已经发生的情况。
+
+## 当前还缺哪些行为证据
+
+当前 `AgentSession` 的运行中配置刷新尚缺完整 request diff。可以在 tool hook 或事件监听者中更新 tools/model，分别记录当前请求和下一请求，检查变更在什么边界生效。
+
+真实长上下文压缩的摘要质量没有测量。当前 tests 验证触发条件、状态更新和续跑，不衡量重要约束是否在真实摘要中丢失。
+
+会话文件校验与分支重建已经执行；进程被 SIGKILL、半写入记录、损坏 parent 链和 workspace 漂移仍需要独立故障实验。解析器跳过坏行也可能留下不完整的逻辑历史。
+
+Subagent 示例的取消和文件竞争、orchestrator 重启、容器或 VM 的文件与网络隔离仍是静态路径。应分别观察 child 退出、残留进程、文件变化和实际隔离边界。
+
+这些是后续检查队列。先完成当前机制理解，再按需要选择具体实验或开展设计比较。
 """
 
-REPORTS["claim-index.md"] = r"""# Claim Index
+REPORTS['13-coverage-reproducibility.md'] = r"""# 覆盖与复现
 
-| Claim | Statement | Confidence | Evidence | Coverage |
-|---|---|---|---|---|
-| `C-001` | Pi 的产品入口由同一 Coding Agent runtime 支撑交互式 TUI、print/JSON 与 RPC 模式，底层能力拆分为 ai、agent、coding-agent、tui 等包。 | high | `D-001`, `S-012`, `S-013`, `S-014` | `interfaces`, `orchestration` |
-| `C-002` | 通用 runAgentLoop 是 Pi 的核心模型-工具循环：模型响应后执行工具、追加 toolResult，再决定继续、注入 steering/follow-up 或退出。 | high | `S-001`, `R-001`, `R-002`, `X-001` | `core_loop`, `orchestration` |
-| `C-003` | Coding Agent 的模型上下文由持久化分支消息、system prompt、项目指令、skills、工具清单及 extension hook 注入共同形成，并在模型边界前转换。 | medium | `S-002`, `S-004`, `S-005`, `R-001` | `context_assembly` |
-| `C-004` | 内置、扩展与 SDK 工具被合并为运行时 registry；tool_call/tool_result hooks 位于实际 execute 前后，可阻断或改写结果。 | high | `S-003`, `S-017`, `R-002`, `X-001` | `tools_extensions` |
-| `C-005` | Pi 没有默认的逐工具权限审批管线；permission popup 与路径保护属于可选 extension，默认工具直接以进程权限执行。 | high | `D-002`, `D-004`, `S-003`, `S-017` | `permissions_safety` |
-| `C-006` | Project trust 只控制项目 settings/resources/extensions 的加载，不是工具权限或执行 sandbox；非交互模式无 UI 时默认 ask 会落到不信任。 | high | `D-002`, `S-005`, `S-006` | `permissions_safety`, `context_assembly` |
-| `C-007` | 默认 bash backend 在当前 cwd 以继承环境启动本地 shell；timeout 是可选且无默认值，abort/timeout 会终止进程树。 | high | `D-002`, `D-007`, `S-007` | `sandbox_execution`, `workspace` |
-| `C-008` | Coding Agent session 是版本化 append-only JSONL 树，id/parentId 与 leaf 表示分支；恢复时重建 compaction-aware active context。 | high | `S-008`, `S-014`, `R-003`, `R-004`, `X-003` | `sessions_persistence` |
-| `C-009` | 当前 Coding Agent AgentSession 实现自动 compaction 与有限自动 retry：overflow 最多 compact-and-retry 一次，普通可重试错误指数退避且受 maxRetries 限制。 | high | `S-009`, `S-010`, `X-003` | `compaction`, `recovery` |
-| `C-010` | 新 packages/agent AgentHarness 是低层 loop 之上的通用编排层，但 v0.80.7 尚未替代 Coding Agent AgentSession，且自身自动 compaction、retry、完整 hooks 与半持久恢复仍未完成。 | high | `D-003`, `D-008`, `S-011`, `X-002` | `orchestration`, `compaction`, `recovery` |
-| `C-011` | 真实 SiFlow 场景观察到 read 工具形成两轮 turn：模型 toolUse、read 执行、toolResult 回填、第二次模型调用、最终退出。 | high | `R-002` | `core_loop`, `tools_extensions`, `workspace` |
-| `C-012` | 持久化 session 能跨独立 Pi 进程恢复对话上下文。 | high | `S-008`, `R-003`, `R-004` | `sessions_persistence`, `recovery` |
-| `C-013` | 核心 Coding Agent 不内置 MCP 或 subagent；仓库提供的 subagent 是可选 extension，通过独立 pi --mode json --no-session 子进程隔离上下文，并共享指定 cwd。 | high | `D-004`, `D-006`, `S-015` | `subagents`, `tools_extensions` |
-| `C-014` | Pi 已提供稳定的 agent/message/tool/compaction/retry 事件及 JSON/RPC 输出，但 OTel 风格 trace/span 仍是设计稿，不是 v0.80.7 的默认核心实现。 | medium | `D-005`, `D-009`, `R-001`, `R-002` | `observability` |
-| `C-015` | 工具批次默认并行执行；全局 sequential 或任一工具声明 executionMode=sequential 会使整批串行，同时最终 toolResult 按模型源码顺序持久化。 | high | `S-001`, `X-001` | `core_loop`, `tools_extensions` |
-| `C-016` | 新 AgentHarness 通过 turn snapshot 与 save point 隔离在途 provider request：运行时配置变化只在下一个安全点刷新，pending session writes 按序落盘。 | high | `D-003`, `S-011`, `X-002` | `orchestration`, `sessions_persistence` |
-| `C-017` | 扩展可以实现工具阻断，但此控制点是应用可选 hook，不是不可绕过的全局安全边界。 | high | `S-003`, `S-017`, `D-002` | `permissions_safety`, `tools_extensions` |
-| `C-018` | orchestrator 是实验性的多 Pi RPC 进程 supervisor，负责 spawn、事件复用、session 元数据和退出清理；它不是默认 Coding Agent 内的 subagent 机制。 | medium | `D-010`, `S-016` | `subagents`, `orchestration` |
-| `C-019` | 模型抽象以 provider-owned model catalog、auth resolution 和 stream/streamSimple 为边界；自定义 models.json 可把 OpenAI-compatible endpoint 接入同一循环。 | high | `S-012`, `R-005`, `R-001` | `model_abstraction` |
-| `C-020` | 恢复策略按错误类型分层：context overflow 走 compaction，其他 retryable provider error 走指数退避，truncated tool-call 参数则拒绝执行并回送错误。 | high | `S-001`, `S-009`, `S-010`, `X-001`, `X-003` | `recovery`, `compaction`, `core_loop` |
+报告的结论由固定源码、历史 trace 和本次测试记录支持。当前 HIR 含 28 个 nodes、34 条 edges；正文采用 28 条 claims 和 65 条 evidence records，其余历史记录标记为范围外。计数用于核对产物，不表示代码覆盖率。
 
-Each claim's falsification test and conditions are stored in `../evidence/claims.jsonl`. Figure-to-evidence mappings are stored in `../diagrams/metadata.json`.
+## 从哪里查证
+
+| 产物 | 用途 |
+|---|---|
+| [manifest](../manifest.json) 与 [analysis brief](../analysis-brief.json) | 固定版本、历史/本次执行范围和待解释问题 |
+| [claims](../evidence/claims.jsonl) 与 [observations](../evidence/observations.jsonl) | 结论、依据、条件和反例检查 |
+| [coverage](../evidence/coverage.json) | 14 个模块的具体检查范围与剩余未知项 |
+| [外部来源目录](../evidence/external-sources.json) | 16 篇页面的作者、版本、阅读状态与采用方式 |
+| [模型输入来源](../evidence/model-input-sources.json) | 外部模板和编码器的查阅范围；未执行模型或抓取云端 prompt |
+| [HIR](../hir.json) | 组件、关系和证据标记 |
+| [scenario catalog](../scenarios/catalog.json) | 历史和新增检查的配置、结果与 artifact |
+| [20261020](../traces/checks/20261020/summary.json)、[followup](../traces/checks/20261020-followup/summary.json)、[CLI](../traces/checks/20261020-cli/summary.json) | 本次逐组命令、时间、通过/失败记录 |
+
+## 本次覆盖的机制
+
+主线从 CLI/SDK session 构建到 AgentSession、Agent、低层循环、模型与工具边界，再到会话记录。新增阅读集中在 compat 分派、事件等待、工具 preflight、next-turn 刷新、压缩条件和首次文件写入。Subagent、orchestrator 与外部隔离作为静态旁支记录。
+
+动态覆盖采用本地 mock/faux/controller 测试；原来的真实 JSON-mode 文本、read、resume 证据保留。TUI/RPC 的完整交互、真实长上下文、OS 崩溃、并发 child 文件竞争和容器/VM backend 不在本次运行覆盖内。
+
+## 复现定向测试
+
+需要固定 commit 的 Pi checkout、它的依赖和 Node 22.19.0。脚本检查 commit，将源码导出到临时目录，使用已安装依赖，关闭测试缓存并使用独立 agent 配置；不会安装包或调用外部模型。
+
+```bash
+python3 pi-harness-analysis/reproduce/run_mechanism_checks.py   --repo /path/to/pi   --node /path/to/node   --output /tmp/pi-mechanism-results   --group X-004 --group X-008 --group X-009 --group X-010
+```
+
+`--output` 必须为空，以免覆盖既有记录。`--group X-005` 可复现产品层组及其五个 e2e 跳过项；`--group X-006` 保留原未加载 tsx 的诊断配置，CLI 子项可能在模块解析时失败。X-010 是相应的加载器对照组。各组具体文件清单在脚本和 summary 中。
+
+Node 官方归档 URL 与 SHA-256 保存在[运行时来源](../traces/checks/node-runtime-provenance.json)。依赖 lockfile hash 在每批 summary 中；这些记录不包含模型凭据。
+
+## 重建分析产物与报告
+
+```bash
+python3 pi-harness-analysis/reproduce/compile_analysis.py
+python3 pi-harness-analysis/reproduce/compile_report.py
+python3 /path/to/harness-analysis-skill/scripts/render_diagrams.py pi-harness-analysis
+python3 /path/to/harness-analysis-skill/scripts/validate_analysis.py pi-harness-analysis --strict
+python3 /path/to/harness-analysis-skill/scripts/audit_outputs.py pi-harness-analysis --strict
+```
+
+`compile_analysis.py` 先构建历史记录，再应用本次源码复核及已保存测试结果；它不会重新运行实验。`compile_report.py` 写入此次维护的正文，并从当前 claims/evidence 生成索引。当前正文使用 6 张经复核的插图；图片、提示词、生成参数与审核状态见[插图记录](../diagrams/generated/README.md)。图片与机制说明使用同一组证据。
 """
 
-REPORTS["index.md"] = r"""# Pi Agent Harness 架构恢复报告
+REPORTS['16-glossary.md'] = r"""# 术语表
 
-分析对象：`earendil-works/pi` tag `v0.80.7`，commit `818d67457cdd6b60bce6b121d16b23141c252dd8`。
+| 术语 | 在本版本中的含义 |
+|---|---|
+| Harness | 组织模型请求、工具执行、上下文、状态和运行控制的系统 |
+| AgentSessionRuntime | 当前产品的 session 与 cwd 相关服务管理层，负责切换、清理和重建 |
+| AgentSession | Coding Agent 的 prompt、extension、重试、压缩和收尾编排 |
+| Agent | 低层 loop 的状态包装，拥有消息、队列、tools/model 和取消信号 |
+| turn | 低层循环中的一轮 assistant 响应及工具处理；用户请求可包含多个 turn |
+| agent_end | 一次低层运行的结束事件，产品层还可能继续处理 |
+| agent_settled | 当前 Coding Agent 完成该次运行收尾；任务成功需要另行判定 |
+| registry | 已注册的工具定义，可能包含默认未启用的工具 |
+| active tools | 当前 Agent 中启用并用于模型请求的工具集合 |
+| toolCall / toolUse | toolCall 是消息内容块，toolUse 是可能的 assistant stop reason |
+| toolResult | 与工具调用关联的结果消息，可携带错误并进入下一请求 |
+| steering | 由提交方式或 API 显式选择，在当前 turn 边界后注入；默认运行中 Enter 选择此队列 |
+| follow-up | 由提交方式或 API 显式选择，在工具与 steering 耗尽时消费；默认运行中 Alt+Enter 选择此队列 |
+| nextTurn | 产品层留给下一次普通 prompt 附带的消息 |
+| context | 当前请求使用的 system、messages、tools；不等于整个 session 文件 |
+| 持久历史 | 已保存的会话记录，可以包含多个分支、摘要、配置与扩展数据 |
+| 当前分支 | 从当前 leaf 沿 parentId 选出的历史路径 |
+| 请求视图 | 本轮实际使用的信息，经分支选择、压缩边界和消息转换后与 system/tools 组装 |
+| AgentMessage | Pi 应用层消息；除普通模型消息外，还可包含 custom、bashExecution 和摘要类型 |
+| CustomEntry / CustomMessageEntry | 前者保存默认不入模型的扩展状态；后者会重建为 custom 应用消息并参与消息转换 |
+| bashExecution | 用户通过 ! 执行命令的内部记录；不同于模型调用 bash 后得到的 toolResult |
+| convertToLlm | 普通 TypeScript 转换函数：将应用消息映射为 pi-ai Message[]，再由 provider 适配器构造实际 API 请求 |
+| chat template / 对话编码器 | 将结构化消息和工具定义组织为模型对应的输入格式；此处讨论服务端职责，具体实现因模型而异 |
+| tokenizer | 将文本和控制标记转换为 token IDs；与 Pi 的应用消息类型转换是不同阶段 |
+| tool-call parser | 将模型生成的调用格式解析为 API 工具调用字段，之后由 Harness 执行工具 |
+| ModelRegistry | 当前产品的模型配置与请求鉴权注册表 |
+| compat | pi-ai 兼容入口，按条件连接内置 Models 或 API registry |
+| Models | pi-ai 的 provider/model 集合接口，当前 compat 的内置模型分支会使用它 |
+| leaf / parentId | 会话树的当前位置与父记录引用，决定当前分支 |
+| compaction boundary | 带摘要和 firstKeptEntryId 的历史选择边界 |
+| project trust | 项目启动资源加载的信任决策，职责不同于执行 sandbox |
+| R / X evidence | R 表示真实模型运行；X 表示控制实验或定向测试 |
 
-本报告不是文件树摘要。结论来自固定版本源码、官方仓库文档、4 个真实 SiFlow 场景和 3 组 faux-provider 定向测试，并通过 Harness Analysis validator 做了 claims/evidence/HIR 的交叉校验。首次遇到内部类型、事件名或 provider/session 术语时，可查[全局术语表](16-glossary.md)。
-
-## 一句话结论
-
-Pi 是一个“薄核心、强扩展、外部隔离”的 agent harness：`pi-ai` 统一 provider，`agent-core` 提供通用模型/工具循环，Coding Agent 的 `AgentSession` 负责当前产品级 compaction、retry、session、资源和 extension 编排；新的通用 `AgentHarness` 正在把这些职责下沉，但在 `v0.80.7` 还没有替代 `AgentSession`。[D: D-001, D-003, D-008] [S: S-001, S-002, S-011]
-
-![Pi system overview](../diagrams/generated/pi-system-overview.png)
-
-> 图 1（gpt-image-2 读者插图）：六步主轴优先解释 Pi 的当前运行路径；迁移、可选 gate、durable state 和外部隔离被降为支路。图像经过标签、箭头、可选性和边界语义审查；它不是证据真值。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；结构事实来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `S-001`, `S-002`, `S-008`, `S-012`, `S-013`, `S-017`, `R-001`, `R-002`, `R-004`, `X-002`, `X-003`。
-
-## 阅读框架
-
-先阅读[设计空间与贯穿案例](00-design-space-and-running-example.md)。它用六个 recurring design questions 解释 Pi 的选择，并以真实 `read -> toolResult -> second model call` trace 贯穿后续章节。Subsystem 章节提供机制细节；claim index、HIR 和技术投影负责审计，不要求正文图同时承担全部证据浏览任务。
-
-## 核心发现
-
-1. **真正的 canonical loop 很小。** `runAgentLoop()` 负责模型流、toolUse、toolResult、steering/follow-up 和退出。工具默认并行；任一工具声明 sequential 会让整批串行；结果仍按模型给出的 tool call 顺序进入 transcript。[C: C-002, C-015] [S: S-001] [X: X-001]
-
-2. **当前有两层产品编排和一条迁移线。** `AgentSession` 是 Coding Agent 当前产品路径；新 `AgentHarness` 直接调用相同 low-level loop，通过 turn snapshot/save point 处理配置和持久化顺序，但 auto-compaction、retry、generic hooks、semi-durable recovery 与 Coding Agent migration 尚未完成。[C: C-010, C-016]
-
-3. **安全边界不在进程内。** Project trust 只阻止未授权项目资源在启动时改变配置/extension；默认 read/write/edit/bash 与 extension 仍以 Pi 进程权限执行。逐工具确认、protected paths 和 subagent confirmation 都是可选 extension 策略，真正隔离依赖 container/VM/OS policy。[C: C-005, C-006, C-007, C-017]
-
-4. **session 是 durable tree，不是平铺 chat log。** JSONL v3 entry 通过 `id/parentId` 形成树，leaf 选择 active branch；compaction summary 是一等 entry。跨两个独立 Pi 进程的恢复实验成功找回合成 token `PI_RESUME_2718`。[C: C-008, C-012] [R: R-003, R-004]
-
-5. **核心不规定 MCP/subagent 工作流。** 默认没有 MCP 和 subagent；示例 subagent extension 通过独立 `pi --mode json --no-session` 进程获得隔离 context，但默认共享 cwd。另有 experimental orchestrator 管理独立 RPC Pi 实例，它不是默认 agent loop 的 delegation。[C: C-013, C-018]
-
-6. **可观测性是事件流，不是完整 distributed trace。** JSON/RPC 暴露 message/tool/compaction/retry/settled 事件，足够重建一次运行；默认事件没有 traceId/spanId。仓库的 OTel/Sentry adapter 仍是 design notes。[C: C-014]
-
-## 动态验证结果
-
-| 场景 | 固定配置 | 区分性断言 | 结果与审计产物 | 能证明 | 不能推出 |
-|---|---|---|---|---|---|
-| `R-SCENARIO-001` | JSON mode；SiFlow；no session/tools/resources | 无工具时一次 provider turn 后是否进入 `agent_settled` | `PI_TEXT_OK`；`R-001-text-only.normalized.jsonl` | 最短真实模型生命周期至少成功一次 | 不证明 tool、session 或 retry 路径 |
-| `R-SCENARIO-002` | JSON mode；只开放 `read`；合成 fixture | toolResult 是否进入第二次 provider request | read start/end、2 turns、`314159`；`R-002-read-tool.normalized.jsonl` | 真实 model -> tool -> context -> model 闭环 | 不证明 write/bash 的权限或隔离 |
-| `R-SCENARIO-003/004` | 相同 session id；两个独立进程；无工具 | 新进程能否只靠 JSONL 恢复未重发 token | 恢复 `PI_RESUME_2718`；raw session copy + normalized events | 正常尾部写入后的跨进程恢复 | 不证明 corruption、半写入或 workspace rollback |
-| `X-SCENARIO-001` | faux provider；agent-core tests | loop、并行/顺序、hooks、queue、length-stop 分支是否满足 contract | `39/39`；测试文件固定在 `X-001` | controller 分支在定向测试中通过 | 不评价真实模型选择工具的质量 |
-| `X-SCENARIO-002` | faux provider；新 `AgentHarness` tests | snapshot/save point、pending writes 和 helper 是否按设计工作 | `61/61`；`X-002` | 迁移中 harness 的现有 contract | 不代表已替代 Coding Agent `AgentSession` |
-| `X-SCENARIO-003` | Coding Agent recovery tests | overflow/threshold compaction、retry、context rebuild 是否分层 | `31/31`；`X-003` | 当前产品路径的定向恢复行为 | 不证明真实 crash、SIGINT 或超长模型场景 |
-
-## 最高价值未知项
-
-- 新 `AgentHarness` 与 Coding Agent `AgentSession` 的迁移/差分一致性尚未证明。
-- Gondolin、Docker、OpenShell 和 extension custom tools 的完整 side-effect matrix 未运行。
-- 损坏 JSONL、真实 SIGINT/tool timeout/进程 crash、半持久 turn recovery 未做故障注入。
-- SiFlow 服务端仍默认输出 thinking，Pi 的 `reasoning:false` 没有关闭服务端 chat template；不影响循环验证，但属于 provider compatibility gap。
-
-## 报告导航
-
-- [设计空间与贯穿案例](00-design-space-and-running-example.md)
-- [范围与方法](01-scope-method.md)
-- [入口与生命周期](02-interfaces-lifecycle.md)
-- [核心循环与编排](03-core-loop.md)
-- [上下文、记忆与压缩](04-context-memory-compaction.md)
-- [模型、工具与扩展](05-models-tools-extensions.md)
-- [权限、sandbox 与 workspace](06-permissions-sandbox-workspace.md)
-- [Subagent 与 delegation](07-subagents-delegation.md)
-- [Session、持久化与恢复](08-sessions-persistence-recovery.md)
-- [可观测性](09-observability.md)
-- [设计决策与权衡](10-design-decisions.md)
-- [运行实验](11-runtime-experiments.md)
-- [失败模式与开放问题](12-failure-modes-open-questions.md)
-- [覆盖与复现](13-coverage-reproducibility.md)
-- [与 2604.14228 的质量对照](quality-comparison-2604.14228.md)
-- [源码与 Claim 索引](14-source-claim-index.md)
-- [全局术语表](16-glossary.md)
-- [兼容 Claim index](claim-index.md)
-
-结构化真值：[manifest](../manifest.json) · [HIR](../hir.json) · [claims](../evidence/claims.jsonl) · [evidence](../evidence/observations.jsonl) · [coverage](../evidence/coverage.json) · [scenarios](../scenarios/catalog.json)
+具体条件和调用顺序在对应章节展开，查证入口见[源码与结论索引](14-source-claim-index.md)。
 """
 
-REPORTS["quality-comparison-2604.14228.md"] = r"""# 与 2604.14228 的质量对照
+REPORTS['quality-comparison-2604.14228.md'] = r"""# 历史报告组织记录
 
-基准：[Dive into Claude Code: The Design Space of Today's and Future AI Agent Systems](https://arxiv.org/html/2604.14228)，v2，2026-07-02。本页评价的是报告方法与表达，不把 Claude Code 和 Pi 的产品复杂度直接等同。
+首轮分析曾参照架构研究的组织方式，补充设计空间、术语表、结构化证据和多层图示。本次调整以 Pi 的实际运行路径和实现细节为主，相关背景不作为当前行为的证据。
 
-## 维度对照
+当前阅读入口是[Pi Agent Harness 分析报告](index.md)。先从一次 read 请求理解对象和消息流，再检查工具排序、压缩、模型接口和 session 文件。设计取舍与跨产品比较留作后续专题。
 
-| 维度 | 2604.14228 | 初版 Pi 报告 | 本轮改进后 | 仍然缺少 |
-|---|---|---|---|---|
-| 证据可追溯 | A/B/C tiers，正文引用文件/函数 | D/S/R/X/I + claim/HIR，严谨但阅读成本高 | 保留机器证据，正文图和设计问题仍可回到 ID | 源码链接还不是交互式 HTML tooltip |
-| 动态验证 | 主要是固定源码快照和文档/社区材料 | 4 个 real-model 场景 + 131 个定向测试 | 不变，这是 Pi 报告相对更强的一项 | 缺 write/bash/sandbox/subagent/fault-injection 实跑 |
-| 设计综合 | 五类 values -> 13 principles -> implementation | 以 subsystem 和事实为主，解释链较弱 | 新增六个 design questions 和 stance -> mechanism -> consequence | Pi 作者公开价值声明较少，不能安全复刻五价值框架 |
-| 贯穿案例 | “Fix auth.test.ts” 跨 3-9 节反复出现 | 实验散落，没有统一阅读线 | 用 R-SCENARIO-002 贯穿 loop/context/tool/event | read-only 案例不足以覆盖写入、权限和恢复 |
-| 系统总览图 | 7 个组件、单一主轴、图标和语义色 | 16 节点技术图，横向过宽、组序错误、回边交叉 | gpt-image 读者图将主路径压为六步，并以图标、短标签和虚线支路分离迁移/gate；HIR/story spec 保留证据 | 仍没有点击展开源码 |
-| Turn flow 图 | 为每轮迭代定制纵向布局，读者快速理解循环 | 自动 HIR 分组把控制顺序打乱 | gpt-image 纵向图严格复现两轮 read trace；trace/HIR 保留完整状态投影 | 只覆盖一个代表 trace，不是全状态机 |
-| 图与证据关系 | caption 和正文说明，图本身不携带结构化 evidence | 技术图/HIR metadata 强，但颜色几乎全被 evidence state 占用 | HIR + story spec + Mermaid source + 受事实约束的读者 PNG；prompt/hash/review metadata 可审计 | 需要 HTML viewer 才能把 metadata 变成可点交互 |
-| 比较与外部有效性 | 对比 OpenClaw/Hermes，并连接相关工作与未来方向 | 单仓库深挖 | 新增 alternatives，但没有完整跨仓库 synthesis | 需要用相同 Skill 分析更多 harness 后再横向比较 |
-| 失败与不确定性 | 有 limitations，但主要来自静态逆向边界 | 明确 blocked experiments、conditions 和最高价值 unknowns | 新章节继续保留，不被叙事图掩盖 | 高风险失败路径尚未在强隔离环境中执行 |
-| 可复现性 | 论文源码和 figure assets 可用 | manifest/HIR/evidence/scenario/trace/scripts 完整 | 新增 story spec、reader prompts、link/PNG audit | 还没有 commit-to-commit architecture diff CI |
+旧版生成图片、提示词和审核元数据保存在 [diagrams/generated](../diagrams/generated/README.md)，用于追溯历史产物。当前模型接口的说明以 S-024、修正后的 HIR 和正文为准；首次写入、压缩分支和事件顺序以本次新增证据为准。
+"""
 
-## 初版图片的具体问题
+REPORTS['claim-index.md'] = r"""# 结论索引
 
-初版 8 张图是合格的 evidence views，但不适合直接作为论文正文图：
+完整的结论、源码和实验链接见[源码与结论索引](14-source-claim-index.md)。机器可读版本见 [claims.jsonl](../evidence/claims.jsonl)。
+"""
 
-1. `attributes.layer` 按字符串排序，system overview 出现 context -> execution -> infrastructure -> interface 的阅读顺序。
-2. 节点几乎全部是绿色 observed，状态编码压过了 interface/model/state/policy 等语义差异。
-3. 所有 group 都是一列卡片，导致主路径弯折、toolResult 回边跨越多个 group。
-4. 2000px 左右横图缩进 Markdown 后字体偏小，edge label 与 node/edge 局部相撞。
-5. 节点显示 HIR type 对审计有用，对第一次阅读是额外噪声。
-6. 自动图试图同时表达当前产品路径、新 Harness、恢复、状态和观测，没有单一视觉论点。
+REPORTS['17-external-perspectives.md'] = r"""# 外部解读与当前源码的对照
 
-论文图更清楚的原因不是“更花哨”，而是每张图有不同的人工语义投影：system overview 只保留七个责任，turn flow 明确重复 iteration，extension 图围绕三个 injection points，context 图按加载时机和可变性组织。它没有把整个 call graph 交给一种布局算法。
+本轮从作者文章、使用者记录、源码分析和产品评测中筛选了 16 篇页面。15 篇阅读了相关正文，1 篇只能读取元数据与搜索摘要。实现仍固定在 `v0.80.7 / 818d674` 的当前 AgentSession 路径；完整来源信息见 [external-sources.json](../evidence/external-sources.json)。
 
-## 本轮采用的改进
+## 吸收的阅读角度
 
-- 把 8 张 HIR 图定义为 technical evidence views，不再默认承担正文解释。
-- 新增 `story-specs.json`，以人工语义选择 + 确定性 renderer 生成 5 张正文叙事图（总览、turn、context、extension、design space）。
-- 新增 gpt-image-2 reader illustration 层，覆盖全部 8 张唯一正文图，以论文式图标、短标签和单一视觉论点降低阅读门槛；caption 直接链接 HIR、story spec 和 evidence metadata。
-- 对生成图执行语义拒绝机制：context v1 因把 tool result 画成直达 model 而被隔离，收紧 prompt 后的 v2 才进入报告。
-- 叙事图中的每个实现节点保留 `hir_ids`，每条材料边保留 `evidence_ids`；concept 节点必须有 claim/evidence。
-- 使用责任语义色，证据状态改由实线、虚线、点线和 caption 表达。
-- 加入六个 design questions、真实 running example 和跨决策张力。
-- 新增 output audit，检查 Markdown links、PNG IHDR 尺寸、prompt/output 哈希、semantic review metadata 和极端 aspect ratio。
-- 要求最终 raster inspection；XML 可解析不再等价于图像质量合格。
+“极简”可以帮助确定检查顺序：看模型请求中实际有什么，再看是谁决定加入这些内容。作者的上下文控制动机已放入[上下文章节](04-context-memory-compaction.md)，与 system prompt、active tools、context hook 和会话分支的具体入口对应。这里没有把短 prompt 写成普遍的性能优势。
 
-## 尚未追平论文的部分
+扩展的作用需要沿着持久状态、reload 和工具 registry 一起看。使用者写出一段扩展后，怎样继续修改并恢复状态，比“能注册一个函数”更能解释接口的用途。[工具与扩展章节](05-models-tools-extensions.md)补充了工具结果的两个消费方和资源重建顺序。
 
-1. **比较研究。** 当前只有 Pi 单项目，不能得出跨 harness recurring patterns；论文通过 OpenClaw/Hermes 对比解释 deployment context。
-2. **文献与产品语境。** Pi 报告没有系统连接 coding-agent taxonomy、治理、长期开发者能力或实证研究。
-3. **全路径 running example。** 当前例子真实但只读；论文案例可以在叙事上贯穿 permission、write、subagent 和 persistence，虽然不等于每条都动态验证。
-4. **视觉出版物。** 当前是 Markdown + reader PNG + structured evidence model，仍没有统一的 HTML/PDF 排版、交叉引用编号、参考文献系统和响应式交互。
-5. **强隔离故障实验。** 对 bash、write、tool timeout、container routing、subagent crash、JSONL corruption 的结论仍主要是静态或单元测试证据。
+树状会话适合解释临时探索后回到主线的过程。配合 `branchWithSummary()`，可以选择带回哪些对话信息；文件副作用则沿真实工作区保留。这一工作流已融入[会话章节](08-sessions-persistence-recovery.md)。
 
-最合理的下一阶段不是继续增加自由文本，而是选择 disposable VM 中的真实 edit-and-test running example，补齐 side-effect/failure matrix，再用相同 codebook 独立分析第二、第三个 harness，最后做跨项目 design-space synthesis。
+队列和事件也有使用者层面的含义。steering 与 follow-up 给出不同的输入消费时机；事件完成与任务验收则是两种观测结果。这些解释分别放入[循环](03-core-loop.md)和[可观测性](09-observability.md)，并继续保留源码条件。
+
+## 哪些说法需要修正或限定
+
+| 外部表述 | 对照固定版本后的处理 |
+|---|---|
+| 部分文章概括为只有四个内置工具 | 当前定义有七个名称，默认 active set 为 read/bash/edit/write。原作者也提到可选只读工具。按 registry 与 active set 分开描述。 |
+| 把最近约 20000 token 与 reserve 混称 | `reserveTokens=16384` 用于触发阈值；`keepRecentTokens=20000` 用于保留片段估算，见 S-028/S-029。 |
+| 将 follow-up 说成等待整个 run settled 后才开始 | 当前低层 loop 在发出 agent_end 前先检查 follow-up，产品 settled 更晚，见 S-001/S-019。 |
+| 将 SYSTEM.md 说成改系统提示的唯一入口 | 当前 `before_agent_start` 也能提供 system prompt，SDK 还有配置路径。按具体入口解释，见 S-002/S-004。 |
+| 使用 agent/pre-step、agent/request 等 hook 名称 | 本报告核对的接口名是 context、before_agent_start、before_provider_request 等；未把社区层或其他版本名称套到当前类型。 |
+| 较新分析使用 prepareRequest、context_edit 等机制 | 这些文章标注的是其他版本；只保留其阅读视角，具体功能不回填到本版本。 |
+| 由个人成本案例、产品评分或标题推断“极简总是更好” | 未采纳这类普遍结论。原作者的 MCP/CLI 实验也有不同任务与评测对象，不能当作本报告的 Pi 测量。 |
+
+四工具概括可见 [PiLot](https://www.pivscode.com/blog/pi-minimal-extensible-coding-agent/) 与 [Holbreich](https://alexander.holbreich.org/posts/2026/pi-coding-agent/)；预算用语见 [Haochuan](https://blog.haochuanz.net/posts/agent-harness-04-pi)；follow-up 表述见 [Shilin](https://edward40.com/p/pi-agent-internal/)；提示与 hook 名称见 [Walking Labs](https://walkinglabs.github.io/learn-harness-engineering/zh/harness-designs/pi/)；较新版本例子见 [Rememorio](https://rememorio.github.io/blog/agent-framework/en/pi-agent-harness/)。它们提供待核对的解释，表中的实现判断来自固定源码。
+
+## 来源与采用范围
+
+| 来源 | 日期或版本 | 本报告如何使用 |
+|---|---|---|
+| [B-01 · Mario Zechner：作者的 Pi 设计回顾](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/) | 2025-11-30；早期实现，未固定本报告 commit | 控制上下文、检查交互；工具内容与显示数据分工。 |
+| [B-02 · Armin Ronacher：Pi 与可定制工作流](https://lucumr.pocoo.org/2026/1/31/pi/) | 2026-01-31；早期使用体验，未固定 commit | 扩展状态、热重载和树状会话支持迭代工作流。 |
+| [B-03 · Mario Zechner：浏览器脚本与按需说明](https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/) | 2025-11-02；浏览器工具案例；非 v0.80.7 实验 | 通过按需读取说明和脚本组合提供额外能力。 |
+| [B-04 · Mario Zechner：MCP / CLI 终端工具实验](https://mariozechner.at/posts/2025-08-15-mcp-vs-cli/) | 2025-08-15；Claude Code 与终端工具比较；不是 Pi 评测 | 原实验没有给出 CLI 对 MCP 的普遍胜负结论。 |
+| [B-05 · Haochuan：双队列、会话树与边界](https://blog.haochuanz.net/posts/agent-harness-04-pi) | 2026-08-25；文章声明 8fa7eebd2353；与 818d674 不同 | 双队列对应两种输入时机；压缩预算术语需修正。 |
+| [B-06 · Shilin：内部机制导读](https://edward40.com/p/pi-agent-internal/) | 2026-07-21；发布日期接近，但源码链接未固定本报告 commit | 应用消息与 provider 格式分离；据此追查数据转换。 |
+| [B-07 · Rememorio：v1.0.0 源码导读](https://rememorio.github.io/blog/agent-framework/en/pi-agent-harness/) | 日期未明示；明确固定 v1.0.0 / a13d35a742c6ef8462812a28fbe1d8c8b7431c32 | 可参考存储历史、分支、请求三种视图的阅读方式。 |
+| [B-08 · Walking Labs：中文 Harness 设计拆解](https://walkinglabs.github.io/learn-harness-engineering/zh/harness-designs/pi/) | 日期未明示；未固定版本，混合主项目与社区扩展 | 扩展可编程性是有用视角；接口名须逐项核查。 |
+| [B-09 · Kahtaf Alam：领域 Agent 构建记录](https://kahtaf.com/blog/lessons-from-building-a-domain-agent/) | 2026-06-22；OpenCandle 的应用层经验，非本报告实验 | 按职责和轨迹定位失败，并单独评价产物。 |
+| [B-10 · Scott Spence：my-pi 构建与观测](https://scottspence.com/posts/building-my-pi-claude-code-alternative-with-pi) | 2026-04-26；持续更新的 my-pi 派生配置，未固定 Pi commit | telemetry 区分运行故障与已完成但答错的结果。 |
+| [B-11 · Julian Prokay：pic 任务管理扩展](https://jprokay.com/post/018-pi-coding-agent) | 2026-02-15；自建 pic CLI / task extension | 任务状态由 CLI/SQLite 管理，extension 负责交互。 |
+| [B-12 · Alexander Holbreich：定制工具的投入](https://alexander.holbreich.org/posts/2026/pi-coding-agent/) | 2026-06-03；未固定版本，含当时产品与价格比较 | 定制能力伴随维护工作流的投入。 |
+| [B-13 · DeepakNess：日常配置与使用](https://deepakness.com/blog/pi-agent-setup) | 2026-05-29；页面标注更新 2026-08-14；个人配置含扩展 | 日常使用涉及模型选择、队列和定制界面。 |
+| [B-14 · DevOpsTales：v0.84.2 产品评测](https://devopstales.github.io/ai/pi-coding-agent-review/) | 2026-09-07；声明对齐 v0.84.2；晚于目标版本 | 阅读其上手与治理讨论，机制仍核对本地版本。 |
+| [B-15 · PiLot Studio：PiLot 产品方解读](https://www.pivscode.com/blog/pi-minimal-extensible-coding-agent/) | 2026-09-23；VS Code 产品方文章，主要转述作者论点 | 可作生态入口；默认工具数与 registry 数需区分。 |
+| [B-16 · Matteo Chieppa：工具栈入门指南](https://www.matteochieppa.com/en/blog/pi-coding-agent-complete-guide) | 2026-04-05；搜索摘要声明 2026-04-27 / v0.70.2；正文读取受客户端渲染限制 | 检索用于发现工具/资源分层线索，未据此新增机制结论。 |
+
+作者原文提供其当时的设计目的，使用者文章提供具体工作方式，代码解读提供追查线索。转述同一原文的多篇文章不构成多份独立验证。后续版本的文章只用于识别版本边界，本报告没有据此扩大到新版实现或新增性能结论。
+"""
+
+REPORTS['reading-guide.md'] = r"""# 专题阅读与查证索引
+
+[Pi Agent Harness 分析报告](index.md)是可以连续阅读的主文。下面的资料用于追查具体机制，不要求按文件编号逐篇读完。
+
+## 从一个操作追到代码
+
+- [一次请求的运行过程](00-task-walkthrough.md)：历史 read 场景及其事件路径。
+- [入口、对象与生命周期](02-interfaces-lifecycle.md)：对象关系，turn 与三个结束事件的例子。
+- [核心循环与工具执行](03-core-loop.md)：参数准备、并发排序、队列与错误回填。
+- [AgentSession 的状态与运行收尾](10-implementation-details.md)：配置刷新、代码规则触发的重试、退避与最终收尾。
+
+## 理解消息、状态与扩展
+
+- [上下文、消息转换与压缩](04-context-memory-compaction.md)：持久历史、当前分支、请求视图，custom/Bash/摘要的转换例子，以及压缩切点、长任务分段和压缩期间的输入队列。
+- [从 Pi 的请求到模型输入](18-model-input-encoding.md)：API 字段、对话模板与 token，以及 Qwen3.8-27B / DeepSeek V4 Flash 的工具格式对照。
+- [模型接口、工具与扩展](05-models-tools-extensions.md)：模型分派、工具 registry、content/details 与 reload。
+- [会话、持久化与恢复](08-sessions-persistence-recovery.md)：首次写入、分支、fork 和重新打开文件。
+
+## 查看执行边界和旁支
+
+- [项目信任、执行权限与工作区](06-permissions-sandbox-workspace.md)：trust、hook 与部署隔离分别控制什么。
+- [子代理与多进程编排](07-subagents-delegation.md)：扩展示例及实验性实例管理的旁支资料。
+- [事件与可观测性](09-observability.md)：事件说明了什么，以及任务验收还需要什么。
+
+## 查证范围和依据
+
+- [范围与方法](01-scope-method.md)：固定版本、证据分类和分析范围。
+- [实验记录](11-runtime-experiments.md)、[失败与待验证路径](12-failure-modes-open-questions.md)、[覆盖与复现](13-coverage-reproducibility.md)。
+- [源码与结论索引](14-source-claim-index.md)、[术语表](16-glossary.md)、[外部解读与源码对照](17-external-perspectives.md)。
+
+这些资料保留详细参数、源码编号和实验状态，供需要深入核对时使用。
 """
 
 RUNTIME_TESTS = r"""# Runtime Test Record
@@ -995,16 +1431,219 @@ Exact test files are recorded in `evidence/observations.jsonl` (`X-001` through 
 ## Trace Handling
 
 Raw traces contain only synthetic prompts/files but may include model thinking. Normalized traces intentionally omit prompt text, assistant text/thinking, tool arguments and tool results. The report and HIR cite normalized traces.
+
+
+## 2026-10-20 mechanism recheck
+
+This is a new local mock/faux run on the same pinned commit. The real-provider
+records above remain historical; no external model was called in this recheck.
+
+Node 22.19.0 was downloaded from nodejs.org and its archive SHA-256 checked
+against the official SHASUMS256. See traces/checks/node-runtime-provenance.json.
+The runner exports pinned sources into a temporary directory, links existing
+dependencies, disables Vitest caching, and passes a restricted environment with
+no model credentials. It does not provide OS-level network isolation.
+
+Detailed commands and per-test results:
+
+- traces/checks/20261020/summary.json (X-004 through X-007)
+- traces/checks/20261020-followup/summary.json (X-008 and X-009)
+- traces/checks/20261020-cli/summary.json (X-010)
+
+The saved results contain 179 passed, 1 failed and 21 skipped entries. The
+initial CLI test in X-006 failed before the target behavior due to module
+loading. X-010 supplied the development tsx/tsconfig loader and passed that
+assertion; X-006 is preserved unchanged. X-005 skipped five real-model e2e
+tests without credentials; X-009 selected five file-validation tests and left
+sixteen tests outside its name filter.
+
+Runner: reproduce/run_mechanism_checks.py. Use --group to select a group and a
+new empty --output directory to preserve prior attempts.
+"""
+
+REPORTS['18-model-input-encoding.md'] = r"""# 从 Pi 的请求到模型真正收到的输入
+
+Pi 已经选好历史、放入压缩摘要，也准备好了 system prompt 和工具定义。它们怎样一起交给模型？这一步跨过了 Harness 与模型服务的边界：Pi 组织 API 请求，服务端再按模型的对话格式编码，模型最终处理 token 序列。[C: C-030]
+
+这里沿用“检查 Docker 配置”的例子。Pi 部分仍固定在 `v0.80.7 / 818d674`；模型侧对照的是 2026-10-21 查阅的 Qwen3.8-27B 官方模板和 DeepSeek V4 Flash 公开参考编码器。下文是源码串讲与简化示例，没有执行这两个模型，也没有抓取云端实际 prompt。外部 main 文件的版本边界与来源见[查阅记录](../evidence/model-input-sources.json)。
+
+## 三份字段怎样变成一条模型输入
+
+在 Pi 的统一接口层，请求 context 分别携带 `systemPrompt`、`messages` 和 `tools`。低层循环先处理消息转换，再把它们一起交给模型调用入口。之后还需要两次不同的转换：[S: S-001, S-037; D: D-013]
+
+```mermaid
+flowchart TD
+  A["Pi：systemPrompt、messages、tools"] --> B["Pi provider 适配器：API 请求字段"]
+  B --> C["模型服务：对话模板或专用编码器"]
+  C --> D["带角色边界和工具说明的序列"]
+  D --> E["Tokenizer：token IDs"]
+  E --> F["模型计算与生成"]
+  F --> G["服务端解析：回答、推理内容、工具调用"]
+  G --> H["Pi：展示回答或执行工具"]
+```
+
+对纯文本聊天，模板负责把角色和内容排成模型训练时使用的格式，tokenizer 再把它转成 token IDs。模型使用这些输入及已经生成的内容，继续预测后续 token。图中的边界表示职责；具体部署可能将多个阶段封装在同一个服务中。[对话模板](https://huggingface.co/docs/transformers/main/en/chat_templating)、[文本生成](https://huggingface.co/docs/transformers/main/en/llm_tutorial)
+
+## Pi 发出去的仍然是结构化请求
+
+选择 OpenAI 兼容 Chat Completions 接口时，下面是一份简化的请求体。模型名称是占位符，摘要和工具说明是教学内容，省略鉴权、采样和思考参数。
+
+```json
+{
+  "model": "MODEL_NAME",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是代码助手。先检查文件，再回答问题。"
+    },
+    {
+      "role": "user",
+      "content": "历史摘要：正在排查启动端口，已确认生产环境 PORT=8080。"
+    },
+    {
+      "role": "user",
+      "content": "请继续检查 Docker 配置。"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "read",
+        "description": "读取指定文件的内容",
+        "parameters": {
+          "type": "object",
+          "properties": {"path": {"type": "string"}},
+          "required": ["path"]
+        }
+      }
+    }
+  ]
+}
+```
+
+Pi 的 `openai-completions` 适配器将独立的 `systemPrompt` 放进 system 或 developer 消息，具体角色取决于模型和兼容配置；这里采用 system。工具的名称、描述和参数 schema 则进入独立的 `tools` 字段，工具执行函数不在其中。这是已检查的一个适配实现，实际入口还要看 [compat 的分派条件](05-models-tools-extensions.md#当前模型请求怎样分派)。[S: S-037]
+
+源码：[Context 组装](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/agent/src/agent-loop.ts#L287)、[system 消息转换](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/ai/src/api/openai-completions.ts#L878)、[工具定义转换](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/ai/src/api/openai-completions.ts#L1101)。
+
+## 同一份内容进入 Qwen3.8-27B
+
+查阅的官方模板在启用工具时，先写入可选思考强度指令、工具定义与调用格式要求，再接应用提供的 system 文本。下面保留主要边界，方括号表示省略内容；末尾采用开启思考的生成前缀。[S: S-038]
+
+```text
+<|im_start|>system
+〔可选的 reasoning effort 指令〕
+# Tools
+〔工具使用说明〕
+<tools>
+〔read 工具的 JSON schema〕
+</tools>
+〔工具调用格式要求〕
+
+你是代码助手。先检查文件，再回答问题。
+<|im_end|>
+<|im_start|>user
+历史摘要：正在排查启动端口，已确认生产环境 PORT=8080。
+<|im_end|>
+<|im_start|>user
+请继续检查 Docker 配置。
+<|im_end|>
+<|im_start|>assistant
+<think>
+```
+
+API 中单独传输的 tools，在这里已经进入 system 段。模型若选择读文件，生成的调用片段可以采用以下格式，再由服务端解析成结构化 `tool_calls`：
+
+```text
+<tool_call>
+<function=read>
+<parameter=path>
+Dockerfile
+</parameter>
+</function>
+</tool_call>
+```
+
+工具执行后，API 里的 tool 消息由此模板包装为 user 段中的 `<tool_response>`。因此，API 返回的调用 JSON 与模型原始生成文本、API 消息角色与最终序列标记，分别属于不同表示。[Qwen3.8-27B 官方模板](https://huggingface.co/Qwen/Qwen3.8-27B/blob/main/chat_template.jinja)
+
+## 同一份内容进入 DeepSeek V4 Flash
+
+公开参考编码器采用另一套标记。普通 system 消息先写正文，再附工具说明；下例同样开启思考，未加入 max effort 的额外前缀。[S: S-039]
+
+```text
+<｜begin▁of▁sentence｜>
+你是代码助手。先检查文件，再回答问题。
+
+## Tools
+〔DSML 调用格式说明〕
+### Available Tool Schemas
+〔read 的函数定义与参数 schema〕
+
+<｜User｜>历史摘要：正在排查启动端口，已确认生产环境 PORT=8080。
+<｜User｜>请继续检查 Docker 配置。
+<｜Assistant｜><think>
+```
+
+该编码器内部把 tools 放在 system 消息上参与渲染；这是参考函数的输入结构，不能直接照搬为 HTTP 请求体。它生成和解析的工具调用使用 DSML，例如：
+
+```text
+<｜DSML｜tool_calls>
+<｜DSML｜invoke name="read">
+<｜DSML｜parameter name="path" string="true">Dockerfile</｜DSML｜parameter>
+</｜DSML｜invoke>
+</｜DSML｜tool_calls>
+```
+
+工具结果经过预处理，变成 user 内容中的 `<tool_result>` 块。公开实现提供了从消息到序列、再从生成文本到结构化结果的两向转换。[参考编码器](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/blob/main/encoding/encoding_dsv4.py)、[格式说明](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash/blob/main/encoding/README.md)
+
+两种示例最容易混淆的位置，可以放在一起对照：
+
+| 位置 | Qwen3.8-27B 查阅模板 | DeepSeek V4 Flash 查阅编码器 |
+|---|---|---|
+| 角色边界 | im_start / im_end | User / Assistant 等专用标记 |
+| 工具定义 | 本例中位于 system 段内、应用 system 文本之前 | 本例中附在 system 文本之后 |
+| 工具调用 | tool_call、function、parameter | DSML tool_calls、invoke、parameter |
+| 工具结果 | user 段中的 tool_response | user 内容中的 tool_result |
+
+这些位置由具体模板决定。相同 API 字段可以被服务端编码成不同序列；同一模型也可能因模板版本、思考设置或服务端覆盖而改变输入格式。上述对照不覆盖整个 Qwen3.8 系列，也不等于确认了任一家云端的完整内部处理。
+
+## 文件还是由 Pi 来读取
+
+模型根据输入生成工具调用后，服务端解析调用并返回给 Pi。Pi 才查找 `read` 的执行函数、检查参数并读取工作区文件，然后把结果加入消息列表，发起下一次模型请求。下一次输入包含先前对话、刚才的调用和文件结果，模型据此继续分析。[S: S-001] [DeepSeek 工具调用示例](https://api-docs.deepseek.com/guides/tool_calls/)也展示了调用方执行工具、再把结果交回模型的流程。
+
+`<think>` 等标记表达生成格式，实际推理来自模型计算。工具定义告诉模型可请求什么动作及其参数，执行动作的代码仍由 Harness 持有。
+
+这也接回了前面的压缩：压缩主要改变 Pi 选给模型的 messages。旧历史被摘要代表之后，仍通过同一套 API 适配、对话编码和分词流程进入模型。模型模板通常只看到一条带摘要说明的普通消息；[摘要、近期消息和新输入如何排列](04-context-memory-compaction.md#压缩后的消息列表长什么样)，由更早的会话重建步骤决定。
 """
 
 
-def main() -> int:
-    REPORT.mkdir(parents=True, exist_ok=True)
+def build_claim_index():
+    claims = [json.loads(line) for line in (ROOT/'evidence/claims.jsonl').read_text().splitlines() if line]
+    evidence = {item['id']: item for item in (json.loads(line) for line in (ROOT/'evidence/observations.jsonl').read_text().splitlines() if line)}
+    lines = ['# 源码与结论索引', '', '结论沿用历史编号，仅列当前 AgentSession 路径采用的记录。完整条件和反例检查保存在 [claims.jsonl](../evidence/claims.jsonl)。', '']
+    for claim in claims:
+        if claim.get('conditions', {}).get('report_scope') == 'historical_only':
+            continue
+        lines.extend([f"## {claim['id']}", '', claim['statement'], ''])
+        for eid in claim['evidence_ids']:
+            item = evidence[eid]
+            src = item['source']
+            path = src.get('path', '')
+            if item['kind'] in ['D', 'S'] and path:
+                url = SOURCE + path + (f"#L{src['start_line']}" if src.get('start_line') else '')
+            else:
+                url = '../' + path if path else '../evidence/observations.jsonl'
+            lines.append(f"- [{eid}]({url})：{item['summary']}")
+        lines.extend(['', f"范围：{claim['scope']}。状态：{claim['status']}；置信度：{claim['confidence']}。", ''])
+    return '\n'.join(lines)
+
+
+def main():
+    REPORT.mkdir(exist_ok=True)
+    REPORTS['14-source-claim-index.md'] = build_claim_index()
     for name, content in REPORTS.items():
-        (REPORT / name).write_text(content.strip() + "\n", encoding="utf-8")
-    (ROOT / "runtime-tests.md").write_text(RUNTIME_TESTS.strip() + "\n", encoding="utf-8")
-    return 0
+        (REPORT / name).write_text(content.strip() + "\n")
+    (ROOT / 'runtime-tests.md').write_text(RUNTIME_TESTS.strip() + "\n")
 
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+if __name__ == '__main__':
+    main()

@@ -48,3 +48,31 @@ Exact test files are recorded in `evidence/observations.jsonl` (`X-001` through 
 ## Trace Handling
 
 Raw traces contain only synthetic prompts/files but may include model thinking. Normalized traces intentionally omit prompt text, assistant text/thinking, tool arguments and tool results. The report and HIR cite normalized traces.
+
+
+## 2026-10-20 mechanism recheck
+
+This is a new local mock/faux run on the same pinned commit. The real-provider
+records above remain historical; no external model was called in this recheck.
+
+Node 22.19.0 was downloaded from nodejs.org and its archive SHA-256 checked
+against the official SHASUMS256. See traces/checks/node-runtime-provenance.json.
+The runner exports pinned sources into a temporary directory, links existing
+dependencies, disables Vitest caching, and passes a restricted environment with
+no model credentials. It does not provide OS-level network isolation.
+
+Detailed commands and per-test results:
+
+- traces/checks/20261020/summary.json (X-004 through X-007)
+- traces/checks/20261020-followup/summary.json (X-008 and X-009)
+- traces/checks/20261020-cli/summary.json (X-010)
+
+The saved results contain 179 passed, 1 failed and 21 skipped entries. The
+initial CLI test in X-006 failed before the target behavior due to module
+loading. X-010 supplied the development tsx/tsconfig loader and passed that
+assertion; X-006 is preserved unchanged. X-005 skipped five real-model e2e
+tests without credentials; X-009 selected five file-validation tests and left
+sixteen tests outside its name filter.
+
+Runner: reproduce/run_mechanism_checks.py. Use --group to select a group and a
+new empty --output directory to preserve prior attempts.

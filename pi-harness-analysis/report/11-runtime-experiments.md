@@ -1,56 +1,41 @@
-# 11 运行实验
+# 实验记录
 
-完整命令和结果见 [runtime-tests.md](../runtime-tests.md)，场景机器可读记录见 [catalog.json](../scenarios/catalog.json)。
+本报告保留两批证据：2026 年 7 月的真实 SiFlow 场景和首次定向测试，以及 2026-10-20 的源码复核与本地 mock/faux 检查。本次没有调用外部模型。
 
-| 场景组 | 执行对象 | 预声明断言 | 结果 | 主要 artifact | 解释边界 |
-|---|---|---|---|---|---|
-| R-001 | 真实 SiFlow text-only | 1 turn、0 tool、最终 settled | 通过，`PI_TEXT_OK` | `traces/normalized/R-001-text-only.normalized.jsonl` | 仅最短 JSON-mode 路径 |
-| R-002 | 真实 SiFlow + read fixture | 必须先 toolUse，再带 toolResult 二次请求 | 通过，2 turns、1 tool、`314159` | `traces/normalized/R-002-read-tool.normalized.jsonl` | 只读；未覆盖 permission/sandbox |
-| R-003/004 | 两个独立 Pi 进程 | 第二次 prompt 不重发 token仍可恢复 | 通过，`PI_RESUME_2718` | `traces/raw/R-004-session-state.jsonl` + normalized traces | 正常 JSONL 尾部；无 corruption |
-| X-001 | agent-core faux provider | loop、双顺序、hooks、queue、length-stop contract | 39/39 passed | 固定 test files 见 `X-001` | 不评价真实模型行为 |
-| X-002 | 新 `AgentHarness` | snapshot/save point、pending writes、helpers | 61/61 passed | 固定 test files 见 `X-002` | 不代表 Coding Agent 已迁移 |
-| X-003 | Coding Agent recovery | compaction/retry/context rebuild 分层 | 31/31 passed | 固定 test files 见 `X-003` | 未注入 OS crash/真实长上下文 |
+## 历史真实模型场景
 
-## R-SCENARIO-001：最短文本路径
+| 场景 | 实际观察 | 记录 |
+|---|---|---|
+| R-001 文本 | 一轮 assistant，无工具，最终 settled | [normalized trace](../traces/normalized/R-001-text-only.normalized.jsonl) |
+| R-002 read | 两轮模型处理，一次 read，最终返回合成值 314159 | [normalized trace](../traces/normalized/R-002-read-tool.normalized.jsonl) |
+| R-003 创建会话 | 记录合成 token 并写入 session | [normalized trace](../traces/normalized/R-003-session-create.normalized.jsonl) |
+| R-004 恢复会话 | 独立新进程在未重发 token 时返回 PI_RESUME_2718 | [normalized trace](../traces/normalized/R-004-session-resume.normalized.jsonl) |
 
-- 配置：JSON mode、no session、no tools、禁 extensions/skills/templates/context files。
-- 预期：一次 turn，无 tool event，最终 settled。
-- 结果：通过，最终 `PI_TEXT_OK`；1 turn、0 tool。
-- 证据：`R-001`；normalized trace `traces/normalized/R-001-text-only.normalized.jsonl`。
+另有 R-005 的模型发现记录，以及当前路径的旧 X-001/X-003 的 39、31 项定向测试。原命令与环境摘要保存在 [runtime-tests.md](../runtime-tests.md)。这些数字属于历史执行，不合并成此次新测试的通过数。
 
-## R-SCENARIO-002：真实 read tool loop
+## 本次定向检查
 
-- Fixture：`fixture.txt` 含合成未知值 `PI_FIXTURE_VALUE=314159`。
-- 配置：只开放 `read`。
-- 预期：模型必须 toolUse，result 回填后再次调用模型。
-- 结果：通过；2 turn、1 tool start/end、最终 `314159`。
-- 证据：`R-002`。
+下表直接对应保存的 Vitest 结果。通过、失败和跳过分别列出；只用执行通过的具体断言支持行为结论。
 
-## R-SCENARIO-003/004：跨进程 resume
+| 检查 | 通过 | 失败 | 跳过 | 内容与产物 |
+|---|---:|---:|---:|---|
+| X-004 | 39 | 0 | 0 | [Agent 与低层 loop](../traces/checks/20261020/X-004.vitest.json) |
+| X-005 | 12 | 0 | 5 | [产品事件、动态工具、重试、压缩后队列](../traces/checks/20261020/X-005.vitest.json) |
+| X-006 | 46 | 1 | 0 | [session context/tree 与首次 CLI 尝试](../traces/checks/20261020/X-006.vitest.json) |
+| X-008 | 15 | 0 | 0 | [faux compaction 与发送前压缩](../traces/checks/20261020-followup/X-008.vitest.json) |
+| X-009 | 5 | 0 | 16 | [setSessionFile 名称筛选](../traces/checks/20261020-followup/X-009.vitest.json) |
+| X-010 | 1 | 0 | 0 | [CLI + tsx 对照](../traces/checks/20261020-cli/X-010.vitest.json) |
 
-- 进程 A：持久 session `analysis-resume-001`，记忆合成 token。
-- 进程 B：相同 session-id，不在 prompt 重复 token。
-- 结果：A 返回 ACK，B 返回 `PI_RESUME_2718`。
-- 证据：`R-003`, `R-004`。
+核心循环组重新验证 loop、工具排序、hook 和队列。产品层组检查异步 `message_end` 的记录顺序、动态工具、重试和压缩后队列。持久化组检查 context projection 与分支树。补充组检查当前产品压缩条件、非法文件处理与 CLI 错误呈现。
 
-## X-SCENARIO-001：agent-core faux provider
+## 一次失败怎样定位
 
-- Files：`agent-loop.test.ts`, `agent.test.ts`。
-- 结果：2 files，39 tests passed。
-- 覆盖：parallel/sequential、hooks、queue、termination、length stop、event settlement。
+X-006 中的 46 项进程内检查通过，CLI 用例在子进程解析模块时退出，尚未进入被测的 session 文件校验路径。该测试直接以 Node 启动 `cli.ts`，临时运行环境最初没有配上 Pi 开发入口使用的 tsx/tsconfig 加载方式。
 
-## X-SCENARIO-002：新 AgentHarness
+X-009 先单独验证 `SessionManager.setSessionFile`：空文件初始化、非法非空文件拒绝与内容保留均通过。X-010 再给 CLI 用例补上 tsx 加载环境，验证友好错误和原文件不变，结果通过。原 X-006 记录保持失败状态，后续成功记录没有覆盖它。
 
-- Files：`agent-harness.test.ts`, `session.test.ts`, `compaction.test.ts`。
-- 结果：3 files，61 tests passed。
-- 覆盖：save point refresh、pending write ordering、hooks、abort、session/compaction helpers。
+## 跳过项与运行边界
 
-## X-SCENARIO-003：Coding Agent recovery
+X-005 的五项真实模型 compaction e2e 因没有凭据而跳过，不能算作压缩验证；相应 controller 行为使用 X-008 的 faux 测试补充。X-009 通过名称筛选只运行五项文件校验用例，其余十六项未选用。
 
-- Files：`agent-session-compaction.test.ts`, network retry regression, session build-context。
-- 结果：3 files，31 tests passed。
-- 覆盖：overflow/threshold compaction、bounded retry、active context rebuild。
-
-## 意外观察
-
-自定义 model 声明 `reasoning:false` 且 `supportsReasoningEffort:false`，但 SiFlow 服务端仍流出 thinking block。此前直接 endpoint smoke test 通过 `chat_template_kwargs.enable_thinking=false` 可关闭；Pi 的 standard models.json path 本轮没有注入该 request body。该差异不否定 harness loop，但 raw trace 可能包含 reasoning，已在 normalized trace 中移除。
+当前范围选用 118 个 passed、1 个 failed、21 个 skipped 的测试条目，其中 CLI 的同一断言先失败后单独通过。这里统计的是当前路径的执行记录。范围外的历史测试仍保存在原始结果与 [runtime-tests.md](../runtime-tests.md)，不计入本表。摘要信息保存在各批次的 `summary.json`，执行脚本见[复现方法](13-coverage-reproducibility.md)。

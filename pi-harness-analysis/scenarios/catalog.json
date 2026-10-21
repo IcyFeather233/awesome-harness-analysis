@@ -81,7 +81,8 @@
       "mode": "scripted-faux",
       "result": "61/61",
       "status": "passed",
-      "title": "new AgentHarness tests"
+      "title": "new AgentHarness tests",
+      "report_scope": "historical_only"
     },
     {
       "id": "X-SCENARIO-003",
@@ -89,6 +90,224 @@
       "result": "31/31",
       "status": "passed",
       "title": "Coding Agent compaction/retry/session tests"
+    },
+    {
+      "id": "X-SCENARIO-004",
+      "title": "Mechanism recheck X-004: agent",
+      "mode": "scripted",
+      "status": "passed",
+      "claims_tested": [
+        "C-002",
+        "C-015",
+        "C-020"
+      ],
+      "configuration": {
+        "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+        "node": "v22.19.0",
+        "config": "vitest.config.ts"
+      },
+      "test_files": [
+        "test/agent-loop.test.ts",
+        "test/agent.test.ts"
+      ],
+      "result": {
+        "passed": 39,
+        "failed": 0,
+        "skipped": 0,
+        "exit_code": 0,
+        "evidence_ids": [
+          "X-004"
+        ],
+        "artifact": "traces/checks/20261020/X-004.vitest.json"
+      },
+      "notes": "2026-10-20 agent 定向测试：39 passed，0 failed，0 skipped；exit=0。"
+    },
+    {
+      "id": "X-SCENARIO-005",
+      "title": "Mechanism recheck X-005: coding-agent",
+      "mode": "scripted",
+      "status": "passed",
+      "claims_tested": [
+        "C-004",
+        "C-009",
+        "C-020",
+        "C-022",
+        "C-024",
+        "C-026"
+      ],
+      "configuration": {
+        "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+        "node": "v22.19.0",
+        "config": "vitest.config.ts"
+      },
+      "test_files": [
+        "test/agent-session-compaction.test.ts",
+        "test/agent-session-auto-compaction-queue.test.ts",
+        "test/agent-session-dynamic-tools.test.ts",
+        "test/suite/regressions/1717-2113-agent-session-event-settlement.test.ts",
+        "test/suite/regressions/3317-network-connection-lost-retry.test.ts"
+      ],
+      "result": {
+        "passed": 12,
+        "failed": 0,
+        "skipped": 5,
+        "exit_code": 0,
+        "evidence_ids": [
+          "X-005"
+        ],
+        "artifact": "traces/checks/20261020/X-005.vitest.json"
+      },
+      "notes": "2026-10-20 coding-agent 定向测试：12 passed，0 failed，5 skipped；exit=0。5 项真实模型 e2e 因未提供凭据跳过；通过项包含 settlement、动态工具、网络错误重试与压缩后队列。"
+    },
+    {
+      "id": "X-SCENARIO-006",
+      "title": "Mechanism recheck X-006: coding-agent",
+      "mode": "scripted",
+      "status": "partial",
+      "claims_tested": [
+        "C-008",
+        "C-023"
+      ],
+      "configuration": {
+        "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+        "node": "v22.19.0",
+        "config": "vitest.config.ts"
+      },
+      "test_files": [
+        "test/session-manager/build-context.test.ts",
+        "test/session-manager/tree-traversal.test.ts",
+        "test/session-file-invalid.test.ts"
+      ],
+      "result": {
+        "passed": 46,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "evidence_ids": [
+          "X-006"
+        ],
+        "artifact": "traces/checks/20261020/X-006.vitest.json"
+      },
+      "notes": "2026-10-20 coding-agent 定向测试：46 passed，1 failed，0 skipped；exit=1。失败发生于 CLI 子进程模块解析；46 项进程内 context/tree 测试通过，后续 X-010 加载器对照单独记录。"
+    },
+    {
+      "id": "X-SCENARIO-007",
+      "title": "Mechanism recheck X-007: agent",
+      "mode": "scripted",
+      "status": "passed",
+      "claims_tested": [
+        "C-010",
+        "C-016"
+      ],
+      "configuration": {
+        "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+        "node": "v22.19.0",
+        "config": "vitest.harness.config.ts"
+      },
+      "test_files": [
+        "test/harness/agent-harness.test.ts",
+        "test/harness/session.test.ts",
+        "test/harness/compaction.test.ts"
+      ],
+      "result": {
+        "passed": 61,
+        "failed": 0,
+        "skipped": 0,
+        "exit_code": 0,
+        "evidence_ids": [
+          "X-007"
+        ],
+        "artifact": "traces/checks/20261020/X-007.vitest.json"
+      },
+      "notes": "2026-10-20 agent 定向测试：61 passed，0 failed，0 skipped；exit=0。",
+      "report_scope": "historical_only"
+    },
+    {
+      "id": "X-SCENARIO-010",
+      "title": "Mechanism recheck X-010: coding-agent",
+      "mode": "scripted",
+      "status": "passed",
+      "claims_tested": [
+        "C-008"
+      ],
+      "configuration": {
+        "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+        "node": "v22.19.0",
+        "config": "vitest.config.ts"
+      },
+      "test_files": [
+        "test/session-file-invalid.test.ts"
+      ],
+      "result": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "exit_code": 0,
+        "evidence_ids": [
+          "X-010"
+        ],
+        "artifact": "traces/checks/20261020-cli/X-010.vitest.json"
+      },
+      "notes": "2026-10-20 coding-agent 定向测试：1 passed，0 failed，0 skipped；exit=0。"
+    },
+    {
+      "id": "X-SCENARIO-008",
+      "title": "Mechanism recheck X-008: coding-agent",
+      "mode": "scripted",
+      "status": "passed",
+      "claims_tested": [
+        "C-009",
+        "C-020",
+        "C-024"
+      ],
+      "configuration": {
+        "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+        "node": "v22.19.0",
+        "config": "vitest.config.ts"
+      },
+      "test_files": [
+        "test/suite/agent-session-compaction.test.ts",
+        "test/suite/regressions/pre-prompt-compaction-no-continue.test.ts"
+      ],
+      "result": {
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "exit_code": 0,
+        "evidence_ids": [
+          "X-008"
+        ],
+        "artifact": "traces/checks/20261020-followup/X-008.vitest.json"
+      },
+      "notes": "2026-10-20 coding-agent 定向测试：15 passed，0 failed，0 skipped；exit=0。"
+    },
+    {
+      "id": "X-SCENARIO-009",
+      "title": "Mechanism recheck X-009: coding-agent",
+      "mode": "scripted",
+      "status": "passed",
+      "claims_tested": [
+        "C-008"
+      ],
+      "configuration": {
+        "commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+        "node": "v22.19.0",
+        "config": "vitest.config.ts"
+      },
+      "test_files": [
+        "test/session-manager/file-operations.test.ts"
+      ],
+      "result": {
+        "passed": 5,
+        "failed": 0,
+        "skipped": 16,
+        "exit_code": 0,
+        "evidence_ids": [
+          "X-009"
+        ],
+        "artifact": "traces/checks/20261020-followup/X-009.vitest.json"
+      },
+      "notes": "2026-10-20 coding-agent 定向测试：5 passed，0 failed，16 skipped；exit=0。仅选择 setSessionFile 组，16 项未选用；5 项空文件/非法文件处理检查通过。"
     }
   ],
   "schema_version": "1.0"

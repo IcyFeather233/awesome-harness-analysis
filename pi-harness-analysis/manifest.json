@@ -47,6 +47,11 @@
       "Docker/OpenShell",
       "production usage flags/configuration",
       "maintainer design intent beyond repository docs"
+    ],
+    "report_focus": "current AgentSession implementation",
+    "excluded_from_report": [
+      "packages/agent/src/harness",
+      "new AgentHarness comparisons and migration"
     ]
   },
   "target": {
@@ -60,6 +65,78 @@
   "tooling": {
     "skill": "harness-analysis",
     "skill_commit": "7f2847d3cfa5d1964576ea99265ca83bbe234bf8",
-    "skill_schema_version": "1.0"
+    "skill_schema_version": "1.0",
+    "review_skill_sha256": "c2b7efa97cb18746354193240ff64dde1b11dc333cbc7cd5ef3f1a2ae4cdfec4"
+  },
+  "analysis_mode": "focused",
+  "objective": "解释当前 AgentSession → Agent → runAgentLoop 的代码实现，以及上下文、工具、事件、会话持久化与恢复。",
+  "last_reviewed_at": "2026-10-21",
+  "review": {
+    "historical_execution": "manifest.execution and R-001..R-005 describe the July analysis",
+    "current_execution": [
+      {
+        "artifact": "traces/checks/20261020/summary.json",
+        "node": "v22.19.0",
+        "started_at": "2026-10-20T13:28:26.280660+00:00",
+        "groups": [
+          "X-004",
+          "X-005",
+          "X-006",
+          "X-007"
+        ]
+      },
+      {
+        "artifact": "traces/checks/20261020-cli/summary.json",
+        "node": "v22.19.0",
+        "started_at": "2026-10-20T13:31:42.215719+00:00",
+        "groups": [
+          "X-010"
+        ]
+      },
+      {
+        "artifact": "traces/checks/20261020-followup/summary.json",
+        "node": "v22.19.0",
+        "started_at": "2026-10-20T13:30:22.638280+00:00",
+        "groups": [
+          "X-008",
+          "X-009"
+        ]
+      }
+    ],
+    "model_api_calls": 0,
+    "source_dirty": false,
+    "notes": "CLI 首次缺少 tsx 加载环境的失败与后续对照均保留。",
+    "report_test_totals": {
+      "passed": 118,
+      "failed": 1,
+      "skipped": 21,
+      "excluded_group_ids": [
+        "X-007"
+      ],
+      "note": "Scope projection of saved results; no new test run."
+    }
+  },
+  "presentation": {
+    "primary_article": "report/index.md",
+    "format": "explanatory blog",
+    "reference_guide": "report/reading-guide.md",
+    "approach": "Task-led narrative, terminology introduced in context, detailed evidence in linked references."
+  },
+  "external_reading": {
+    "retrieved_on": "2026-10-21",
+    "catalog": "evidence/external-sources.json",
+    "source_count": 16,
+    "relevant_sections_reviewed": 15,
+    "partial_retrieval": 1,
+    "target_commit_unchanged": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+    "new_runtime_experiments": 0,
+    "integration": "Attributed views in mechanism chapters; source-checked corrections and a separate literature guide."
+  },
+  "model_input_review": {
+    "reviewed_on": "2026-10-21",
+    "source_catalog": "evidence/model-input-sources.json",
+    "chapter": "report/18-model-input-encoding.md",
+    "new_runtime_experiments": 0,
+    "scope": "Pi request adapter and separately reviewed external model input formats"
   }
 }

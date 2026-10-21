@@ -1,0 +1,21 @@
+{
+  "model": "gpt-image-2.5-flare",
+  "requested_size": "1536x1024",
+  "actual_size": "1536x1024",
+  "quality": "high",
+  "started_at": "2026-10-20T16:51:19.073593+00:00",
+  "completed_at": "2026-10-20T16:51:58.199357+00:00",
+  "endpoint_family": "configured OpenAI-compatible Responses/Images API",
+  "credential_source": "explicit_codex_configuration",
+  "generator_sha256": "f744c6850300e5ccb41c545691d621aac5be3d01b2d5820379dffb7710592ebe",
+  "prompt_sha256": "59782e723f498ae3b938d48c337ff0d70d4492cef534dfa564cac9342e211464",
+  "output_sha256": "3375c3dd86b3a441d1dddb659a5b023a809189eddbc70ae6f3c6658399b7594d",
+  "semantic_review": "passed",
+  "reviewed_dimensions": [
+    "full resolution",
+    "1200px report preview",
+    "800px narrow preview"
+  ],
+  "reviewed_at": "2026-10-20T16:56:45.195810+00:00",
+  "review_notes": "Reviewed actual labels, arrows, multiplicity, state boundaries, scope and readability against the figure contract and current report."
+}

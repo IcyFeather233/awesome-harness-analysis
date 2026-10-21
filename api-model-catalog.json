@@ -1,0 +1,144 @@
+{
+  "queried_at": "2026-10-20T16:48:20.808991+00:00",
+  "source": "active provider in user-authorized Codex configuration; GET /v1/models",
+  "configured_model": "gpt-6-astra",
+  "count": 27,
+  "models": [
+    {
+      "id": "codex-auto-review",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-4o-audio-preview",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-4o-realtime-preview",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.2",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.2-2025-12-11",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.2-chat-latest",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.2-pro",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.2-pro-2025-12-11",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.3-codex-spark",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.4",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.4-2026-03-05",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.4-mini",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.6",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.6-luna",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.6-sol",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-5.6-terra",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-6",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-6-astra",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-6-luna",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-6-sol",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-6.1-sol",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-image-1",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-image-1.5",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-image-2",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-image-2.5-flare",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-image-2.5-sunburst",
+      "owned_by": "openai",
+      "capability_fields": {}
+    },
+    {
+      "id": "gpt-reserve",
+      "owned_by": "openai",
+      "capability_fields": {}
+    }
+  ],
+  "note": "Advertised model IDs; no inference requests were made. Availability may depend on account, route and quota."
+}

@@ -1,0 +1,14 @@
+{
+  "model": "gpt-image-2.5-flare",
+  "requested_size": "1536x1024",
+  "actual_size": "1536x1024",
+  "quality": "high",
+  "started_at": "2026-10-20T16:51:17.901404+00:00",
+  "completed_at": "2026-10-20T16:52:36.712513+00:00",
+  "endpoint_family": "configured OpenAI-compatible Responses/Images API",
+  "credential_source": "explicit_codex_configuration",
+  "generator_sha256": "f744c6850300e5ccb41c545691d621aac5be3d01b2d5820379dffb7710592ebe",
+  "prompt_sha256": "854193a5f9bb4eff92e23c5014eb70c4420d6a4050d7090719b46d4c5fc60eb3",
+  "output_sha256": "0eab1cff66f30b541b922e5377e8c2689751bc9fe4d49936bc9c05787495c647",
+  "semantic_review": "pending"
+}

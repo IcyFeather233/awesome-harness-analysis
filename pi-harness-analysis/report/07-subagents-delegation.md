@@ -1,43 +1,36 @@
-# 07 Subagent 与 Delegation
+# 子代理与多进程编排
 
-![Subagent topology](../diagrams/generated/pi-subagent-topology.png)
+![Pi 的可选 subagent extension 与实验性 orchestrator](../diagrams/generated/pi-subagent-topology.png)
 
-> 图 6（gpt-image-2 读者插图）：核心默认无 subagent；可选 subagent extension 与 experimental orchestrator 是两条不同条件路径。Child 隔离 context/process 但共享 cwd/workspace，orchestrator 不是 loop delegation。图像的 prompt、output hash 与语义审查见[生成图 metadata](../diagrams/generated/metadata.json)；topology 结论来自[Harness IR](../hir.json)和下列 Evidence IDs。Evidence: `D-004`, `D-006`, `D-010`, `S-015`, `S-016`。
+图展示源码中的两条可选路径：subagent extension 启动独立 child 并默认共享 cwd；orchestrator 管理独立 RPC Pi 实例。OPT 表示可选扩展，EXP 表示实验性实现，RPC 是进程间命令与事件通道。本次未运行这两条路径；证据：D-004、D-006、D-010、S-015、S-016。图片经本次复核后继续使用，[提示词与审核记录](../diagrams/generated/metadata.json)。
 
-## 默认核心
+Pi v0.80.7 的默认 Coding Agent 不提供内置 subagent 工具。仓库另有 subagent extension 示例和实验性 orchestrator：前者让模型通过一个工具委托任务，后者管理多个 RPC Pi 实例。[D: D-004, D-006, D-010]
 
-Coding Agent README 明确写出 “No sub-agents”。默认 tool registry 不会自动出现 delegation，也没有父子 context/session 协议。[C: C-013]
+## Subagent extension 怎样启动任务
 
-## 示例 extension
+父代理调用 extension 注册的 `subagent` 工具后，示例按 agent name 找到定义，把任务交给一个独立 Pi 子进程。参数包括 `--mode json -p --no-session`；定义中的 model/tools 可进入子进程参数，system prompt 通过临时文件追加。
 
-`examples/extensions/subagent` 注册一个 `subagent` tool：
+`getPiInvocation()` 尝试复用当前脚本与 runtime，或使用打包后的可执行文件，最后回退到 PATH 中的 `pi`。子进程 cwd 由任务参数指定，未指定时使用 parent 的默认 cwd。`spawn` 没有设置独立 env，因此通常继承父进程环境。[S: S-015]
 
-- single、parallel（最多 8 task、并发 4）和 chain；
-- 每个 child 为独立 `pi --mode json -p --no-session` 进程；
-- system prompt 写入 mode `0600` 临时文件并 append；
-- child 默认 cwd 与 parent 相同，可覆盖；
-- 解析 child JSON events，聚合 usage/tool calls/final output；
-- abort 先 SIGTERM，5 秒后尝试 SIGKILL；
-- parallel 返回每 task 最多 50KB 到 parent context，完整值留在 details。
+源码：[runSingleAgent](https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/examples/extensions/subagent/index.ts#L268)。
 
-因此隔离的是 **context/process**，不是 workspace 或权限。child 默认继承进程环境，工具能力由 agent definition 的 model/tools 字段控制。[S: S-015]
+## 隔离和共享分别发生在哪里
 
-| 属性 | Parent -> example child 的默认关系 | 可配置点 | 安全含义 |
-|---|---|---|---|
-| Process | 独立 `pi --mode json -p --no-session` 子进程 | agent definition 可改 model/tools/cwd | process crash/context 隔离；仍通常是同一 OS user |
-| Context/history | child 新建 transcript，不继承 parent 全量 history | system prompt 临时文件、task/chain 前序输出显式传入 | parent 中间 history 不自动泄漏；传入文本仍可能含敏感信息 |
-| Session | `--no-session`，child 不写普通 durable session | 示例实现固定 | child 结果靠 parent toolResult 回收；无法靠 child session resume |
-| Cwd/workspace | 默认与 parent 相同 | agent definition 可覆盖 cwd | 并行 child 可竞争同一文件；context 隔离不等于 workspace 隔离 |
-| Environment/credentials | 继承启动进程环境 | 需由容器或 spawn env 显式收窄 | child 可能拥有与 parent 相同 provider key 和主机能力 |
-| Tool surface | agent definition 的 `tools` allowlist | 每个 agent 可不同 | 限制模型可调用的命名工具，但不构成 OS sandbox |
-| Concurrency | parallel 最多 8 tasks、并发 4 | 示例常量/模式 | 控制资源量，不解决共享文件冲突 |
-| Cancellation | abort -> SIGTERM；5 秒后尝试 SIGKILL | 固定示例行为 | 可清理进程树，但未证明所有 child 副作用可回滚 |
-| Return to parent | final/tool usage/details；parallel 每 task context 最多 50KB | 完整结果保留在 details | 控制 parent context 体积，不等于 durable artifact store |
+| 维度 | 示例中的行为 |
+|---|---|
+| 进程 | 每个任务启动独立 Pi 子进程 |
+| 模型上下文 | 新建 child 消息，不自动复制 parent 全部 history；task 和 chain 的前序输出显式传入 |
+| 会话文件 | `--no-session`，通过父工具结果回收输出 |
+| 工作区 | 默认共享 cwd，也可由单项任务覆盖 |
+| 权限与环境 | 通常同一 OS user，继承进程环境；工具名单不构成 OS sandbox |
+| 返回通道 | 解析 JSON 事件，收集 assistant 消息、usage、工具调用和最终结果 |
 
-Project-local agent prompt 是 repo-controlled；interactive mode 可确认，但 headless 退化路径本轮未验证。
+示例支持 single、parallel 和 chain。parallel 的任务数与并发数由示例常量限制；chain 逐项把前序结果传给下一项。它们改变任务组织方式，没有自动为共享文件建立冲突管理。
 
-## Experimental orchestrator
+取消时示例向直接 child 发送 SIGTERM，五秒后按 `proc.killed` 条件尝试 SIGKILL。该标记与进程是否真正退出不是同一个判断；这里没有运行挂起进程测试，因此不把这一逻辑写成保证清理整个进程树。[S: S-015]
 
-`OrchestratorSupervisor` 创建一个 RPC Pi child per instance，复用 events/UI request，持久化 instance/session metadata，并在意外退出时标 error/清理 Radius presence。restart recovery 只是把原 online/starting 记录标 stopped，没有恢复 in-flight child。[C: C-018]
+## Orchestrator 管理的是实例
 
-它更像 multi-session process supervisor，不是 agent loop 中的 parent/child delegation primitive。
+`OrchestratorSupervisor` 为每个 instance 创建 RPC Pi 进程，转发事件和 UI 请求，维护 instance/session 元数据并处理进程退出。启动恢复会把先前处于 online/starting 的记录标为 stopped；这不恢复子进程当时的在途模型请求。[S: S-016]
+
+这两条路径本次均为静态复核，未启动 child 或 orchestrator。它们的入口、context、工作区和恢复语义与默认单 session 路径分开记录。

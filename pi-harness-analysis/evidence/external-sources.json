@@ -1,0 +1,322 @@
+{
+  "schema_version": "1.0",
+  "target_commit": "818d67457cdd6b60bce6b121d16b23141c252dd8",
+  "scope": "Current AgentSession path; no new generic harness or newer-release feature adoption",
+  "search_queries": [
+    "pi coding agent harness architecture Mario Zechner blog extensions minimal agent",
+    "pi agent harness architecture analysis blog AgentSession context compaction",
+    "pi coding agent harness 设计 解读 博客",
+    "What I learned building an opinionated and minimal coding agent",
+    "Armin Ronacher Pi harness context",
+    "pi coding agent experience blog extensions tree"
+  ],
+  "selection": "Read original author/practitioner pages and source-linked explanations; trace repeated opinions back to their original publication. Use versioned local source for behavior. No article rankings or benchmark gains are adopted as Pi results.",
+  "sources": [
+    {
+      "id": "B-01",
+      "author": "Mario Zechner",
+      "title": "What I learned building an opinionated and minimal coding agent",
+      "url": "https://mariozechner.at/posts/2025-11-30-pi-coding-agent/",
+      "published_on": "2025-11-30",
+      "retrieved_on": "2026-10-21",
+      "source_role": "author_design_essay",
+      "version_scope": "早期实现，未固定本报告 commit",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "adopt",
+      "reading_note": "控制上下文、检查交互；工具内容与显示数据分工。",
+      "topics": [
+        "motivation",
+        "tools",
+        "context"
+      ],
+      "qualification": null,
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-02",
+      "author": "Armin Ronacher",
+      "title": "Pi: The Minimal Agent Within OpenClaw",
+      "url": "https://lucumr.pocoo.org/2026/1/31/pi/",
+      "published_on": "2026-01-31",
+      "retrieved_on": "2026-10-21",
+      "source_role": "first_person_practice",
+      "version_scope": "早期使用体验，未固定 commit",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "adopt",
+      "reading_note": "扩展状态、热重载和树状会话支持迭代工作流。",
+      "topics": [
+        "extensions",
+        "sessions"
+      ],
+      "qualification": null,
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-03",
+      "author": "Mario Zechner",
+      "title": "What if you don’t need MCP at all?",
+      "url": "https://mariozechner.at/posts/2025-11-02-what-if-you-dont-need-mcp/",
+      "published_on": "2025-11-02",
+      "retrieved_on": "2026-10-21",
+      "source_role": "author_design_essay",
+      "version_scope": "浏览器工具案例；非 v0.80.7 实验",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "adopt",
+      "reading_note": "通过按需读取说明和脚本组合提供额外能力。",
+      "topics": [
+        "tools",
+        "skills",
+        "MCP"
+      ],
+      "qualification": null,
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-04",
+      "author": "Mario Zechner",
+      "title": "MCP vs CLI: Benchmarking Tools for Coding Agents",
+      "url": "https://mariozechner.at/posts/2025-08-15-mcp-vs-cli/",
+      "published_on": "2025-08-15",
+      "retrieved_on": "2026-10-21",
+      "source_role": "author_experiment_report",
+      "version_scope": "Claude Code 与终端工具比较；不是 Pi 评测",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "qualify",
+      "reading_note": "原实验没有给出 CLI 对 MCP 的普遍胜负结论。",
+      "topics": [
+        "evaluation",
+        "MCP"
+      ],
+      "qualification": null,
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-05",
+      "author": "Haochuan",
+      "title": "Pi’s Small Agent Harness: Queues, Session Trees, and an Honest Security Boundary",
+      "url": "https://blog.haochuanz.net/posts/agent-harness-04-pi",
+      "published_on": "2026-08-25",
+      "retrieved_on": "2026-10-21",
+      "source_role": "original_code_interpretation",
+      "version_scope": "文章声明 8fa7eebd2353；与 818d674 不同",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "adopt_with_correction",
+      "reading_note": "双队列对应两种输入时机；压缩预算术语需修正。",
+      "topics": [
+        "queues",
+        "sessions",
+        "security"
+      ],
+      "qualification": "reserveTokens 与 keepRecentTokens 在目标源码中是两个参数。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-06",
+      "author": "Shilin",
+      "title": "Inside Pi Agent",
+      "url": "https://edward40.com/p/pi-agent-internal/",
+      "published_on": "2026-07-21",
+      "retrieved_on": "2026-10-21",
+      "source_role": "original_code_interpretation",
+      "version_scope": "发布日期接近，但源码链接未固定本报告 commit",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "adopt_with_qualification",
+      "reading_note": "应用消息与 provider 格式分离；据此追查数据转换。",
+      "topics": [
+        "context",
+        "tools",
+        "compaction"
+      ],
+      "qualification": "follow-up 在本版本可于 agent_end 前消费，不能概括为等到产品 settled 才开始。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-07",
+      "author": "Rememorio",
+      "title": "Why Pi Treats a Coding Agent as an Extensible Harness",
+      "url": "https://rememorio.github.io/blog/agent-framework/en/pi-agent-harness/",
+      "published_on": null,
+      "retrieved_on": "2026-10-21",
+      "source_role": "original_code_interpretation",
+      "version_scope": "明确固定 v1.0.0 / a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "version_reference",
+      "reading_note": "可参考存储历史、分支、请求三种视图的阅读方式。",
+      "topics": [
+        "version_boundaries",
+        "context"
+      ],
+      "qualification": "prepareRequest、context_edit 等 1.0 描述不回填为 v0.80.7 事实。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-08",
+      "author": "Walking Labs",
+      "title": "拆解 Pi 的 harness 设计",
+      "url": "https://walkinglabs.github.io/learn-harness-engineering/zh/harness-designs/pi/",
+      "published_on": null,
+      "retrieved_on": "2026-10-21",
+      "source_role": "original_teaching_interpretation",
+      "version_scope": "未固定版本，混合主项目与社区扩展",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "qualify",
+      "reading_note": "扩展可编程性是有用视角；接口名须逐项核查。",
+      "topics": [
+        "extensions",
+        "context"
+      ],
+      "qualification": "SYSTEM.md 唯一入口、agent/pre-step 等表述不能直接用于此版本。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-09",
+      "author": "Kahtaf Alam",
+      "title": "Lessons from Building a Domain Agent",
+      "url": "https://kahtaf.com/blog/lessons-from-building-a-domain-agent/",
+      "published_on": "2026-06-22",
+      "retrieved_on": "2026-10-21",
+      "source_role": "first_person_build_log",
+      "version_scope": "OpenCandle 的应用层经验，非本报告实验",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "adopt",
+      "reading_note": "按职责和轨迹定位失败，并单独评价产物。",
+      "topics": [
+        "observability",
+        "evaluation"
+      ],
+      "qualification": null,
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-10",
+      "author": "Scott Spence",
+      "title": "Building my-pi: my own Claude Code alternative with Pi",
+      "url": "https://scottspence.com/posts/building-my-pi-claude-code-alternative-with-pi",
+      "published_on": "2026-04-26",
+      "retrieved_on": "2026-10-21",
+      "source_role": "first_person_build_log",
+      "version_scope": "持续更新的 my-pi 派生配置，未固定 Pi commit",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "adopt",
+      "reading_note": "telemetry 区分运行故障与已完成但答错的结果。",
+      "topics": [
+        "observability",
+        "extensions"
+      ],
+      "qualification": "其扩展能力和个人对照结果不代表 stock Pi 或同模型受控实验。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-11",
+      "author": "Julian Prokay",
+      "title": "pi: The Coding Agent For Your Workflow",
+      "url": "https://jprokay.com/post/018-pi-coding-agent",
+      "published_on": "2026-02-15",
+      "retrieved_on": "2026-10-21",
+      "source_role": "first_person_build_log",
+      "version_scope": "自建 pic CLI / task extension",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "adopt",
+      "reading_note": "任务状态由 CLI/SQLite 管理，extension 负责交互。",
+      "topics": [
+        "extensions",
+        "workflow"
+      ],
+      "qualification": null,
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-12",
+      "author": "Alexander Holbreich",
+      "title": "Pi: A coding agent for engineers who own their tools",
+      "url": "https://alexander.holbreich.org/posts/2026/pi-coding-agent/",
+      "published_on": "2026-06-03",
+      "retrieved_on": "2026-10-21",
+      "source_role": "first_person_opinion",
+      "version_scope": "未固定版本，含当时产品与价格比较",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "background",
+      "reading_note": "定制能力伴随维护工作流的投入。",
+      "topics": [
+        "product_tradeoffs"
+      ],
+      "qualification": "不采用跨产品排名、价格或价值占比；四工具说法按默认集合理解。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-13",
+      "author": "DeepakNess",
+      "title": "Setting Up and Using the Pi Coding Agent",
+      "url": "https://deepakness.com/blog/pi-agent-setup",
+      "published_on": "2026-05-29",
+      "retrieved_on": "2026-10-21",
+      "source_role": "first_person_usage",
+      "version_scope": "页面标注更新 2026-08-14；个人配置含扩展",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "background",
+      "reading_note": "日常使用涉及模型选择、队列和定制界面。",
+      "topics": [
+        "usage",
+        "queues"
+      ],
+      "qualification": "个人成本案例未复现，不作为本报告性能证据。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-14",
+      "author": "DevOpsTales",
+      "title": "Pi Coding Agent Review: A Minimal Harness You Finish Yourself",
+      "url": "https://devopstales.github.io/ai/pi-coding-agent-review/",
+      "published_on": "2026-09-07",
+      "retrieved_on": "2026-10-21",
+      "source_role": "review",
+      "version_scope": "声明对齐 v0.84.2；晚于目标版本",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "version_reference",
+      "reading_note": "阅读其上手与治理讨论，机制仍核对本地版本。",
+      "topics": [
+        "version_boundaries",
+        "security"
+      ],
+      "qualification": "不采用主观评分或把后续版本配置回填到 v0.80.7。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-15",
+      "author": "PiLot Studio",
+      "title": "Pi Coding Agent: Why a Minimal, Extensible Harness Wins",
+      "url": "https://www.pivscode.com/blog/pi-minimal-extensible-coding-agent/",
+      "published_on": "2026-09-23",
+      "retrieved_on": "2026-10-21",
+      "source_role": "product_vendor_interpretation",
+      "version_scope": "VS Code 产品方文章，主要转述作者论点",
+      "reading_status": "relevant_sections_reviewed",
+      "integration": "qualify",
+      "reading_note": "可作生态入口；默认工具数与 registry 数需区分。",
+      "topics": [
+        "tools",
+        "embedding"
+      ],
+      "qualification": "四个 built-in 的概括不符合本版本七个已定义工具；标题中的优势不是受控结果。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    },
+    {
+      "id": "B-16",
+      "author": "Matteo Chieppa",
+      "title": "Pi Coding Agent: A Minimal, Extensible Stack",
+      "url": "https://www.matteochieppa.com/en/blog/pi-coding-agent-complete-guide",
+      "published_on": "2026-04-05",
+      "retrieved_on": "2026-10-21",
+      "source_role": "guide",
+      "version_scope": "搜索摘要声明 2026-04-27 / v0.70.2；正文读取受客户端渲染限制",
+      "reading_status": "metadata_and_search_excerpt_only",
+      "integration": "screened_only",
+      "reading_note": "检索用于发现工具/资源分层线索，未据此新增机制结论。",
+      "topics": [
+        "discovery"
+      ],
+      "qualification": "只读到页面元数据和搜索摘要，未声称完整阅读全文。",
+      "primary_for": "the named author’s own explanation or experience; implementation checked separately"
+    }
+  ]
+}

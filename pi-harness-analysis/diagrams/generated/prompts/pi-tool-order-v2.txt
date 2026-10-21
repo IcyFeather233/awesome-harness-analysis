@@ -1,0 +1,9 @@
+Create a precise educational infographic for a Chinese technical architecture report. This is a reader illustration of Pi v0.80.7, NOT a speculative design. Use a warm white background, navy text, restrained coral for orchestration, blue for model/tool processing, green for state. Flat vector-like icons, clean rounded cards, strong spacing, no gradients or watermarks. Large readable labels, English identifiers exactly as given; short Chinese subtitles. All necessary facts are specified below. Add no components, arrows, safety shields or claims. Do not connect adjacent cards unless an arrow is explicitly specified. No legend unless requested. Landscape composition, 1536x1024. Use very few words; captions outside the image will carry evidence and scope.
+
+Title: "Pi：执行完成顺序与回填顺序".
+Three equally spaced panels arranged left to right. A single large arrow connects each panel to the next.
+Panel 1 heading "模型调用顺序". Two cards vertically: "1  Tool A" and "2  Tool B". Use blue.
+Panel 2 heading "并行执行示例". Two horizontal time bars starting at the same vertical line: A long bar labeled "A：较晚完成" and B short bar labeled "B：先完成". These are qualitative timings, no numbers. Under the bars one large label "完成事件：B → A". Use light blue and navy. No semantic edges between A and B.
+Panel 3 heading "模型下轮看到". Two stacked green message cards: "1  result A" then "2  result B". Under them a large label "回填顺序：A → B".
+At the very bottom, a separate amber note, not connected by arrows: "tool_execution_start 先于校验；收到事件不等于 handler 已执行".
+This is an illustrative two-tool batch, not a measured latency chart. Do not add a performance gain, speed number, permission shield, external API, or sequential execution arrows between the time bars.

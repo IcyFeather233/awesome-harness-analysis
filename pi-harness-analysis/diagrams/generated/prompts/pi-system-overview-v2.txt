@@ -1,0 +1,11 @@
+Create a precise educational infographic for a Chinese technical architecture report. This is a reader illustration of Pi v0.80.7, NOT a speculative design. Use a warm white background, navy text, restrained coral for orchestration, blue for model/tool processing, green for state. Flat vector-like icons, clean rounded cards, strong spacing, no gradients or watermarks. Large readable labels, English identifiers exactly as given; short Chinese subtitles. All necessary facts are specified below. Add no components, arrows, safety shields or claims. Do not connect adjacent cards unless an arrow is explicitly specified. No legend unless requested. Landscape composition, 1536x1024. Use very few words; captions outside the image will carry evidence and scope.
+
+Title: "Pi：一次请求的执行路径".
+Upper row, left to right, three coral cards with small neutral icons:
+"CLI / JSON / RPC" -> "AgentSession" (subtitle "输入、重试与压缩") -> "Agent + runAgentLoop" (subtitle "消息状态与工具循环"). Exactly two forward arrows in this row.
+Below the rightmost card, two separate blue cards side by side:
+left "ModelRegistry + compat" (subtitle "模型请求入口"), right "Tools" (subtitle "校验、hook、execute").
+From "Agent + runAgentLoop" draw an arrow DOWN to "ModelRegistry + compat" labeled "request" and a separate return arrow UP labeled "assistant". From "Agent + runAgentLoop" draw an arrow DOWN to "Tools" labeled "toolCall" and a separate return arrow UP labeled "toolResult". Use clean routing with visible arrowheads and no crossings. The model and tools do NOT connect directly to each other.
+Below AgentSession at lower left, one green card "SessionManager" (subtitle "会话树与 JSONL"). Only an arrow from AgentSession down to SessionManager labeled "append / rebuild". This is a responsibility summary, not a disk-write timing diagram.
+Bottom-right a small detached gray note: "新 AgentHarness：独立迁移路径". No arrows to or from this note; it is NOT on the current CLI path.
+No workspace or sandbox boundaries in this figure. Exactly six main cards plus one detached note. Never draw a Model -> Tools arrow. Never draw a generic AgentHarness -> AgentSession arrow.

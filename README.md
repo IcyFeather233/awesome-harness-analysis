@@ -6,14 +6,16 @@
 
 它不是普通的代码 Wiki，也不只是文件树和调用关系摘要。每个分析都会先冻结到明确的 tag/commit，再结合静态源码调查、真实模型场景、scripted model、定向测试或故障实验，逐步恢复 harness 的设计框架与实际执行逻辑。
 
-![Pi agent harness overview](pi-harness-analysis/diagrams/generated/pi-system-overview.png)
+从 [Pi Agent Harness 分析报告](pi-harness-analysis/report/index.md) 开始，跟着一次读取配置的任务，理解模型怎样调用工具、处理失败并延续会话。
+
+![Pi 当前产品执行路径](pi-harness-analysis/diagrams/generated/pi-system-overview-session-only.png)
 
 ## 分析方法
 
-`harness-analysis-skill` 将分析过程组织为一套证据驱动的架构恢复流程：
+`harness-analysis-skill` 将分析过程组织为一套证据驱动的架构分析流程：
 
 1. **冻结研究对象**：记录仓库 tag、commit、入口、运行时、provider 和启用配置。
-2. **静态架构恢复**：调查 agent loop、context、tools、permissions、sandbox、subagents、session、recovery 和 observability。
+2. **静态架构分析**：调查 agent loop、context、tools、permissions、sandbox、subagents、session、recovery 和 observability。
 3. **结构化证据**：区分文档证据（D）、静态源码（S）、真实运行（R）、控制实验（X）和分析推断（I）。
 4. **主动运行验证**：在隔离环境中运行代表场景，用真实 trace 或定向测试验证关键路径和反例。
 5. **Harness IR**：将组件、状态、边界和执行关系整理成统一的中间表示，使报告、图和证据保持一致。
@@ -26,14 +28,15 @@
 
 | Agent harness | 冻结版本 | 分析入口 | 简要结论 |
 |---|---|---|---|
-| [earendil-works/pi](https://github.com/earendil-works/pi) | `v0.80.7` / `818d674` | [Pi Agent Harness 架构恢复报告](pi-harness-analysis/report/index.md) | 薄核心、强扩展、外部隔离；当前 `AgentSession` 与新 `AgentHarness` 构成一条尚未完成的迁移线 |
-| [openai/codex](https://github.com/openai/codex) | `rust-v0.144.5` / `87db9bc` | [Codex Harness 架构恢复报告](codex-harness-analysis/report/index.md) | 以 thread/session 为耐久边界、turn 为调度边界、policy+sandbox 为副作用边界；工具 exposure、world-state diff 和条件 multi-agent 是主要复杂度来源 |
-| Claude Code source snapshot | commit `16a676f`（无 tag） | [Claude Code Harness 架构恢复报告](claude-code-harness-analysis/report/index.md) | 共享 `query()` 驱动交互与 headless；source-only 快照缺失构建清单和 657 个相对 import，报告明确标为静态恢复 |
+| [earendil-works/pi](https://github.com/earendil-works/pi) | `v0.80.7` / `818d674` | [Pi Agent Harness 分析报告](pi-harness-analysis/report/index.md) | `AgentSession → Agent → runAgentLoop` 是当前产品主线；报告解释工具排序、消息转换、压缩与延迟落盘 |
+| [openai/codex](https://github.com/openai/codex) | `rust-v0.144.5` / `87db9bc` | [Codex Harness 分析报告](codex-harness-analysis/report/index.md) | 以 thread/session 为耐久边界、turn 为调度边界、policy+sandbox 为副作用边界；工具 exposure、world-state diff 和条件 multi-agent 是主要复杂度来源 |
+| Claude Code source snapshot | commit `16a676f`（无 tag） | [Claude Code Harness 分析报告](claude-code-harness-analysis/report/index.md) | 共享 `query()` 驱动交互与 headless；source-only 快照缺失构建清单和 657 个相对 import，报告明确标为静态恢复 |
 
-Pi 分析同时提供：
+Pi 的[主文](pi-harness-analysis/report/index.md)适合连续阅读，[专题索引](pi-harness-analysis/report/reading-guide.md)用于深入查证：
 
-- [设计空间与贯穿案例](pi-harness-analysis/report/00-design-space-and-running-example.md)
-- [核心循环与编排](pi-harness-analysis/report/03-core-loop.md)
+- [一次请求的运行过程](pi-harness-analysis/report/00-task-walkthrough.md)
+- [外部解读与源码对照](pi-harness-analysis/report/17-external-perspectives.md)
+- [核心循环与工具执行](pi-harness-analysis/report/03-core-loop.md)
 - [上下文、记忆与压缩](pi-harness-analysis/report/04-context-memory-compaction.md)
 - [权限、sandbox 与 workspace](pi-harness-analysis/report/06-permissions-sandbox-workspace.md)
 - [运行实验](pi-harness-analysis/report/11-runtime-experiments.md)

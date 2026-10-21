@@ -1,44 +1,39 @@
-# 01 范围与方法
+# 范围与方法
 
-## 冻结对象
+本报告分析 `earendil-works/pi` 的 `v0.80.7`，commit 为 `818d67457cdd6b60bce6b121d16b23141c252dd8`。2026-10-20 复核时，本地 checkout 与该 commit 一致，工作区干净。本轮聚焦当前 Coding Agent 的 `AgentSession → Agent → runAgentLoop` 路径，以及直接支撑它的模型、工具、上下文和会话服务。
 
-- Repository：`https://github.com/earendil-works/pi`
-- Tag：`v0.80.7`
-- Commit：`818d67457cdd6b60bce6b121d16b23141c252dd8`
-- Worktree：detached HEAD，分析开始和结束时目标代码无 tracked changes
-- Runtime：Linux x86_64；临时 Node `22.19.0`；npm `10.9.3`；Vitest `4.1.9`
-- Real model：`siflow/qwen3.6-35ba3b`，OpenAI-compatible endpoint；无 API key
+## 本次做了什么
 
-完整配置见 [manifest.json](../manifest.json)。
+重新跟踪了 `AgentSession → Agent → runAgentLoop`，检查工具 preflight/执行/回填、消息事件与持久化的顺序、模型兼容入口、动态配置刷新、压缩条件，以及 session 文件创建和分支重建。随后在固定源码的临时副本中执行定向测试，产物保存到 `traces/checks/`。其中 mock/faux 用确定性的测试响应替代真实模型，以便触发指定分支；preflight 指执行工具前的查找、参数校验和 hook 判断。
 
-## 证据等级
+历史报告中的真实 SiFlow 文本、read 和跨进程 resume 场景继续保留。本次没有重新调用外部模型。`manifest.execution` 描述历史运行配置，`manifest.review` 描述本次复核，二者的证据时间和验证范围分别记录。
 
-| 标记 | 证据来源 | 可以建立 | 不能单独建立 | 本报告实例 |
-|---|---|---|---|---|
-| `D` | 固定 commit 的仓库文档 | 明确产品边界、公开设计立场、已知未完成项 | 代码一定实现文档描述，或生产默认启用 | security、extension、AgentHarness lifecycle 文档 |
-| `S` | 固定 commit 源码与测试 contract | 类型、控制流、condition 和可到达路径 | 该路径在本轮运行过，或生产出现频率 | `runAgentLoop`、`AgentSession`、JSONL v3 |
-| `R` | 真实 SiFlow + official Pi runtime | 命名配置下一次确实发生的路径和事件顺序 | 其他 provider/mode/tool/platform 等价 | text、read-tool、跨进程 resume |
-| `X` | faux provider/定向 test suite | controller 分支、顺序、反例和失败 contract | 真实模型质量或部署安全 | 39 + 61 + 31 tests |
-| `I` | 多条 D/S/R/X 的分析综合 | 明示 tradeoff、风险和下一步实验 | 作者意图或 HIR 中的直接事实 | workspace/session 缺少共同 checkpoint 的后果 |
+## 证据怎样阅读
 
-每条 claim 都有 falsification test；每个 HIR node/edge 都有 evidence ID。严格 validator 结果为 `0 errors, 0 warnings`。
+| 标记 | 来源 | 阅读方式 |
+|---|---|---|
+| D | 目标仓库文档 | 支持公开说明的行为或产品立场 |
+| S | 固定版本源码 | 支持实现路径、数据结构与触发条件 |
+| R | 历史真实模型运行 | 支持指定配置中实际出现的路径 |
+| X | mock/faux、定向或故障测试 | 支持执行过的具体断言 |
+| I | 分析推断 | 与实现事实分开陈述 |
 
-## 动态安全边界
+`C-xxx` 是结论编号，链接到支持它的证据。`runtime_verified` 表示相应路径有运行证据，并不表示组件的全部配置都经过测试。报告以机制解释为主，设计评价留给后续分析。
 
-所有真实 model runs 使用：
+## 对旧分析的实质修订
 
-- `/tmp/pi-analysis-runtime/home` 作为独立 HOME；
-- `/tmp/pi-analysis-runtime/fixture` 作为合成 workspace；
-- `/tmp/pi-analysis-runtime/sessions` 作为合成 session store；
-- `--no-extensions --no-skills --no-prompt-templates --no-context-files --no-approve`；
-- 无工具或只开放 `read`；
-- 不运行 write/edit/bash；
-- raw trace 只包含合成内容，normalized trace 删除 prompt、thinking、工具参数和文件内容。
+模型入口分别说明 `ModelRegistry/compat` 及其内置模型分派。`compat` 自身还会在内置模型路径中使用 `Models`，因此两者的关系需要按分派条件解释，详见[模型接口](05-models-tools-extensions.md)。这一处已同步修正 C-019、HIR 和[冲突记录](../evidence/conflicts.jsonl)。
 
-## 解释边界
+压缩章节补上两种此前容易混淆的情况：成功 stop 响应 usage 越界时压缩但不重答；threshold 压缩后如果有排队输入，仍可继续处理。持久化章节补上首条 assistant 才触发新文件写入的条件。事件章节区分工具开始通知与 handler 真实执行。
 
-`R` 只能证明某路径在指定模式中发生过一次，不能证明生产频率或所有配置。没有运行到的 path 仍可能存在；没有在源码中找到的行为也不能在 coverage 不完整时直接判定为不存在。设计“为什么”仅在文档明确说明时归为 documented intent，否则只讨论可观察 tradeoff。
+## 本次运行环境
 
-## 覆盖
+使用官方 Node 22.19.0，并按官方 SHASUMS256 校验归档。测试复用本机已有依赖；源码由 `git archive` 导出到临时目录，缓存关闭，临时配置和测试数据分开保存。测试子进程没有继承模型凭据环境变量，选用 mock/faux；这里采用临时目录隔离，未配置 OS 网络沙箱。脚本及各组命令、返回码和结果见[复现方法](13-coverage-reproducibility.md)。
 
-14 个 codebook 模块全部有状态：interfaces/core loop/model/tools/session/recovery 等为 analyzed；context、sandbox、subagents、observability 为 partial。详细文件与未覆盖面见 [coverage.json](../evidence/coverage.json)。
+本次不覆盖跨平台 sandbox、真实长上下文质量、生产运行频率、subagent 文件竞争或实际进程崩溃恢复。这些问题保留在[待验证路径](12-failure-modes-open-questions.md)，不影响已查明的具体源码顺序。
+
+## 外部阅读的使用方式
+
+本次检索筛选 16 篇作者文章、使用记录和技术解读，阅读了其中 15 篇的相关正文；1 篇只取得元数据与搜索摘要。来源、日期、版本和采用方式记录在 [external-sources.json](../evidence/external-sources.json)。多篇文章转述同一作者，不计为相互独立的验证。
+
+作者关于自身设计目的的陈述记为 D；社区和使用者的解释记为署名观点或 I。实现细节仍以本地 `818d674` 的源码为依据。阅读促成了工具结果分流、reload 顺序和压缩预算的补充核查，新增 C-027 至 C-029；本轮没有新增运行实验或性能比较。

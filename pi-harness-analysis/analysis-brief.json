@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "mode": "focused",
+  "objective": "解释当前 AgentSession → Agent → runAgentLoop 的代码实现，以及上下文、工具、事件、会话持久化与恢复。",
+  "selected_questions": [
+    "AgentSession、Agent、runAgentLoop 分别持有什么状态？",
+    "工具准备、执行完成、结果回填和 session append 按什么顺序发生？",
+    "应用消息怎样变为 provider messages，动态配置何时刷新？",
+    "压缩、重试、排队输入如何共同决定 settled？",
+    "新会话何时创建文件，branch/resume 如何选择上下文？"
+  ],
+  "excluded_topics": [
+    "新 AgentHarness 的实现、对比与迁移",
+    "最新版本迁移",
+    "跨产品优劣排名",
+    "成本或成功率优化实验"
+  ],
+  "evidence_boundary": "新验证使用本地 mock/faux；历史真实模型记录保留原日期与配置。",
+  "presentation": {
+    "primary_article": "report/index.md",
+    "format": "explanatory blog",
+    "reference_guide": "report/reading-guide.md",
+    "approach": "Task-led narrative, terminology introduced in context, detailed evidence in linked references."
+  }
+}

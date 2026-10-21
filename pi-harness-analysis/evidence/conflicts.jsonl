@@ -1,0 +1,1 @@
+{"description": "旧正文将新 Models API 的描述直接用于 Coding Agent 模型路径，缺少 ModelRegistry/compat 入口及内置/自定义分派条件。", "evidence_ids": ["S-012", "S-024"], "id": "CF-001", "record_type": "conflict", "resolution": "修正 C-019、模型章节和 HIR，分别说明 ModelRegistry/compat 入口及 compat 的内置/自定义分派条件。", "status": "resolved", "subject_id": "C-019"}

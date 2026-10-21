@@ -1,0 +1,274 @@
+{
+  "schema_version": "1.0",
+  "figures": [
+    {
+      "id": "pi-system-overview-v2",
+      "question": "当前 Coding Agent 如何驱动模型与工具循环，并保存会话？",
+      "evidence_ids": [
+        "S-001",
+        "S-002",
+        "S-008",
+        "S-019",
+        "S-024",
+        "R-002"
+      ],
+      "hir_ids": [
+        "N-CLI",
+        "N-AgentSession",
+        "N-LowLoop",
+        "N-Models",
+        "N-ToolRegistry",
+        "N-SessionStore"
+      ],
+      "exclusions": [
+        "不表示模型直接执行工具",
+        "不展示默认 sandbox",
+        "不展开新 AgentHarness",
+        "不表示每条消息立即落盘"
+      ],
+      "glossary": {
+        "AgentSession": "当前产品编排",
+        "Agent + runAgentLoop": "内存状态包装与模型工具循环",
+        "compat": "当前模型兼容分派入口",
+        "SessionManager": "会话树与文件管理"
+      },
+      "prompt_file": "prompts/pi-system-overview-v2.txt",
+      "file": "pi-system-overview-v2.png",
+      "required_semantics": [
+        "不表示模型直接执行工具",
+        "不展示默认 sandbox",
+        "不展开新 AgentHarness",
+        "不表示每条消息立即落盘"
+      ],
+      "exact_text": [
+        "Pi：一次请求的执行路径",
+        "CLI / JSON / RPC",
+        "AgentSession",
+        "Agent + runAgentLoop",
+        "ModelRegistry + compat",
+        "Tools",
+        "SessionManager",
+        "新 AgentHarness：独立迁移路径"
+      ],
+      "required_edges": [
+        "CLI -> AgentSession",
+        "AgentSession -> Agent + runAgentLoop",
+        "loop -> ModelRegistry + compat (request)",
+        "ModelRegistry + compat -> loop (assistant)",
+        "loop -> Tools (toolCall)",
+        "Tools -> loop (toolResult)",
+        "AgentSession -> SessionManager (append / rebuild)"
+      ],
+      "generation_status": "accepted",
+      "exactly_once": [
+        "Pi：一次请求的执行路径",
+        "CLI / JSON / RPC",
+        "AgentSession",
+        "Agent + runAgentLoop",
+        "ModelRegistry + compat",
+        "Tools",
+        "SessionManager",
+        "新 AgentHarness：独立迁移路径"
+      ],
+      "multiplicity_notes": "JSONL icons in the persistence illustration are successive time states of the same file; identifiers in arrows/annotations may repeat."
+    },
+    {
+      "id": "pi-context-views-v3",
+      "question": "持久历史怎样变成本次模型请求，system prompt 和 tools 在哪里加入？",
+      "evidence_ids": [
+        "S-001",
+        "S-004",
+        "S-008",
+        "S-022"
+      ],
+      "hir_ids": [
+        "N-SessionStore",
+        "N-Session",
+        "N-Context",
+        "N-ModelCall"
+      ],
+      "exclusions": [
+        "不展示压缩触发条件",
+        "system prompt 和 tools 不经过消息转换函数",
+        "不展开 provider 内部格式转换"
+      ],
+      "glossary": {
+        "Active branch": "当前 leaf 的分支视图",
+        "transformContext": "消息变换 hook",
+        "convertToLlm": "应用消息转 provider 消息",
+        "Model request": "合并 messages/system/tools 的请求"
+      },
+      "prompt_file": "prompts/pi-context-views-v3.txt",
+      "file": "pi-context-views-v3.png",
+      "required_semantics": [
+        "不展示压缩触发条件",
+        "system prompt 和 tools 不经过消息转换函数",
+        "不展开 provider 内部格式转换"
+      ],
+      "exact_text": [
+        "Pi：从会话记录到模型请求",
+        "Session entries",
+        "Active branch",
+        "transformContext",
+        "convertToLlm",
+        "Model request",
+        "System prompt + Active tools",
+        "custom / summary -> user",
+        "excluded bash -> filtered"
+      ],
+      "required_edges": [
+        "Session entries -> Active branch",
+        "Active branch -> transformContext",
+        "transformContext -> convertToLlm",
+        "convertToLlm -> Model request",
+        "System prompt + Active tools -> Model request"
+      ],
+      "generation_status": "accepted",
+      "exactly_once": [
+        "Pi：从会话记录到模型请求",
+        "Session entries",
+        "Active branch",
+        "transformContext",
+        "convertToLlm",
+        "Model request",
+        "System prompt + Active tools",
+        "custom / summary -> user",
+        "excluded bash -> filtered"
+      ],
+      "multiplicity_notes": "JSONL icons in the persistence illustration are successive time states of the same file; identifiers in arrows/annotations may repeat."
+    },
+    {
+      "id": "pi-tool-order-v2",
+      "question": "并行工具为何有执行完成顺序和回填顺序两种顺序？",
+      "evidence_ids": [
+        "S-018",
+        "X-004"
+      ],
+      "hir_ids": [
+        "N-LowLoop",
+        "N-ToolRegistry",
+        "N-Events",
+        "N-Context"
+      ],
+      "exclusions": [
+        "A/B 时长是示例，不是性能测量",
+        "不展示 sequential 批次",
+        "start 事件不证明真实 handler 执行"
+      ],
+      "glossary": {
+        "tool_execution_start": "开始处理工具调用的事件",
+        "handler": "实际执行函数",
+        "回填": "将 toolResult 加入后续模型上下文"
+      },
+      "prompt_file": "prompts/pi-tool-order-v2.txt",
+      "file": "pi-tool-order-v2.png",
+      "required_semantics": [
+        "A/B 时长是示例，不是性能测量",
+        "不展示 sequential 批次",
+        "start 事件不证明真实 handler 执行"
+      ],
+      "exact_text": [
+        "Pi：执行完成顺序与回填顺序",
+        "模型调用顺序",
+        "并行执行示例",
+        "模型下轮看到",
+        "1  Tool A",
+        "2  Tool B",
+        "A：较晚完成",
+        "B：先完成",
+        "完成事件：B → A",
+        "1  result A",
+        "2  result B",
+        "回填顺序：A → B",
+        "tool_execution_start 先于校验；收到事件不等于 handler 已执行"
+      ],
+      "required_edges": [
+        "model call order panel -> parallel execution panel",
+        "parallel execution panel -> ordered results panel"
+      ],
+      "generation_status": "accepted",
+      "exactly_once": [
+        "Pi：执行完成顺序与回填顺序",
+        "模型调用顺序",
+        "并行执行示例",
+        "模型下轮看到",
+        "1  Tool A",
+        "2  Tool B",
+        "A：较晚完成",
+        "B：先完成",
+        "完成事件：B → A",
+        "1  result A",
+        "2  result B",
+        "回填顺序：A → B",
+        "tool_execution_start 先于校验；收到事件不等于 handler 已执行"
+      ],
+      "multiplicity_notes": "JSONL icons in the persistence illustration are successive time states of the same file; identifiers in arrows/annotations may repeat."
+    },
+    {
+      "id": "pi-session-first-write-v2",
+      "question": "新会话什么时候真正创建文件，之后如何追加？",
+      "evidence_ids": [
+        "S-020",
+        "X-006"
+      ],
+      "hir_ids": [
+        "N-AgentSession",
+        "N-Session",
+        "N-SessionStore"
+      ],
+      "exclusions": [
+        "范围为新建且未写过的会话",
+        "不表示 fsync 或 workspace 事务",
+        "不展开空文件/迁移重写路径"
+      ],
+      "glossary": {
+        "entry": "会话记录",
+        "JSONL": "逐行 JSON 会话文件",
+        "assistant entry": "包含 assistant 消息的会话记录",
+        "RAM": "内存中的会话记录"
+      },
+      "claim_ids": [
+        "C-023"
+      ],
+      "prompt_file": "prompts/pi-session-first-write-v3.txt",
+      "file": "pi-session-first-write-v3.png",
+      "required_semantics": [
+        "范围为新建且未写过的会话",
+        "不表示 fsync 或 workspace 事务",
+        "不展开空文件/迁移重写路径"
+      ],
+      "exact_text": [
+        "Pi：新会话的首次落盘",
+        "仅有 user / 配置记录",
+        "先保留在内存",
+        "尚未创建新文件",
+        "首条 assistant entry",
+        "JSONL",
+        "创建文件，写入已有记录",
+        "后续 entry",
+        "逐条追加",
+        "新建、尚未写过文件的持久会话",
+        "已有空文件初始化与格式迁移另有路径"
+      ],
+      "required_edges": [
+        "memory-only state -> first assistant write state",
+        "first assistant write state -> subsequent append state"
+      ],
+      "generation_status": "accepted",
+      "exactly_once": [
+        "Pi：新会话的首次落盘",
+        "仅有 user / 配置记录",
+        "先保留在内存",
+        "尚未创建新文件",
+        "首条 assistant entry",
+        "创建文件，写入已有记录",
+        "后续 entry",
+        "逐条追加",
+        "新建、尚未写过文件的持久会话",
+        "已有空文件初始化与格式迁移另有路径"
+      ],
+      "multiplicity_notes": "JSONL icons in the persistence illustration are successive time states of the same file; identifiers in arrows/annotations may repeat.",
+      "generation_file": "pi-session-first-write-v3.generation.json"
+    }
+  ]
+}
